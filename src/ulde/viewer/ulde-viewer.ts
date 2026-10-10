@@ -1,7 +1,7 @@
 // src/ulde/viewer/ulde-viewer.ts
 
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal, computed } from '@angular/core';
-import { ULDEDevtools, ULDEDevtoolsService } from '@ulde/core';
+import { ULDEDevtools, ULDEDevtoolsService } from '@ulde/devtools';
 import { ULDEFrame } from '@ulde/types/frame';
 import type { ULDERendererState } from '@ulde/types/renderer';
 import { ULDERendererService } from '@ulde/viewer';
@@ -9,14 +9,15 @@ import { isBrowser } from '../../app/global.utils/global.utils';
 
 @Component({
   selector: 'ulde-viewer',
+  standalone: true,
   imports: [
-    ULDEDevtools
+    // ULDEDevtools
   ],
   templateUrl: 'ulde-viewer.html',
   styleUrl: 'ulde-viewer.scss',
 })
 export class UldeViewer implements AfterViewInit, OnDestroy {
-  @ViewChild('viewerHost', { static: true })
+  @ViewChild('markdownHost', { static: true })
   hostRef!: ElementRef<HTMLElement>;
 
   // Full renderer state comes in as a signal input
@@ -141,26 +142,27 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     this.$rendererState.set(state); // input for UldeDevtools
   }
 
-  /**
-   * Theme Switcher
-   * @param theme
-   */
-  setTheme(theme: 'light' | 'dark') {
-    this.hostRef.nativeElement.setAttribute('data-theme', theme);
-  }
+  // /**
+  //  * Theme Switcher
+  //  * @param theme
+  //  */
+  // setTheme(theme: 'light' | 'dark') {
+  //   this.hostRef.nativeElement.setAttribute('data-theme', theme);
+  // }
 
+  // Move to devtools???
   onHighLight(message: string) {
     this.rendererService.highlightDiagnostic(message)
   }
 
-  getFrame(): ULDEFrame | null {
+  // getFrame(): ULDEFrame | null {
 
-    const frame = this.rendererService.getState()?.executionContext?.artifacts.frame;
-    if (!frame) return null;
+  //   const frame = this.rendererService.getState()?.executionContext?.artifacts.frame;
+  //   if (!frame) return null;
 
-    return frame
+  //   return frame
 
-  }
+  // }
 
 
 }

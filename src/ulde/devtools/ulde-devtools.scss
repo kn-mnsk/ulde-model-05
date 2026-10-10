@@ -1,20 +1,20 @@
 // src/ulde/core/devtools/ulde-devtools.scss
 
 .ulde-devtools-root {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 650px;
-  height: 90vh;
-  background: rgba(20, 20, 20, 0.85); // var(--ulde-background
-  color: #eee;
-  font-family: system-ui, sans-serif;
-  border-radius: 8px 8px 8px 8px;
+  // position: fixed;
+  // top: 0;
+  // right: 0;
+  // // width: 650px;
+  // // height: 90vh;
+  // background: rgba(20, 20, 20, 0.85); // var(--ulde-background
+  // color: #eee;
+  // font-family: system-ui, sans-serif;
+  // border-radius: 8px 8px 8px 8px;
   display: flex;
   flex-direction: column;
-  padding: 12px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
+  // padding: 12px;
+  // box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  // backdrop-filter: blur(6px);
   transition: opacity 0.2s ease;
   // opacity: 1.0;
   // visibility: visible;
@@ -29,8 +29,8 @@
     background: var(--ulde-background);
     color: rgb(20, 16, 16); //
     // opacity: 0;
-      // visibility: hidden;
-      // pointer-events: none;
+    // visibility: hidden;
+    // pointer-events: none;
   }
 
 }

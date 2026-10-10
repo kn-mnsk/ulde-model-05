@@ -1,7 +1,7 @@
 // src/ulde/core/ulde-plugin-registry.service.ts
 
 import { Injectable } from '@angular/core';
-import { ULDEDevtoolsService } from '@ulde/core';
+import { ULDEDevtoolsService } from '@ulde/devtools';
 import { ULDEPluginInstance, ULDEPluginFactory } from '@ulde/types/plugin';
 // import { ULDEPluginInstance, ULDEPlugin, ULDEPluginFactory } from '@ulde/types/plugin';
 

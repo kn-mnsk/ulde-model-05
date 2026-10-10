@@ -3,7 +3,7 @@
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
 import { createComponent, EnvironmentInjector } from "@angular/core";
-import { Example02 } from "../../../../app/demo/example02/example02"; // TBD
+import { Example01 } from "../../../../app/demo/example01/example01"; // TBD
 import { ULDEExecutionContext } from "@ulde/types";
 
 export class ULDEPlaygroundInjectorPlugin implements ULDEPluginInstance {
@@ -21,7 +21,7 @@ export class ULDEPlaygroundInjectorPlugin implements ULDEPluginInstance {
     const injector = (window as any).ngEnvironment as EnvironmentInjector;
 
     for (const el of placeholders) {
-      const cmpRef = createComponent(Example02, {
+      const cmpRef = createComponent(Example01, {
         hostElement: el,
         environmentInjector: injector
       });

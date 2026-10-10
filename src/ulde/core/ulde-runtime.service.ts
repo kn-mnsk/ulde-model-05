@@ -1,7 +1,7 @@
 // src/ulde/core/ulde-runtime.service.ts
 
 import { Injectable } from '@angular/core';
-import {ULDEDevtoolsService } from '@ulde/core';
+import {ULDEDevtoolsService } from '@ulde/devtools';
 import { ULDEFrame } from '@ulde/types/frame';
 
 
@@ -20,7 +20,8 @@ export class ULDERuntimeService {
 
   /**
    * Called at the end of each full lifecycle (afterRender).
-   * Orchestrates frame finalization + anomaly detection.
+   * Orchestrates fro
+   * ame finalization + anomaly detection.
    */
   finalizeFrameAndAnalyze() {
     this.devtoolsService.finalizeFrame();

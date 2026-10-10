@@ -1,5 +1,15 @@
 <!-- src/ulde/configurator/ulde-configurator.html -->
+<diV claa="ulde-configurator-container">
+  <div class="ulde-markdwon-viewer-pane">
+    <ulde-viewer [$rendererStateInput]="$rendererStateOfMarkdownViewer()" ($stateChange)="onMarkdownViewerStateChange($event)"
+      ($error)="onErrorOfMarkdownViewer($event)">
+    </ulde-viewer>
+  </div>
 
-<ulde-viewer [$rendererStateInput]="$rendererState()" ($stateChange)="onViewerStateChange($event)"
-  ($error)="onError($event)">
-</ulde-viewer>
+  
+  <div class="ulde-devtools-viewer-pane">
+    <ulde-devtools [$rendererState]="$rendererStateOfDevtoolsViewer()"></ulde-devtools>
+  </div>
+
+
+</diV>

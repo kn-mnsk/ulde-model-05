@@ -1,17 +1,17 @@
 // src/ulde/core/devtools/ulde-devtools.ts
 
 import { DatePipe, DecimalPipe, JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, input, output, signal, Signal, computed } from '@angular/core';
-import { UldeDevToolsDiagnosticsPanel, UldeDevtoolsFrameTimelinePanel, UldeDevtoolsPluginTimelinePanel, UldeDevtoolsRuntimeInspectorPanel, ULDEDevtoolsService } from '@ulde/core/devtools';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { ULDERendererState } from '@ulde/types';
-import { ULDEDevtoolsSnapshot, ULDEDevToolsTab } from '@ulde/types/devtools';
+import { ULDEDevToolsTab } from '@ulde/types/devtools';
 import { ULDEDiagnostic } from '@ulde/types/diagnostics';
 import { ULDEFrame } from '@ulde/types/frame';
 import { ULDELifecyclePhaseTiming } from '@ulde/types/lifecycle';
-import { isBrowser } from '../../../app/global.utils/global.utils';
+import { UldeDevToolsDiagnosticsPanel, UldeDevtoolsFrameTimelinePanel, UldeDevtoolsPluginTimelinePanel, UldeDevtoolsRuntimeInspectorPanel, ULDEDevtoolsService } from '.';
 
 @Component({
   selector: 'ulde-devtools',
+  standalone: true,
   imports: [
     DecimalPipe, DatePipe, JsonPipe,
     UldeDevToolsDiagnosticsPanel,
@@ -21,7 +21,7 @@ import { isBrowser } from '../../../app/global.utils/global.utils';
 
   ],
   templateUrl: './ulde-devtools.html',
-  styleUrls: ['./ulde-devtools.scss'],
+  styleUrl: './ulde-devtools.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ULDEDevtools {

@@ -2,9 +2,9 @@
 
 import { Injectable } from '@angular/core';
 import { ULDEPluginRegistryService, ULDERuntimeService } from '@ulde/core';
-import { ULDEDevtoolsService } from '@ulde/core/devtools';
-import { ULDEArtifacts, ULDEExecutionContext, ULDEPageContext, ULDERenderContext, } from '@ulde/types/context';
+import { ULDEArtifacts, ULDEExecutionContext, ULDEPageContext } from '@ulde/types/context';
 import { ULDELifecyclePhase } from '@ulde/types/lifecycle';
+import { ULDEDevtoolsService } from '../devtools';
 
 import { ULDERenderContextBuilderService } from '@ulde/engine';
 
@@ -50,7 +50,7 @@ export class ULDELifecycleService {
   * Full lifecycle execution for a page.
   */
   async executeLifecycle(pageContext: ULDEPageContext): Promise<ULDEExecutionContext | undefined> {
-  // async executeLifecycle(pageContext: ULDEPageContext): Promise<ULDERenderContext | undefined> {
+    // async executeLifecycle(pageContext: ULDEPageContext): Promise<ULDERenderContext | undefined> {
 
     // INIT
     const artifacts: ULDEArtifacts = {
