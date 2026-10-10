@@ -3,11 +3,23 @@
 {
   "compilerOptions": {
     "paths": {
+      "@ulde/configurator": [
+        "./src/ulde/configurator/index"
+      ],
+      "@ulde/configurator/*": [
+        "./src/ulde/configurator/*"
+      ],
       "@ulde/core": [
         "./src/ulde/core/index"
       ],
       "@ulde/core/*": [
         "./src/ulde/core/*"
+      ],
+      "@ulde/devtools": [
+        "./src/ulde/devtools/index"
+      ],
+      "@ulde/devtools/*": [
+        "./src/ulde/devtools/*"
       ],
       "@ulde/engine": [
         "./src/ulde/engine/index"
@@ -21,12 +33,6 @@
       "@ulde/plugins/*": [
         "./src/ulde/plugins/*"
       ],
-      // "@ulde/plugins/system/content": [
-      //   "./src/ulde/plugins/system/index"
-      // ],
-      // "@ulde/plugins/system/content/*": [
-      //   "./src/ulde/plugins/system/content/*"
-      // ],
       "@ulde/tools": [
         "./src/ulde/tools/index"
       ],
@@ -45,12 +51,6 @@
       "@ulde/viewer/*": [
         "./src/ulde/viewer/*"
       ],
-      "@ulde/configurator": [
-        "./src/ulde/configurator/index"
-      ],
-      "@ulde/configurator/*": [
-        "./src/ulde/configurator/*"
-      ]
     }
   }
 }

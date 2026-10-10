@@ -1,10 +1,11 @@
 // src/ulde/configurator/configurator.ts
 
-import { AfterViewInit, Component, OnInit, signal, computed } from '@angular/core';
+import { AfterViewInit, Component, computed, OnInit, signal } from '@angular/core';
 
 import { ULDELifecycleService } from '@ulde/core';
 import { ULDEPageContext } from '@ulde/types/context';
 
+import { ULDEDevtools } from '@ulde/devtools';
 import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldeViewer } from '@ulde/viewer';
@@ -13,8 +14,11 @@ import { isBrowser } from '../../app/global.utils/global.utils';
 @Component({
   selector: 'ulde-configurator',
   standalone: true,
-  imports: [UldeViewer],
-  templateUrl: 'ulde-configurator.html'
+  imports: [
+    UldeViewer, ULDEDevtools
+  ],
+  templateUrl: 'ulde-configurator.html',
+  styleUrl: 'ulde-configurator.scss',
 })
 export class UldeConfigurator implements AfterViewInit, OnInit {
 
@@ -27,11 +31,11 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
 
   $reload = signal<number>(0);
   $page = computed(() => {
-    return {id: this.pageId, reload: this.$reload()};
+    return { id: this.pageId, reload: this.$reload() };
   })
 
 
-  $rendererState = signal<ULDERendererState>({
+  $rendererStateOfMarkdownViewer = signal<ULDERendererState>({
     modelId: 'ulde-demo-01',
     variantId: 'default',
     zoom: 1,
@@ -41,7 +45,10 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
     devtoolsSnapshot: undefined
   });
 
+  $rendererStateOfDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateOfMarkdownViewer());
   // private md = new MarkdownIt();
+
+  $theme = signal<string>('dark');
 
   private async buildPageContext(): Promise<ULDEPageContext | void> {
 
@@ -77,7 +84,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
     private lifecycle: ULDELifecycleService) { }
 
   async ngOnInit() {
-    this.$reload.update(n => n+1); // load current pageId
+    this.$reload.update(n => n + 1); // load current pageId
   }
 
   async ngAfterViewInit() {
@@ -85,26 +92,44 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
 
     const executionContext = await this.runUlde(this.lifecycle);
     if (!executionContext) {
-      console.error('Error: [UldeDemo01] Render context is not available.');
+      console.error('Error: [${this.component}] Render context is not available.');
       return;
     }
 
-    this.$rendererState.update(state => ({ ...state, executionContext }));
+    this.$rendererStateOfMarkdownViewer.update(state => ({ ...state, executionContext }));
 
-    console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererState());
+    console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateOfMarkdownViewer());
 
   }
 
-  onViewerStateChange(state: ULDERendererState) {
+  onMarkdownViewerStateChange(state: ULDERendererState) {
 
-    // this.$rendererState.update(state => ({ ...state, state }));
+    this.$rendererStateOfDevtoolsViewer.set(state);
     console.log(`Log: [${this.component}] onViewerStateChanged state=`, state);
     // sync UI or analytics
   }
 
-  onError(error: Error) {
+  onErrorOfMarkdownViewer(error: Error) {
     console.error(`Log: [${this.component}] onError error=`, JSON.stringify(error, null, 2));
 
   }
+
+
+  /**
+   * Theme Switcher
+   * @param theme
+   */
+  setTheme(theme: 'light' | 'dark') {
+
+    this.$theme.set(theme);
+
+    // coding
+    /**
+     * use local session
+     * Reload from the lifecyclephase 'hydrate', by theme plugin */
+
+    // this.hostRef.nativeElement.setAttribute('data-theme', theme);
+  }
+
 
 }

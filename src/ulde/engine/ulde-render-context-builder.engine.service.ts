@@ -6,9 +6,7 @@ import { buildUldeAst } from './ulde-ast-builder.engine';
 import { renderUldeAstToHtml } from './ulde-ast-renderer.engine';
 import { ULDELayoutEngineService } from './ulde-layout.engine.service';
 
-import { ULDEDevtoolsService } from '@ulde/core/devtools';
-import { ULDEDiagnostic } from '@ulde/types';
-import { ULDEDiagnosticNode } from '@ulde/types/context';
+import { ULDEDevtoolsService } from '../devtools';
 
 
 @Injectable({ providedIn: 'root' })

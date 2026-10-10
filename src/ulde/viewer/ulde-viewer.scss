@@ -7,15 +7,15 @@
 // @use './styles/ulde-viewer-theme-light.scss';
 // @use './styles/ulde-viewer-theme-dark.scss';
 
-.ulde-pane-container {
-  display: flex;
-  flex-direction: column;
-}
+// .ulde-pane-container {
+//   display: flex;
+//   flex-direction: column;
+// }
 
-.ulde-markdown-viewer-pane {
+.ulde-markdown-container {
   display: flex;
 
-  .viewer-host {
+  .markdown-host {
     padding-left: 15px;
     min-height: 400px;
   }
@@ -36,6 +36,3 @@
 
 }
 
-.udel-devtools-viewer-pane {
-  display: flex;
-}
