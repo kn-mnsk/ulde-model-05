@@ -1,6 +1,6 @@
 // src/ulde/configurator/configurator.ts
 
-import { AfterViewInit, Component, computed, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, OnInit, OnDestroy, signal, ViewChild, ElementRef } from '@angular/core';
 
 import { ULDELifecycleService } from '@ulde/core';
 import { ULDEPageContext } from '@ulde/types/context';
@@ -20,7 +20,7 @@ import { isBrowser } from '../../app/global.utils/global.utils';
   templateUrl: 'ulde-configurator.html',
   styleUrl: 'ulde-configurator.scss',
 })
-export class UldeConfigurator implements AfterViewInit, OnInit {
+export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   component = 'UldeConfigurator';
 
@@ -49,6 +49,8 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
   // private md = new MarkdownIt();
 
   $theme = signal<string>('dark');
+  $visibility = signal<'visible' | 'hidden'>('hidden');
+  private handleKey = (e: KeyboardEvent) => void {};
 
   private async buildPageContext(): Promise<ULDEPageContext | void> {
 
@@ -79,6 +81,9 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
     return executionContext;
   }
 
+  @ViewChild('configurator', { static: true })
+  configuratorRef!: ElementRef<HTMLElement>;
+
   constructor(
     private contenEngine: ContentEngineService,
     private lifecycle: ULDELifecycleService) { }
@@ -100,6 +105,16 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
 
     console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateOfMarkdownViewer());
 
+    document.addEventListener('keydown', this.onKeyDown);
+    // this.configuratorRef.nativeElement.addEventListener('keydown', this.handleKey.bind(this.onKeyDown));
+
+  }
+
+  async ngOnDestroy() {
+    if (isBrowser()) {
+      document.removeEventListener('keypress', this.onKeyDown);
+    }
+    // this.configuratorRef.nativeElement.removeEventListener('keydown', this.onKeyDown);
   }
 
   onMarkdownViewerStateChange(state: ULDERendererState) {
@@ -130,6 +145,21 @@ export class UldeConfigurator implements AfterViewInit, OnInit {
 
     // this.hostRef.nativeElement.setAttribute('data-theme', theme);
   }
+
+
+  private onKeyDown = (e: KeyboardEvent) => {
+    // e.preventDefault();
+
+    if (e.ctrlKey && e.key === 'k') {
+      // if (e.ctrlKey && e.shiftKey && e.key === 'd') {
+      e.preventDefault();
+      console.log(`Log: [${this.component}] onkeyDown`, e);
+      this.$visibility.update(b =>
+        b == 'hidden' ? 'visible' : 'hidden'
+      );
+    }
+
+  };
 
 
 }
