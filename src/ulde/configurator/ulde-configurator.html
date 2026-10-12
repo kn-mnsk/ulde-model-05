@@ -1,13 +1,13 @@
 <!-- src/ulde/configurator/ulde-configurator.html -->
-<diV claa="ulde-configurator-container">
+<diV claa="ulde-configurator-container" #configurator>
   <div class="ulde-markdwon-viewer-pane">
     <ulde-viewer [$rendererStateInput]="$rendererStateOfMarkdownViewer()" ($stateChange)="onMarkdownViewerStateChange($event)"
       ($error)="onErrorOfMarkdownViewer($event)">
     </ulde-viewer>
   </div>
 
-  
-  <div class="ulde-devtools-viewer-pane">
+
+  <div class="ulde-devtools-viewer-pane" [class.hidden]="$visibility()==='hidden' ? true : false">
     <ulde-devtools [$rendererState]="$rendererStateOfDevtoolsViewer()"></ulde-devtools>
   </div>
 

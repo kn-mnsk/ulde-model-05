@@ -24,26 +24,20 @@
   color: #eee;
   font-family: system-ui, sans-serif;
   border-radius: 8px 8px 8px 8px;
-  // display: flex;
-  // flex-direction: column;
   padding: 12px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  // backdrop-filter: blur(6px);
-  // transition: opacity 0.2s ease;
-  // opacity: 1.0;
+  backdrop-filter: blur(6px);
+  transition: all 0.5s ease-in-out;
+  // transition: visibility 2s 500ms;// ease-in-out;
+  opacity: 1.0;
   visibility: visible;
 
   &.hidden {
-    // position: relative;
-    // display: flex;
-    // flex-direction: row;
-    right: 0;
-    width: 300px;
-    height: 5vh;
-    background: var(--ulde-background);
-    color: rgb(20, 16, 16); //
-    // opacity: 0;
-    // visibility: hidden;
-    // pointer-events: none;
+    padding: 0;
+    display: flex;
+    width: 0%;
+    height: 0%;
+    visibility: hidden;
   }
+
 }
