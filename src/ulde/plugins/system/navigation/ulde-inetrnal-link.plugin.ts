@@ -5,6 +5,7 @@ import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 import { createComponent, EnvironmentInjector } from "@angular/core";
 import { Example01 } from "../../../../app/demo/example01/example01"; // TBD
 import { ULDEExecutionContext } from "@ulde/types";
+import { isBrowser } from "../../../../app/global.utils/global.utils";
 
 export class UldeInternalLinkPlugin implements ULDEPluginInstance {
   pluginKind: ULDEPluginKind = 'navigation';
@@ -15,12 +16,13 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
 
     if (ctx.lifecyclePhase !== 'hydrate') return;
     if (!ctx.render) return;
+    if (!isBrowser()) return;
 
-    const markdownContainer = document?.querySelector('ulde-markdown-container');
-    if (!markdownContainer) {
+    const markdownHost = document.querySelector('.markdown-host');
+    if (!markdownHost) {
       ctx.artifacts.diagnostics.push({
         level: "error",
-        message: `'Can't find the htmlelement with class "ulde-markdown-container"`,
+        message: `'Can't find the htmlelement with class "markdown-host"`,
         lifecyclePhase: ctx.lifecyclePhase,
         pluginKind: this.pluginKind,
         pluginName: this.pluginName
@@ -28,30 +30,36 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
       return;
     }
 
-    const internalLinks = markdownContainer.querySelectorAll('a[href^="#docId:"]');
+    requestAnimationFrame(() => {
+      const internalLinks = markdownHost.querySelectorAll(`a[href^="#pageId:docs/"]`);
 
-    internalLinks.forEach(a => {
-      a.addEventListener('click', (e: any) => {
-        e.preventDefault();
 
-        const href = a.getAttribute('href')!;
-        const pageId = href.replace('#docId:', '');
+      console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
 
-        const rect = a.getBoundingClientRect();
-        const containerRect = markdownContainer.getBoundingClientRect();
-        const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+      internalLinks.forEach(a => {
+        a.addEventListener('click', (e: any) => {
+          e.preventDefault();
 
-        // console.log(`Log: [UldeAnchotsBrowserPlugin] Internal Doc Routing Click Event ClientY=`, e.currentTarget);
+          const href = a.getAttribute('href')!;
+          const pageId = href.replace('#pageId:', '');
 
-        markdownContainer.dispatchEvent(new CustomEvent('ulde:navigate', {
-          detail: {
-            pageId: pageId,
-            // scrollTop: e.clientY
-          },
-          bubbles: true
-        }));
+          const rect = a.getBoundingClientRect();
+          const containerRect = markdownHost.getBoundingClientRect();
+          const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+
+          console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
+
+          markdownHost.dispatchEvent(new CustomEvent('ulde:navigate', {
+            detail: {
+              pageId: pageId,
+              // scrollTop: e.clientY
+            },
+            bubbles: true
+          }));
+        });
       });
     });
+
 
   }
 
