@@ -36,7 +36,7 @@ export class ULDERendererService {
     return this.handle ? this.handle.getState() : null;
   }
 
-  highlightDiagnostic(message: string): void{
+  highlightDiagnostic(message: string): void {
     this.handle?.highlightDiagnostic(message);
   }
 
@@ -66,6 +66,8 @@ export class ULDERendererService {
       if (!renderContext) return;
       config.container.innerHTML = renderContext.html;
       bindInteractivity(config.container);
+
+
     }
 
     function renderLifecyclePhase(phase: string | undefined) {
@@ -198,6 +200,29 @@ export class ULDERendererService {
           }
         });
       });
+
+
+
+
+    }
+
+
+    const bindNavigate = (container: HTMLElement) => {
+
+      // const handleNavigate = (e: any) => {
+      //   const pageId = e.detail.pageId;
+
+      //   const executionContext = state.executionContext;
+      //   if (!executionContext) return;
+      //   executionContext.page.pageId = pageId;
+
+      //   this.handle?.setState({ ...state, executionContext });
+
+      //   console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId);
+
+      // };
+
+      // container.addEventListener('ulde:navigate', handleNavigate);
     }
 
 
@@ -208,6 +233,23 @@ export class ULDERendererService {
 
         if (partial.executionContext !== undefined) {
           renderFromContext(state.executionContext?.render);
+
+          // internal docrouting
+          config.container.addEventListener('ulde:navigate', (e: any) => {
+            const pageId = e.detail.pageId;
+
+            const executionContext = state.executionContext;
+            if (!executionContext) return;
+            executionContext.page.pageId = pageId;
+
+          this.setState({ ...state, executionContext });
+
+            console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId, state);
+
+          });
+
+
+
         }
 
         // if (partial.renderContext !== undefined) {

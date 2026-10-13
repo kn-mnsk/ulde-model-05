@@ -1,6 +1,6 @@
 // src/ulde/configurator/configurator.ts
 
-import { AfterViewInit, Component, computed, OnInit, OnDestroy, signal, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 
 import { ULDELifecycleService } from '@ulde/core';
 import { ULDEPageContext } from '@ulde/types/context';
@@ -26,12 +26,12 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   // renderContext: ULDERenderContext | undefined = undefined;
 
-  pageId: string = 'docs/index'; // initila value
+  $pageId = signal<string>('docs/index'); // initila value
   // $pageId = signal<string>('docs/index'); // initila value
 
   $reload = signal<number>(0);
   $page = computed(() => {
-    return { id: this.pageId, reload: this.$reload() };
+    return { id: this.$pageId(), reload: this.$reload() };
   })
 
 
@@ -116,10 +116,14 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     }
     // this.configuratorRef.nativeElement.removeEventListener('keydown', this.onKeyDown);
   }
-
+  React
   onMarkdownViewerStateChange(state: ULDERendererState) {
 
     this.$rendererStateOfDevtoolsViewer.set(state);
+    if (state.executionContext) {
+      this.$pageId.set(state.executionContext.page.pageId);
+      this.$reload.update(n => n + 1)
+    }
     console.log(`Log: [${this.component}] onViewerStateChanged state=`, state);
     // sync UI or analytics
   }
