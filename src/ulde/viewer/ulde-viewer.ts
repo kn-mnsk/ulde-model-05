@@ -4,7 +4,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, inp
 import { ULDEDevtools, ULDEDevtoolsService } from '@ulde/devtools';
 import { ULDEFrame } from '@ulde/types/frame';
 import type { ULDERendererState } from '@ulde/types/renderer';
-import { ULDERendererService } from '@ulde/viewer';
+import { ULDERendererService } from '@ulde/viewer/services';
 import { isBrowser } from '../../app/global.utils/global.utils';
 
 @Component({
@@ -21,12 +21,12 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   hostRef!: ElementRef<HTMLElement>;
 
   // Full renderer state comes in as a signal input
-  $rendererStateInput = input<ULDERendererState>();
+  $rendererState = input<ULDERendererState>();
+
+  $currentRendererState = signal(this.$rendererState());
+
   // $reload = signal<number>(0);
-  $rendererState = signal(this.$rendererStateInput());
-  // $currentRendererState = computed(() => {
-  //   return { state: this.$rendererState(), reload: this.$reload() }
-  // });
+  // $currentRendererState = computed(() => {  return { state: this.$rendererState(), reload: this.$reload() } });
 
   $ready = output<void>();
   $error = output<Error>();
@@ -89,13 +89,15 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     // 🔥4 React to rendererState signal input (without re-init)
     effect(() => {
-      const input = this.$rendererStateInput();
-      if (!input || !input.executionContext) return;
+
+      const state = this.$rendererState();
+      // const input = this.$currentRendererState();
+      if (!state || !state.executionContext) return;
 
 
-      this.syncSignalInput();
+      this.syncSignalInput(state);
       // this.$reload.update(n => n + 1);
-      console.log(`Log: [UldeViewer] effect(): 🔥4`);
+      console.log(`Log: [UldeViewer] effect(): 🔥4`, state.executionContext);
     });
   }
 
@@ -116,30 +118,35 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     );
 
     // Push initial state after init
-    this.syncSignalInput();
+    // this.syncSignalInput();
   }
 
   ngOnDestroy(): void {
     this.rendererService.dispose();
   }
 
-  private syncSignalInput(): void {
-    const input = this.$rendererStateInput();
-    if (!input || !input.executionContext) return;
+  private syncSignalInput(state: ULDERendererState): void {
+    // const input = this.$currentRendererState();
+    // if (!input || !input.executionContext) return;
 
-    const state = {
-      modelId: input.modelId,
-      variantId: input.variantId,
-      zoom: input.zoom,
-      rotation: input.rotation,
-      executionContext: input.executionContext,
-      devtoolsSnapshot: this.devtoolsService.$generateDevtoolsSnapshot(input.executionContext)()
-    };
+    if (!state.executionContext) return;
+    state.devtoolsSnapshot = this.devtoolsService.$generateDevtoolsSnapshot(state.executionContext)();
+
+    // const state = {
+    //   modelId: input.modelId,
+    //   variantId: input.variantId,
+    //   zoom: input.zoom,
+    //   rotation: input.rotation,
+    //   executionContext: input.executionContext,
+    //   devtoolsSnapshot: this.devtoolsService.$generateDevtoolsSnapshot(input.executionContext)()
+    // };
+
+    console.log(`Log: [UldeViewer] syncSignalInput()`, state);
 
     this.rendererService.setState(state);
 
 
-    this.$rendererState.set(state); // input for UldeDevtools
+    this.$currentRendererState.set(state); // input for UldeDevtools
   }
 
   // /**

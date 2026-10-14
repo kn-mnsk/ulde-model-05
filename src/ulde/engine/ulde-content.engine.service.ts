@@ -36,12 +36,12 @@ export class ContentEngineService {
       const raw = await response.text();
 
 
-      // console.log(`Log: ${this.title} load \nid=`, pageId, `raw=`, raw);
+      // console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
 
       return raw;
 
     } catch (err) {
-      console.error(`${this.title} load() error:`, err);
+      console.error(`${this.title} load() pageId=${pageId} error:`, err);
       return undefined;
     }
 

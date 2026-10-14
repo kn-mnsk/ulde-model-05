@@ -1,0 +1,110 @@
+// app/core/services/theme.service.ts
+
+import { Injectable } from '@angular/core';
+import { isBrowser } from '../../app/global.utils/global.utils';
+import { readSessionState, writeSessionState } from '@ulde/configurator';
+
+export type ThemeName = 'light' | 'dark';
+export const defaultThemeName: ThemeName = 'dark';
+
+@Injectable({ providedIn: 'root' })
+export class ThemeService {
+
+
+  private readonly attrName = 'data-theme';
+
+  constructor() {
+    if (!isBrowser()) return;
+    const { docTheme } = readSessionState(isBrowser());
+    const saved = docTheme as ThemeName || defaultThemeName;
+    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
+    this.applyTheme(saved, { animate: false });
+  }
+
+  get currentTheme(): ThemeName {
+    if (!isBrowser()) {
+      return defaultThemeName;
+    };
+    let attr: ThemeName | null = null;
+    try {
+      const { docTheme } = readSessionState(isBrowser());
+      attr = docTheme as ThemeName | null;
+      // attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
+    } catch (err) {
+      console.error('Error: [ThemeService]:', err);
+    }
+    return attr ?? defaultThemeName;;
+
+  }
+
+  toggleTheme(theme: ThemeName): void {
+    // const next: ThemeName = theme;
+    // this.applyTheme(theme, { animate: false });
+    this.applyTheme(theme, { animate: true });
+    writeSessionState({ docTheme: theme }, isBrowser());
+    // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
+  }
+
+  setTheme(theme: ThemeName): void {
+    // this.applyTheme(theme, { animate: false });
+    this.applyTheme(theme, { animate: true });
+    writeSessionState({ docTheme: theme }, isBrowser());
+    // writeSessionState({ docTheme: theme as string }, isBrowser());
+    // sessionStorage.setItem(this.storageKey, theme as string);
+    // console.log(`Log: [ThemeService] setTheme =`, theme);
+  }
+
+  private applyTheme(theme: ThemeName, opts: { animate: boolean }) {
+
+    // Apply attribute for CSS + Angular Material theming
+    document.documentElement.setAttribute(this.attrName, theme);
+
+    // Body fade-in (uses your @keyframes fade-in)
+    if (opts.animate) {
+      this.animateBodyFade();
+    }
+
+    // Artifacts panel micro animation
+    if (opts.animate) {
+      this.animateArtifactsPanelTheme();
+    }
+    // Mermaid micro animation
+    if (opts.animate) {
+      this.animateMermaid();
+    }
+  }
+
+  private animateBodyFade() {
+    const body = document.body;
+    if (!body) return;
+
+    // Restart animation
+    body.style.animation = 'none';
+    // Force reflow
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    body.offsetHeight;
+    body.style.animation = 'fade-in 0.7s forwards ease-in-out';
+  }
+
+  private animateArtifactsPanelTheme() {
+    const panel = document.querySelector('.ulde-artifacts-panel-content') as HTMLElement | null;
+    if (!panel) return;
+
+    panel.classList.add('theme-enter');
+    setTimeout(() => panel.classList.remove('theme-enter'), 180);
+  }
+
+  // test implementation
+  private animateMermaid() {
+    // const mermaidSvgs = document.querySelectorAll('.language-mermaid');
+    const mermaidSvgs = document.querySelectorAll('code.language-mermaid svg');
+    mermaidSvgs.forEach(s => {
+      s.classList.add('theme-enter');
+
+      // console.log(`Log: mermaidSvg=`, s);
+
+      setTimeout(() => s.classList.remove('theme-enter'), 700);
+    });
+
+  }
+}

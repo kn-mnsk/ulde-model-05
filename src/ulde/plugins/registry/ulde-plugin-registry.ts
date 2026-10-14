@@ -17,6 +17,7 @@ import {
 import {
   ULDENavigationBreadcrumbsPlugin, UldeInternalLinkPlugin
 } from '@ulde/plugins/system/navigation';
+import { UldeMermaidPlugin } from '@ulde/plugins/system/navigation/ulde-mermaid.plugin';
 
 import {
   ULDEOverlayCustomPanelPlugin, ULDESlowPluginDetectorPlugin, ULDETimelineProfilerPlugin
@@ -53,6 +54,7 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
   hydrate: [
     () => new UldeInternalLinkPlugin(),
     () => new ULDEPlaygroundInjectorPlugin(),
+    () => new UldeMermaidPlugin(),
   ],
 
   // ULDE system: diagnostics, overlay, performance analysis

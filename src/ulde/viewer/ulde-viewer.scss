@@ -12,26 +12,12 @@
 //   flex-direction: column;
 // }
 
-.ulde-markdown-container {
+.ulde-markdown-viewer {
   display: flex;
 
   .markdown-host {
     padding-left: 15px;
     min-height: 400px;
-  }
-
-}
-
-.ulde-graph-viewer-pane {
-  display: flex;
-  align-content: center;
-  visibility: hidden;
-  cursor:pointer;
-
-  &.visible {
-    width: 600px;
-    height: 400px;
-    visibility: visible;
   }
 
 }

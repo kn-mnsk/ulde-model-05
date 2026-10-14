@@ -9,7 +9,7 @@
   <header class="header" [class.hidden]="!$visible()">
     <!-- <header class="header"> -->
     <h3>ULDE DevTools Panel</h3>
-    <div class="controls"  [class.hidden]="!$visible()">
+    <div class="controls" [class.hidden]="!$visible()">
       <button (click)="toggleDevTools()">Toggle</button>
       <button (click)="pinDevTools()">
         {{ $pinned() ? 'Unpin' : 'Pin' }}
@@ -109,26 +109,27 @@
     <div class="frame-history-tab">
       <section class="frame-history">
         <h4>Frame History</h4>
+        <div class="frame-history-container">
 
-        @for (f of $snapshot()?.frameHistory; track f.id) {
-        <div class="frame-row" (click)="selectFrame(f)">
-          <span class="frame-id">Frame Id: {{ f.id }}</span>
-          <span class="timestamp">Timestamp: {{ f.timestamp | date:'full' }}</span>
-          <span class="total">Total Duration:
-            {{
-            f.lifecyclePhaseTimings.reduce((a, p) => a + p.duration, 0)
-            | number:'1.0-1'
-            }}ms
-          </span>
-          <span class="json-view">
-            @for(t of f.lifecyclePhaseTimings; track t.lifecyclePhase; let no = $index){
-            <span>#{{no}}: </span>
-            <span>{{t| json }}</span><br>
-            }
-          </span>
+          @for (f of $snapshot()?.frameHistory; track f.id) {
+          <div class="frame-row" (click)="selectFrame(f)">
+            <span class="frame-id">Frame Id: {{ f.id }}</span>
+            <span class="timestamp">Timestamp: {{ f.timestamp | date:'full' }}</span>
+            <span class="total">Total Duration:
+              {{
+              f.lifecyclePhaseTimings.reduce((a, p) => a + p.duration, 0)
+              | number:'1.0-1'
+              }}ms
+            </span>
+            <span class="json-view">
+              @for(t of f.lifecyclePhaseTimings; track t.lifecyclePhase; let no = $index){
+              <span>#{{no}}: </span>
+              <span>{{t| json }}</span><br>
+              }
+            </span>
+          </div>
+          }
         </div>
-        }
-
       </section>
     </div>
 

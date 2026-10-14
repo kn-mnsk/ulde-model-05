@@ -248,53 +248,68 @@ header.header {
 .frame-history-tab {
   display: flex;
   width: fit-content;
-  height: auto;
-  overflow-y: auto;
+  height: 75vh;
+  // overflow-y: auto;
 
   .frame-history {
 
     // max-height: auto;
     // display: flex;
-    overflow-y: auto h4 {
+    // overflow-y: auto;
+
+    border: 1px solid var(--ulde-border);
+    border-radius: 5px;
+    ;
+
+    h4 {
+      padding-left: 5px;
+      ;
       margin: 0 0 6px 0;
       font-size: 14px;
       font-weight: 600;
     }
 
-    .frame-row {
-      display: flex;
-      flex-direction: column;
-      // display: grid;
-      // grid-template-columns: 1fr 1fr 0.7fr;
-      padding: 4px 0;
-      border-bottom: 1px solid #444;
-      cursor: pointer;
-      // overflow-y: auto;
+    .frame-history-container {
+      padding-left: 10px;
+      // display: flex;
+      // flex-direction: column;
+      height: 70vh;
+      overflow-y: auto;
 
-      &:hover {
-        background: rgba(255, 255, 255, 0.05);
+      .frame-row {
+        display: flex;
+        flex-direction: column;
+        // display: grid;
+        // grid-template-columns: 1fr 1fr 0.7fr;
+        padding: 4px 0;
+        border-bottom: 1px solid #444;
+        cursor: pointer;
+        // overflow-y: auto;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .frame-id {
+          font-weight: bold;
+        }
+
+        .total {
+          text-align: left;
+        }
+
+        .json-view {
+          height: 200px;
+          font-family: monospace;
+          font-size: 0.8rem;
+          background: #1113;
+          padding: 0.5rem;
+          border-radius: 4px;
+          overflow: auto;
+        }
+
       }
-
-      .frame-id {
-        font-weight: bold;
-      }
-
-      .total {
-        text-align: left;
-      }
-
-      .json-view {
-        height: 200px;
-        font-family: monospace;
-        font-size: 0.8rem;
-        background: #1113;
-        padding: 0.5rem;
-        border-radius: 4px;
-        overflow: auto;
-      }
-
     }
-
   }
 
 }

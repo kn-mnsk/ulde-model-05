@@ -1,6 +1,6 @@
 // src/ulde/configurator/configurator.ts
 
-import { AfterViewInit, Component, computed, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 
 import { ULDELifecycleService } from '@ulde/core';
 import { ULDEPageContext } from '@ulde/types/context';
@@ -24,10 +24,17 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   component = 'UldeConfigurator';
 
+
+
   // renderContext: ULDERenderContext | undefined = undefined;
 
+  // for future use
+  $contentId = signal<{ pageId: string, graphId: string }>({
+    pageId: 'docs/index',
+    graphId: ''
+  }); // initial value
+
   $pageId = signal<string>('docs/index'); // initila value
-  // $pageId = signal<string>('docs/index'); // initila value
 
   $reload = signal<number>(0);
   $page = computed(() => {
@@ -35,7 +42,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
   })
 
 
-  $rendererStateOfMarkdownViewer = signal<ULDERendererState>({
+  $rendererStateMarkdownViewer = signal<ULDERendererState>({
     modelId: 'ulde-demo-01',
     variantId: 'default',
     zoom: 1,
@@ -45,17 +52,39 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     devtoolsSnapshot: undefined
   });
 
-  $rendererStateOfDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateOfMarkdownViewer());
+  $rendererStateDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateMarkdownViewer());
   // private md = new MarkdownIt();
 
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
+
+
+
+
+  @ViewChild('configurator', { static: true })
+  configuratorRef!: ElementRef<HTMLElement>;
+
+  constructor(
+    private contenEngine: ContentEngineService,
+    private lifecycleService: ULDELifecycleService) {
+
+    effect(() => {
+
+      if (!isBrowser()) return;
+
+      this.UldeLoadAndRender();
+
+    });
+
+  }
+
+
   private handleKey = (e: KeyboardEvent) => void {};
 
-  private async buildPageContext(): Promise<ULDEPageContext | void> {
+  private async buildPageContext(pageId: string): Promise<ULDEPageContext | void> {
 
     // load markdown file
-    const markdown = await this.contenEngine.load(this.$page().id);
+    const markdown = await this.contenEngine.load(pageId);
     if (!markdown) return;
 
     const tokens = await this.contenEngine.transform(markdown);
@@ -71,22 +100,35 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     };
   }
 
-  private async runUlde(lifecycle: ULDELifecycleService) {
-    const pageContext = await this.buildPageContext();
+  private async uldeRun() {
+    const pageContext = await this.buildPageContext(this.$pageId());
     if (!pageContext) return undefined;
 
-    const executionContext = await lifecycle.executeLifecycle(pageContext);
+    const executionContext = await this.lifecycleService.executeLifecycle(pageContext);
     // const renderContext = executionContext?.render;
+
+    // console.log(`Log: [UldeConfigurator] uldeLoadAndRender executionContext=\n`, executionContext);
+
 
     return executionContext;
   }
 
-  @ViewChild('configurator', { static: true })
-  configuratorRef!: ElementRef<HTMLElement>;
 
-  constructor(
-    private contenEngine: ContentEngineService,
-    private lifecycle: ULDELifecycleService) { }
+  private async UldeLoadAndRender() {
+
+    const executionContext = await this.uldeRun();
+    if (!executionContext) {
+      console.error(`Error: [${this.component}] UldeLoadAndRender() Render context is not available.`);
+      return;
+    }
+
+
+    this.$rendererStateMarkdownViewer.update(state => ({ ...state, executionContext }));
+
+    console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
+
+  }
+
 
   async ngOnInit() {
     this.$reload.update(n => n + 1); // load current pageId
@@ -95,15 +137,18 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
   async ngAfterViewInit() {
     if (!isBrowser()) return;
 
-    const executionContext = await this.runUlde(this.lifecycle);
-    if (!executionContext) {
-      console.error('Error: [${this.component}] Render context is not available.');
-      return;
-    }
+    // await this.UldeLoadAndRender();
+    // const executionContext = await this.uldeRun(this.lifecycleService);
+    // if (!executionContext) {
+    //   console.error('Error: [${this.component}] Render context is not available.');
+    //   return;
+    // }
 
-    this.$rendererStateOfMarkdownViewer.update(state => ({ ...state, executionContext }));
+    // this.$rendererStateMarkdownViewer.update(state => ({ ...state, executionContext }));
 
-    console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateOfMarkdownViewer());
+    // console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
+
+
 
     document.addEventListener('keydown', this.onKeyDown);
     // this.configuratorRef.nativeElement.addEventListener('keydown', this.handleKey.bind(this.onKeyDown));
@@ -116,19 +161,24 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     }
     // this.configuratorRef.nativeElement.removeEventListener('keydown', this.onKeyDown);
   }
-  React
-  onMarkdownViewerStateChange(state: ULDERendererState) {
 
-    this.$rendererStateOfDevtoolsViewer.set(state);
+  //React
+  async onMarkdownViewerStateChange(state: ULDERendererState) {
+
+
+    this.$rendererStateDevtoolsViewer.set(state);
+
     if (state.executionContext) {
       this.$pageId.set(state.executionContext.page.pageId);
-      this.$reload.update(n => n + 1)
+      // this.$reload.update(n => n + 1)
+
+      // await this.UldeLoadAndRender()
     }
     console.log(`Log: [${this.component}] onViewerStateChanged state=`, state);
     // sync UI or analytics
   }
 
-  onErrorOfMarkdownViewer(error: Error) {
+  onErrorMarkdownViewer(error: Error) {
     console.error(`Log: [${this.component}] onError error=`, JSON.stringify(error, null, 2));
 
   }
