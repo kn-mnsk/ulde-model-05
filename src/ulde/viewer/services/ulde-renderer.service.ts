@@ -1,4 +1,4 @@
-// src/ulde/viewer/ulde-renderer.service.ts
+// src/ulde/viewer/services/ulde-renderer.service.ts
 
 import { ElementRef, Injectable } from '@angular/core';
 import { ULDERenderContext, } from '@ulde/types/context';
@@ -231,7 +231,8 @@ export class ULDERendererService {
         state = { ...state, ...partial };
 
 
-        if (partial.executionContext !== undefined) {
+        if (state.executionContext !== undefined) {
+        // if (partial.executionContext !== undefined) {
           renderFromContext(state.executionContext?.render);
 
           // internal docrouting
@@ -242,7 +243,7 @@ export class ULDERendererService {
             if (!executionContext) return;
             executionContext.page.pageId = pageId;
 
-          this.setState({ ...state, executionContext });
+            this.setState({ ...state, executionContext });
 
             console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId, state);
 

@@ -3,7 +3,7 @@
   flex-direction: column;
 }
 
-.ulde-markdown-viewer-pane {
+.ulde-markdown-viewer-container {
   display: flex;
 
   .viewer-host {
@@ -13,8 +13,22 @@
 
 }
 
+.ulde-graph-viewer-container {
+  display: flex;
+  align-content: center;
+  visibility: hidden;
+  cursor:pointer;
 
-.ulde-devtools-viewer-pane {
+  &.visible {
+    width: 600px;
+    height: 400px;
+    visibility: visible;
+  }
+
+}
+
+
+.ulde-devtools-viewer-container {
   position: fixed;
   top: 0;
   right: 0;
