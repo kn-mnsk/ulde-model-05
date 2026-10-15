@@ -53,12 +53,12 @@ export interface ULDEPluginInstance {
    * Unified execution entry point.
    * The registry decides which lifecycle phase is being executed.
    */
-  run(ctx: ULDEExecutionContext): void | Promise<void>;
+  run(ctx: ULDEExecutionContext): void | Promise<void> | Promise<() => void |undefined>;
 
   /**
    * Optional teardown hook.
    */
-  destroy?(): void | Promise<void>;
+  destroy?(): void | Promise<void> | Promise<() => void |undefined>;
 }
 
 /**

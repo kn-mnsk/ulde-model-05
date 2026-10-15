@@ -54,6 +54,7 @@ export class ULDEPluginRegistryService {
    */
   async runPhase(executionCtx: ULDEExecutionContext): Promise<void> {
 
+    // const { diagnostics } = executionCtx.artifacts;
     const phase = executionCtx.lifecyclePhase;
     const factories = ULDE_PLUGIN_REGISTRY[phase] || [];
 
@@ -72,6 +73,7 @@ export class ULDEPluginRegistryService {
       try {
 
         await plugin.run(executionCtx);
+        // await plugin.destroy?.(); // did not exist before
       } catch (err) {
         this.devtoolsService.addDiagnostic({
           level: 'error',
@@ -98,6 +100,8 @@ export class ULDEPluginRegistryService {
    * Destroy all plugins (called at end of lifecycle).
    */
   async destroyAll() {
+    // const { diagnostics } = executionCtx.artifacts;
+
     for (const plugin of this.instances) {
       if (!plugin.destroy) continue;
 
@@ -106,6 +110,7 @@ export class ULDEPluginRegistryService {
       try {
         await plugin.destroy();
       } catch (err) {
+
         this.devtoolsService.addDiagnostic({
           level: 'error',
           message: `Plugin "${plugin.pluginName}" failed in destroy(): ${String(err)}`,

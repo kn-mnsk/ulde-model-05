@@ -2,6 +2,19 @@
 - [Katex test file](#pageId:docs/test/test.katex)
 - [Stacking Order](#pageId:docs/supplements/doc-stackingorder-0100)
 
+- __Table__
+
+
+Concept	|queueMicrotask()	|Signals 
+---------|-----------------|--------
+Purpose	|Schedule ASAP after stack	|Reactive state system
+Knows about dependencies	|❌ No	|✅ Yes
+Batching	|❌ No	|✅ Yes
+Deduplication	|❌ No	|✅ Yes
+Propagation	|❌ No	|✅ Yes
+Runs before paint	|Yes	|Usually (via microtasks)
+Similarity	|Timing	|Timing + scheduling
+
 
 # 2. Angular README
 ___This project was generated using <a href="https://github.com/angular/angular-cli" target="_blank">[Angular CLI]</a>version 21.0.0. ...___

@@ -215,6 +215,26 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         break;
       }
 
+      case 'table': {
+        buf.push('<table class="markdown-table">')
+        node.children?.forEach(renderNode);
+        buf.push('</table>')
+        break;
+      }
+
+      case 'tableRow': {
+        buf.push('<tr>')
+        node.children?.forEach(renderNode);
+        buf.push('</tr>')
+        break;
+      }
+
+      case 'tableCell': {
+        buf.push('<td>')
+        node.children?.forEach(renderNode);
+        buf.push('</td>')
+        break;
+      }
 
       // ---------------------------------------------------------
       // Fallback: render children only

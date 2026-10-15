@@ -99,16 +99,17 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
         close();
         break;
 
-      case 'thead_open':
-      case 'tbody_open':
-        // treat as section-like containers if needed
-        open({ type: 'section', id: t.type  });
-        break;
+      // case 'thead_open':
+      // case 'tbody_open':
+      //   // treat as section-like containers if needed
+      //   open({ type: 'section', id: t.type });
+      //   open({ type: 'section', id: t.type });
+      //   break;
 
-      case 'thead_close':
-      case 'tbody_close':
-        close();
-        break;
+      // case 'thead_close':
+      // case 'tbody_close':
+      //   close();
+      //   break;
 
       case 'tr_open':
         open({ type: 'tableRow' });
@@ -128,6 +129,14 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
         close();
         break;
 
+      // // table -revised
+
+      // case 'table':
+      //   for (const child of t.children ||[]){
+
+      //   }
+      //   break;
+
       // Code blocks (fence)
       case 'fence':
         push({
@@ -143,6 +152,8 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
           switch (child.type) {
 
             case 'text':
+              find RegExp ??
+                console.log(`Log: [buildUldeAst] inline text href`, child.attrGet('href'), child.content.match('<a href^'));
               push({ type: 'text', value: child.content });
               break;
 
