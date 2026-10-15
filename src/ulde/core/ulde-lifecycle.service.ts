@@ -28,6 +28,8 @@ export class ULDELifecycleService {
   ) {
     this.devtoolsService.startPhase(lifecyclePhase);
 
+    // const { diagnostics } = executionCtx.artifacts;
+
     try {
 
 
@@ -36,12 +38,13 @@ export class ULDELifecycleService {
 
       this.devtoolsService.endPhase(lifecyclePhase);
     } catch (err) {
+
       this.devtoolsService.addDiagnostic({
         level: 'error',
         message: `Error in phase "${lifecyclePhase}": ${String(err)}`,
         lifecyclePhase,
       });
-      console.log(`Log: [ULDELifecycleServic - runPluginByLifecyclePhase]\nmessage=`, `Error in phase "${lifecyclePhase}": ${String(err)}`);
+      // console.log(`Log: [ULDELifecycleServic - runPluginByLifecyclePhase]\nmessage=`, `Error in phase "${lifecyclePhase}": ${String(err)}`);
     }
 
   }
@@ -106,9 +109,13 @@ export class ULDELifecycleService {
     executionContext.lifecyclePhase = 'afterRender';
     await this.runPluginByLifecyclePhase('afterRender', executionContext);
 
-    // Cleanup + diagnostics
+    // Cleanup
     await this.pluginRegistry.destroyAll();
     this.runtime.finalizeFrameAndAnalyze();
+
+    // finally add disgnostics caught by UldeDevtoolsService.addDiagnostics
+    const diagnostics = this.devtoolsService.$diagnostics();
+    executionContext.artifacts.diagnostics.push(...diagnostics);
 
     // console.log(`Log: [ULDELifecycleService] final rendercontext: \n`, executionContext.render);
 

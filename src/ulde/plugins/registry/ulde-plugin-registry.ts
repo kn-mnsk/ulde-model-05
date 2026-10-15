@@ -8,7 +8,7 @@ import {
   ULDEDemoPlugin, ULDEPlaygroundInjectorPlugin
 } from '@ulde/plugins/system/demo';
 
-import { ULDEDummyTestPlugin } from '@ulde/plugins/system/interactive';
+import { ULDEDummyTestPlugin, UldeMermaidPlugin, UldeKatexPlugin } from '@ulde/plugins/system/interactive';
 
 import {
   ULDEAnchorPlugin, ULDETocPlugin
@@ -17,7 +17,6 @@ import {
 import {
   ULDENavigationBreadcrumbsPlugin, UldeInternalLinkPlugin
 } from '@ulde/plugins/system/navigation';
-import { UldeMermaidPlugin } from '@ulde/plugins/system/navigation/ulde-mermaid.plugin';
 
 import {
   ULDEOverlayCustomPanelPlugin, ULDESlowPluginDetectorPlugin, ULDETimelineProfilerPlugin
@@ -55,12 +54,16 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
     () => new UldeInternalLinkPlugin(),
     () => new ULDEPlaygroundInjectorPlugin(),
     () => new UldeMermaidPlugin(),
+    () => new UldeKatexPlugin(),
   ],
 
   // ULDE system: diagnostics, overlay, performance analysis
   afterRender: [
+
+    // () => new UldeMermaidPlugin(),
     () => new ULDEOverlayCustomPanelPlugin(),
     () => new ULDETimelineProfilerPlugin(),
     () => new ULDESlowPluginDetectorPlugin(),
+
   ],
 };

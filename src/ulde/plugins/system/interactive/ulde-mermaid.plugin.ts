@@ -2,16 +2,12 @@
 
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
-import { createComponent, EnvironmentInjector } from "@angular/core";
-import { Example01 } from "../../../../app/demo/example01/example01"; // TBD
 import { ULDEExecutionContext } from "@ulde/types";
 import { isBrowser } from "../../../../app/global.utils/global.utils";
-
 
 import mermaid from 'mermaid';
 import type { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
-// import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 import { readSessionState } from '@ulde/configurator';
 
 
@@ -85,14 +81,15 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
   description = "render mermaid graph";
   enabled = true;
 
-  async run(ctx: ULDEExecutionContext) {
+  // async run(ctx: ULDEExecutionContext){
+  async run(ctx: ULDEExecutionContext): Promise<() => void | undefined> {
 
-    if (ctx.lifecyclePhase !== 'hydrate') return;
-    if (!ctx.render) return;
-    if (!isBrowser()) return;
+    if (ctx.lifecyclePhase !== 'hydrate') return new Promise(() => undefined);
+    if (!ctx.render) return new Promise(() => undefined);
+    if (!isBrowser()) return new Promise(() => undefined);
 
 
-    console.log(`Log: [UldeMermaidPlugin] Start`);
+    console.log(`Log: [UldeMermaidPlugin] run() Start`);
 
 
     const { diagnostics } = ctx.artifacts;
@@ -106,9 +103,15 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
 
 
 
+    let container!: HTMLElement | null;
+    let mermaidNodes!: NodeListOf<HTMLElement>;
 
-    const container = document.querySelector<HTMLElement>('.markdown-host');
+    // requestAnimationFrame(() => {
 
+    container = document.querySelector<HTMLElement>('.markdown-host');
+
+    // requestAnimationFrame(() => {
+    //   requestAnimationFrame(() => {
     if (!container) {
       diagnostics.push({
         level: "error",
@@ -117,22 +120,21 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
         pluginKind: this.pluginKind,
         pluginName: this.pluginName
       });
-      return;
+      return new Promise(() => undefined);
     }
 
 
     const postRenderCB = genPostRenderCB(container);
 
     console.log(`Log: [UldeMermaidPlugin] container`, container);
-    let mermaidNodes!: NodeListOf<HTMLElement>;
-    requestAnimationFrame(() => {
 
-      [error on diagnostics]
+
+    requestAnimationFrame(() => {
 
       mermaidNodes = container.querySelectorAll<HTMLElement>('pre code.language-mermaid');
       if (mermaidNodes.length < 1) {
         diagnostics.push({
-          level: "error",
+          level: "info",
           lifecyclePhase: ctx.lifecyclePhase,
           message: `selector 'code.language-mermaid' not found in 'markdown-host'`,
           pluginKind: this.pluginKind,
@@ -218,7 +220,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
         //   panel.append('No Debug Entries Found');
         // }
 
-        console.log(`Log: [UldeMermaidPlugin] Finished`);
+        console.log(`Log: [UldeMermaidPlugin] run() Finished`);
 
 
       } catch (err: any) {
@@ -236,25 +238,34 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
       }
 
     });
-    // return () => {
-    //   zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
-    //   zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
-    //   resetHandlers.forEach(reset => reset.button.removeEventListener('click', reset.handler));
+    // });
+    return () => {
+      // tear down process
+      zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
+      zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
+      resetHandlers.forEach(reset => reset.button.removeEventListener('click', reset.handler));
 
-    //   window.removeEventListener('error', handleEventError);
-    //   window.removeEventListener('unhandledrejection', handleEventUnhandle);
-    // };
+      window.removeEventListener('error', handleEventError);
+      window.removeEventListener('unhandledrejection', handleEventUnhandle);
+    };
 
   };
 
-  destroy(): void | Promise<void> {
+  async destroy() {
 
-    zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
-    zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
-    resetHandlers.forEach(reset => reset.button.removeEventListener('click', reset.handler));
+    console.log(`Log: [UldeMermaidPlugin] destroy() start`);
+    //     return () => {
+    //       zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
+    //       zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
+    //       resetHandlers.forEach(reset => reset.button.removeEventListener('click', reset.handler));
 
-    window.removeEventListener('error', handleEventError);
-    window.removeEventListener('unhandledrejection', handleEventUnhandle);
+    //       window.removeEventListener('error', handleEventError);
+    //       window.removeEventListener('unhandledrejection', handleEventUnhandle);
+    //     }
+    //   }
+
+    console.log(`Log: [UldeMermaidPlugin] destroy() start`);
+
   }
 
 }

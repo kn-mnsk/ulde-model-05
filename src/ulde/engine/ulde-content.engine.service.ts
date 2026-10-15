@@ -52,6 +52,8 @@ export class ContentEngineService {
     const md = new MarkdownIt();
     const tokens = md.parse(raw, {});
 
+    console.log(`Log: [${this.title}] tokens=\n`, tokens);
+
     return tokens;
 
   }

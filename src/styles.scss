@@ -307,6 +307,37 @@ body[data-theme="light"] {
 }
 
 
+// markdown table specific
+.markdown-host .markdown-table {
+  border-collapse: collapse;
+  width: fit-content;
+  margin-top: 1rem;
+  font-size: 1rem;
+
+  th {
+    background-color: rgb(206, 14, 78);
+  }
+
+
+  tr td {
+    border: 1px solid #1bee22;
+    padding: 0.5rem;
+    // text-align: center;
+  }
+
+  tr:nth-child(even) {
+    background-color: #93ccdc;
+    border-bottom: solid 1px rgb(227, 219, 219);
+  }
+
+  tr:nth-child(odd) {
+    background-color: #bebaf1;
+    border-bottom: solid 1px rgb(227, 219, 219);
+  }
+}
+
+
+// THE BELOWS ARE DEPRICATED
 /* ---------------------------------------------
    LEFT-SIDE COLLAPSIBLE SIDEBAR
 --------------------------------------------- */
