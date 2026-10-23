@@ -1,7 +1,7 @@
 // src/ulde/engine/ulde-ast-builder.engine.ts
 
 import Token from 'markdown-it/lib/token.mjs';
-import { ULDEAstNode } from '@ulde/types/context';
+import { ULDEAstNode, ULDEExternalLinkNode } from '@ulde/types/context';
 
 export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
   const root: ULDEAstNode[] = [];
@@ -152,9 +152,33 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
           switch (child.type) {
 
             case 'text':
-              find RegExp ??
-                console.log(`Log: [buildUldeAst] inline text href`, child.attrGet('href'), child.content.match('<a href^'));
               push({ type: 'text', value: child.content });
+              break;
+
+            case 'html_inline':
+
+              const html = child.content;
+
+              const externalLink =
+                parseExternalAnchor(html);
+
+
+              if (externalLink) {
+
+                push({
+                  type: 'externalLink',
+
+                  href: externalLink.href,
+
+                  text: externalLink.text,
+
+                  title: externalLink.title,
+
+                  target: externalLink.target,
+
+                  rel: externalLink.rel
+                });
+              }
               break;
 
             case 'strong_open':
@@ -175,8 +199,10 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
 
             case 'link_open':
               open({
-                type: 'link',
+                type: 'internalLink',
+                // type: 'link',
                 href: child.attrGet('href') || '',
+                title: t.content  // ??
               });
               break;
 
@@ -210,6 +236,34 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
   return root;
 }
 
+
+function parseExternalAnchor(
+  html: string
+): ULDEExternalLinkNode | undefined {
+
+  const href =
+    html.match(/href="([^"]+)"/)?.[1];
+
+  if (!href) {
+    return undefined;
+  }
+
+  const text =
+    html.replace(/<[^>]+>/g, '')
+      .trim();
+
+  return {
+    type: 'externalLink',
+
+    href,
+
+    text,
+
+    target: '_blank',
+
+    rel: 'noopener noreferrer'
+  };
+}
 //-----------------------------------------
 // NOTE:
 // If addinng custom tokens (for frontmatter, demos, ULDE blocks) later, can extend this switch with those types and map them to ULDEFrontmatterNode, ULDEDemoNode, ULDEUldeBlockNode, etc.

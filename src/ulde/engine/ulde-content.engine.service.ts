@@ -36,7 +36,7 @@ export class ContentEngineService {
       const raw = await response.text();
 
 
-      // console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
+      console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
 
       return raw;
 
@@ -49,7 +49,10 @@ export class ContentEngineService {
   async transform(raw: string): Promise<Token[]> {
     /* existing parser */
 
-    const md = new MarkdownIt();
+    const md = new MarkdownIt({
+      html: true
+    });
+    // const md = new MarkdownIt();
     const tokens = md.parse(raw, {});
 
     console.log(`Log: [${this.title}] tokens=\n`, tokens);
