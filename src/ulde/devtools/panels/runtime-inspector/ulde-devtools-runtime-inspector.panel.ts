@@ -53,7 +53,7 @@ export class UldeDevtoolsRuntimeInspectorPanel {
     const tocs: { href: string; label: string }[] = [];
 
     function walk(node: ULDEAstNode) {
-      if (node.type === 'link') {
+      if (node.type === 'internalLink') {
         tocs.push({
           href: node.href,
           label: node.children?.filter(n => n.type === 'text').map(n => n.value).join('') ?? ''

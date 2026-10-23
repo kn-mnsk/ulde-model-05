@@ -115,10 +115,36 @@ export interface ULDESectionInfo {
   title: string;
 }
 
-export interface ULDELinkInfo {
+// navigation artifact
+export interface ULDEInternalLinkInfo {
+
+  /**
+   * Example:
+   * #pageId:docs/angular-readme
+   */
   href: string;
+
+  title?: string;
+}
+
+// external resource artifact
+export interface ULDEExternalLinkInfo {
+
+  /**
+   * Visible label.
+   */
   text: string;
-  external: boolean;
+
+  /**
+   * External URL.
+   */
+  href: string;
+
+  title?: string;
+
+  target?: string;
+
+  rel?: string;
 }
 
 export interface ULDECodeBlockInfo {
@@ -136,8 +162,11 @@ export interface ULDEArtifacts {
   anchors: ULDEAnchorEntry[];
   sections: ULDESectionInfo[];
 
-  // Content Analysis
-  links: ULDELinkInfo[];
+  // links
+  internalLinks: ULDEInternalLinkInfo[];
+  externalLinks: ULDEExternalLinkInfo[];
+
+  // Content
   codeBlocks: ULDECodeBlockInfo[];
 
   // Diagnostics
@@ -222,14 +251,55 @@ export interface ULDEBreakNode extends ULDEAstNodeBase {
   type: 'break';
 }
 
-export interface ULDELinkNode extends ULDEAstNodeBase {
-  type: 'link';
+// ULE documentation navigation
+export interface ULDEInternalLinkNode
+  extends ULDEAstNodeBase {
+  type: 'internalLink';
+
+  /**
+   * Example:
+   * #pageId:docs/angular-readme
+   */
   href: string;
+
+  /**
+   * Optional metadata.
+   */
   title?: string;
-  // meta: {
-  //   href: string;
-  //   title?: string;
-  // };
+}
+
+// web navigation
+export interface ULDEExternalLinkNode
+  extends ULDEAstNodeBase {
+
+  type: 'externalLink';
+
+  /**
+   * Example:
+   * https://github.com/angular/angular-cli
+   */
+  href: string;
+
+  /**
+   * Visible link label.
+   */
+  text: string;
+
+  /**
+   * Browser target.
+   * Usually "_blank".
+   */
+  target?: string;
+
+  /**
+   * Security attributes.
+   */
+  rel?: string;
+
+  /**
+   * Tooltip text.
+   */
+  title?: string;
 }
 
 export interface ULDEImageNode extends ULDEAstNodeBase {
@@ -396,12 +466,13 @@ export type ULDEAstNode =
   | ULDEStrongNode
   | ULDEInlineCodeNode
   | ULDEBreakNode
-  | ULDELinkNode
+  | ULDEInternalLinkNode
   | ULDEImageNode
   | ULDERootNode
   | ULDESectionNode
   | ULDEFrontmatterNode
   | ULDECodeNode
+  | ULDEExternalLinkNode
   | ULDEFenceNode
   | ULDEMathNode
   | ULDEInlineMathNode

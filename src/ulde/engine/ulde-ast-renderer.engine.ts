@@ -87,7 +87,7 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         break;
       }
 
-      case 'link': {
+      case 'internalLink': {
         const href = escapeHtml(node.href ?? '');
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
@@ -95,6 +95,35 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         buf.push(`<a href="${href}"${title}>`);
         node.children?.forEach(renderNode);
         buf.push('</a>');
+        break;
+      }
+
+
+      case 'externalLink': {
+        const href = escapeHtml(node.href);
+        const title = node.title
+          ? ` title="${escapeHtml(node.title)}"`
+          : '';
+        const target =
+          node.target
+            ? ` target="${escapeHtml(node.target)}"`
+            : '';
+
+        const rel =
+          node.rel
+            ? ` rel="${escapeHtml(node.rel)}"`
+            : '';
+
+        buf.push(
+          `<a href="${href}"${title}${target}${rel}>`
+        );
+
+        buf.push(
+          escapeHtml(node.text)
+        );
+
+        buf.push('</a>');
+        
         break;
       }
 

@@ -35,7 +35,7 @@ export class ULDETocPlugin implements ULDEPluginInstance {
     const tocNode: ULDETocNode = {
       type: 'toc',
       children: headings.map(h => ({
-        type: 'link',
+        type: 'internalLink',
         href: `#${slugify(h.text)}`,
         title: h.text,
         children: [{ type: 'text', value: h.text}]

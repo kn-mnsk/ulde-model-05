@@ -57,10 +57,11 @@ export class ULDELifecycleService {
 
     // INIT
     const artifacts: ULDEArtifacts = {
+      internalLinks: [],
+      externalLinks: [],
       toc: [],
       anchors: [],
       sections: [],
-      links: [],
       codeBlocks: [],
       diagnostics: [],
       pluginData: {}
