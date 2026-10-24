@@ -148,38 +148,43 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
 
       // Inline tokens
       case 'inline':
-        for (const child of t.children || []) {
-          switch (child.type) {
 
+        for (const child of t.children || []) {
+
+          switch (child.type) {
             case 'text':
               push({ type: 'text', value: child.content });
               break;
 
             case 'html_inline':
-
-              const html = child.content;
-
-              const externalLink =
-                parseExternalAnchor(html);
-
-
-              if (externalLink) {
-
-                push({
-                  type: 'externalLink',
-
-                  href: externalLink.href,
-
-                  text: externalLink.text,
-
-                  title: externalLink.title,
-
-                  target: externalLink.target,
-
-                  rel: externalLink.rel
-                });
-              }
+              // reserved for future ULDEHtmlNode
               break;
+
+            // case 'html_inline':
+
+            //   const content = child.content;
+            //   const html = t.content;
+
+            //   const externalLink =
+            //     parseExternalAnchor(html);
+            //   if (externalLink) {
+            //     // push(externalLink);
+            //     if (content.includes('<a')) {
+            //       open({
+            //         type: 'externalLink',
+            //         href: externalLink.href,
+            //         text: externalLink.text,
+            //         title: externalLink.title,
+            //         target: externalLink.target,
+            //         rel: externalLink.rel
+
+            //       })
+            //     } else if (content.includes('</a>')) {
+            //       close();
+            //     }
+            //   };
+
+            //   break;
 
             case 'strong_open':
               open({ type: 'strong' });
@@ -197,14 +202,61 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
               close();
               break;
 
-            case 'link_open':
-              open({
-                type: 'internalLink',
-                // type: 'link',
-                href: child.attrGet('href') || '',
-                title: t.content  // ??
-              });
+            case 'link_open': {
+
+              const href =
+                child.attrGet('href') || '';
+
+              const text =
+                getInlineLinkText(t.children ?? []);
+
+              console.log(`Log: [AstBuilder] link-open text=`, text, href)
+              const isExternal =
+                text.startsWith('external:');
+
+              if (isExternal) {
+
+                open({
+                  type: 'externalLink',
+
+                  href,
+
+                  text: text.replace(
+                    /^external:/,
+                    ''
+                  ),
+
+                  target: '_blank',
+
+                  rel: 'noopener noreferrer'
+                });
+
+              } else {
+
+                open({
+                  type: 'internalLink',
+
+                  href,
+
+                  title: undefined
+                });
+
+              }
+
               break;
+            }
+
+
+            // case 'link_open':
+            //   open({
+            //     type: 'internalLink',
+            //     // type: 'link',
+            //     href: child.attrGet('href') || '',
+            //     title: t.content  // ??
+            //   });
+            //   break;
+
+
 
             case 'link_close':
               close();
@@ -236,6 +288,19 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
   return root;
 }
 
+function getInlineLinkText(
+  children?: Token[]
+): string {
+
+  return (children ?? [])
+    .filter(
+      child => child.type === 'text'
+    )
+    .map(
+      child => child.content
+    )
+    .join('');
+}
 
 function parseExternalAnchor(
   html: string
@@ -248,9 +313,10 @@ function parseExternalAnchor(
     return undefined;
   }
 
-  const text =
-    html.replace(/<[^>]+>/g, '')
-      .trim();
+  const reg = /<a[^>]*>([^<]+)<\/a>/g;
+  const text = reg.exec(html)?.[1] ?? '';
+
+  // console.log(`Log: [AstBuildr] parseExternalAnchor \ntext=`, text, href)
 
   return {
     type: 'externalLink',

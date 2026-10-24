@@ -17,7 +17,7 @@ Similarity	|Timing	|Timing + scheduling
 
 
 # 2. Angular README
-**This project was generated using <a href="https://github.com/angular/angular-cli" target="_blank>Angular CLI</a>version 21.0.0. ...**
+**This project was generated using <a href="https://github.com/angular/angular-cli" target="_blank" rel="noopener noreferer"  title="External Site">Angular CLI version 21.0.0.</a> ...**
 
 - [details](#pageId:docs/angular-readme)
 - [Angular Lifecycle - relation to Browser frame lifecyle](#pageId:docs/supplements/doc-angular-0100 "docID: doc-angular-0100")

@@ -92,14 +92,15 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
           : '';
-        buf.push(`<a href="${href}"${title}>`);
+        buf.push(`<a href="${href}" ${title}>`);
         node.children?.forEach(renderNode);
         buf.push('</a>');
         break;
       }
 
-
       case 'externalLink': {
+        // console.log(`Log: [AstRenderer] externalLink \nnode=`, node);
+
         const href = escapeHtml(node.href);
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
@@ -109,21 +110,15 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
             ? ` target="${escapeHtml(node.target)}"`
             : '';
 
-        const rel =
-          node.rel
-            ? ` rel="${escapeHtml(node.rel)}"`
-            : '';
+        const rel = node.rel ?? 'nonopener nonreferrer'
+          // node.rel
+          //   ? ` rel="${escapeHtml(node.rel)}"`
+          //   : '';
 
-        buf.push(
-          `<a href="${href}"${title}${target}${rel}>`
-        );
+        buf.push(`<a href="${href}"${title}${target}${rel}>`);
+        buf.push(escapeHtml(node.text));
+        buf.push(`<\a>`);
 
-        buf.push(
-          escapeHtml(node.text)
-        );
-
-        buf.push('</a>');
-        
         break;
       }
 

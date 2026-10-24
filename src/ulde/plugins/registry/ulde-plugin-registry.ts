@@ -1,6 +1,7 @@
 // src/ulde/plugins/registry/ulde-plugin-registry.ts
 
 import {
+  ULDEExternalLinkPlugin,
   ULDECodeblockPlugin, ULDEFrontmatterNormalizerPlugin
 } from '@ulde/plugins/system/content';
 
@@ -36,6 +37,7 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
 
   // Content + navigation: operate on page context / tokens / early AST
   load: [
+    () => new ULDEExternalLinkPlugin(),
     () => new ULDEFrontmatterNormalizerPlugin(),
     () => new ULDECodeblockPlugin(),
     () => new ULDEDemoPlugin(),
