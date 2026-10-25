@@ -252,38 +252,31 @@ export interface ULDEBreakNode extends ULDEAstNodeBase {
 }
 
 // ULE documentation navigation
-export interface ULDEInternalLinkNode
+
+export interface ULDELinkNodeBase
   extends ULDEAstNodeBase {
-  type: 'internalLink';
-
   /**
-   * Example:
-   * #pageId:docs/angular-readme
-   */
+ * Example:
+ * #pageId:docs/angular-readme, or
+ * https://github.com/angular/angular-cli
+ */
   href: string;
-
   /**
    * Optional metadata.
    */
   title?: string;
 }
 
+export interface ULDEInternalLinkNode
+  extends ULDELinkNodeBase {
+  type: 'internalLink';
+}
+
 // web navigation
 export interface ULDEExternalLinkNode
-  extends ULDEAstNodeBase {
+  extends ULDELinkNodeBase {
 
   type: 'externalLink';
-
-  /**
-   * Example:
-   * https://github.com/angular/angular-cli
-   */
-  href: string;
-
-  /**
-   * Visible link label.
-   */
-  text: string;
 
   /**
    * Browser target.
@@ -296,10 +289,6 @@ export interface ULDEExternalLinkNode
    */
   rel?: string;
 
-  /**
-   * Tooltip text.
-   */
-  title?: string;
 }
 
 export interface ULDEImageNode extends ULDEAstNodeBase {

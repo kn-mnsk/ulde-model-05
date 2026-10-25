@@ -126,7 +126,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
 
     const postRenderCB = genPostRenderCB(container);
 
-    console.log(`Log: [UldeMermaidPlugin] container`, container);
+    // console.log(`Log: [UldeMermaidPlugin] container`, container);
 
 
     requestAnimationFrame(() => {

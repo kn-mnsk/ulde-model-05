@@ -33,8 +33,7 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
     requestAnimationFrame(() => {
       const internalLinks = markdownHost.querySelectorAll(`a[href^="#pageId:docs/"]`);
 
-
-      console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
+      // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
 
       internalLinks.forEach(a => {
         a.addEventListener('click', (e: any) => {
@@ -47,7 +46,7 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
           const containerRect = markdownHost.getBoundingClientRect();
           const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
 
-          console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
+          // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
 
           markdownHost.dispatchEvent(new CustomEvent('ulde:navigate', {
             detail: {

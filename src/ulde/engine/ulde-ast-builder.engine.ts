@@ -160,32 +160,6 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
               // reserved for future ULDEHtmlNode
               break;
 
-            // case 'html_inline':
-
-            //   const content = child.content;
-            //   const html = t.content;
-
-            //   const externalLink =
-            //     parseExternalAnchor(html);
-            //   if (externalLink) {
-            //     // push(externalLink);
-            //     if (content.includes('<a')) {
-            //       open({
-            //         type: 'externalLink',
-            //         href: externalLink.href,
-            //         text: externalLink.text,
-            //         title: externalLink.title,
-            //         target: externalLink.target,
-            //         rel: externalLink.rel
-
-            //       })
-            //     } else if (content.includes('</a>')) {
-            //       close();
-            //     }
-            //   };
-
-            //   break;
-
             case 'strong_open':
               open({ type: 'strong' });
               break;
@@ -204,59 +178,44 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
 
             case 'link_open': {
 
-              const href =
-                child.attrGet('href') || '';
+              const href = child.attrGet('href') || '';
+              const title = child.attrGet('title') || '';
 
-              const text =
-                getInlineLinkText(t.children ?? []);
-
-              console.log(`Log: [AstBuilder] link-open text=`, text, href)
-              const isExternal =
-                text.startsWith('external:');
+              const content = t.content;
+              const isExternal = content.includes('external:');
 
               if (isExternal) {
+                // const text = getInlineLinkText(content);
+                // console.log(`Log: [AstBuilder] link-open isExternal=`, isExternal, href, text);
+
+                // open({
+                //   type: 'externalLink',
+                //   href,
+                //   text,
+                //   title
+
+                // });
 
                 open({
                   type: 'externalLink',
-
                   href,
-
-                  text: text.replace(
-                    /^external:/,
-                    ''
-                  ),
-
+                  title,
                   target: '_blank',
-
                   rel: 'noopener noreferrer'
-                });
+                })
 
               } else {
 
                 open({
                   type: 'internalLink',
-
                   href,
-
-                  title: undefined
+                  title
                 });
 
               }
 
               break;
             }
-
-
-            // case 'link_open':
-            //   open({
-            //     type: 'internalLink',
-            //     // type: 'link',
-            //     href: child.attrGet('href') || '',
-            //     title: t.content  // ??
-            //   });
-            //   break;
-
-
 
             case 'link_close':
               close();
@@ -288,48 +247,56 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
   return root;
 }
 
-function getInlineLinkText(
-  children?: Token[]
-): string {
+// function getInlineLinkText(content: string): string {
 
-  return (children ?? [])
-    .filter(
-      child => child.type === 'text'
-    )
-    .map(
-      child => child.content
-    )
-    .join('');
-}
+//   const reg = /\[external:\s*([^\]]+)\]/;
+//   const linkText = reg.exec(content) ?? '';
 
-function parseExternalAnchor(
-  html: string
-): ULDEExternalLinkNode | undefined {
+//   return linkText[1];
+// }
 
-  const href =
-    html.match(/href="([^"]+)"/)?.[1];
+// function getInlineLinkText(
+//   children?: Token[]
+// ): string {
+//   return (children ?? [])
+//     .filter(
+//       child => child.type === 'text'
+//     )
+//     .map(
+//       child => child.content
+//     )
+//     .join('');
+// }
 
-  if (!href) {
-    return undefined;
-  }
 
-  const reg = /<a[^>]*>([^<]+)<\/a>/g;
-  const text = reg.exec(html)?.[1] ?? '';
+// function parseExternalAnchor(
+//   html: string
+// ): ULDEExternalLinkNode | undefined {
 
-  // console.log(`Log: [AstBuildr] parseExternalAnchor \ntext=`, text, href)
+//   const href =
+//     html.match(/href="([^"]+)"/)?.[1];
 
-  return {
-    type: 'externalLink',
+//   if (!href) {
+//     return undefined;
+//   }
 
-    href,
+//   const reg = /<a[^>]*>([^<]+)<\/a>/g;
+//   const text = reg.exec(html)?.[1] ?? '';
 
-    text,
+//   // console.log(`Log: [AstBuildr] parseExternalAnchor \ntext=`, text, href)
 
-    target: '_blank',
+//   return {
+//     type: 'externalLink',
 
-    rel: 'noopener noreferrer'
-  };
-}
+//     href,
+
+//     text,
+
+//     target: '_blank',
+
+//     rel: 'noopener noreferrer'
+//   };
+// }
 //-----------------------------------------
 // NOTE:
 // If addinng custom tokens (for frontmatter, demos, ULDE blocks) later, can extend this switch with those types and map them to ULDEFrontmatterNode, ULDEDemoNode, ULDEUldeBlockNode, etc.

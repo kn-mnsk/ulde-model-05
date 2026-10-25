@@ -35,8 +35,7 @@ export class ContentEngineService {
 
       const raw = await response.text();
 
-
-      console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
+      // console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
 
       return raw;
 
@@ -55,7 +54,7 @@ export class ContentEngineService {
     // const md = new MarkdownIt();
     const tokens = md.parse(raw, {});
 
-    console.log(`Log: [${this.title}] tokens=\n`, tokens);
+    // console.log(`Log: [${this.title}] tokens=\n`, tokens);
 
     return tokens;
 

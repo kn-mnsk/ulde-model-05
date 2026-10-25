@@ -17,62 +17,62 @@ Similarity	|Timing	|Timing + scheduling
 
 
 # 2. Angular README
-**This project was generated using <a href="https://github.com/angular/angular-cli" target="_blank" rel="noopener noreferer"  title="External Site">Angular CLI version 21.0.0.</a> ...**
+**This project was generated using <a href="https://github.com/angular/angular-cli">Angular CLI version 21.0.0.</a>&nbsp; ...**
 
-- [details](#pageId:docs/angular-readme)
-- [Angular Lifecycle - relation to Browser frame lifecyle](#pageId:docs/supplements/doc-angular-0100 "docID: doc-angular-0100")
+- [details](#pageId:docs/angular-readme "pageId: docs/angular-readme")
+- [Angular Lifecycle - relation to Browser frame lifecyle](#pageId:docs/supplements/doc-angular-0100 "pageID: doc-angular-0100")
 
 
 ## 1. Application(Documentation System) README
 ___This document is the master reference for the entire documentation rendering system. It explains how Markdown is parsed, enhanced, rendered to html, and synchronized with user navigation. ...___
 
 - [details](#pageId:docs/application-readme "Internal Documents")
-- [Lifcycle integration and plugin-ready documentation components](#pageId:docs/supplements/doc-app-0200 "docID: doc-app-0200")
+- [Lifcycle integration and plugin-ready documentation components](#pageId:docs/supplements/doc-app-0200 "pageID: doc-app-0200")
 
  
 - ___Supplements:___
->1. [DocsViewer Key Logic Diagram](#pageId:docs/supplements/doc10-app-0110 "docID: doc10-app-0110")
->2. [Browser Refresh Recovery](#pageId:docs/supplements/doc10-app-0140 "docID: doc10-app-0140")
->3. [Browser Scroll Restoration](#pageId:docs/supplements/doc10-app-0150 "docID: doc10-app-0150")
->4. [Scroll Restoration & Timing Diagram](#pageId:docs/supplements/doc10-app-0151 "docID: doc10-app-0151")
+>1. [DocsViewer Key Logic Diagram](#pageId:docs/supplements/doc10-app-0110 "pageID: doc10-app-0110")
+>2. [Browser Refresh Recovery](#pageId:docs/supplements/doc10-app-0140 "pageID: doc10-app-0140")
+>3. [Browser Scroll Restoration](#pageId:docs/supplements/doc10-app-0150 "pageID: doc10-app-0150")
+>4. [Scroll Restoration & Timing Diagram](#pageId:docs/supplements/doc10-app-0151 "pageID: doc10-app-0151")
 
 
 ## 2. GitHub
 - [README](#pageId:docs/github-readme "Internal Documents")
-- [Troubleshooting Guide](#pageId:docs/supplements/doc-github-0100 "Internal Documents")
-- <a href="https://github.com/mdn/dom-examples/tree/main" target="_blank" title="External Site">Dom Examples on Github</a> 
+- [Troubleshooting Guide](#pageId:docs/supplements/doc-github-0100 "pageId: doc-github-0100")
+- <a href="https://github.com/mdn/dom-examples/tree/main">Dom Examples on Github</a> 
 
 ## 3. Markdown Documents
-- <a href="https://daringfireball.net/projects/markdown/" target="_blank" title="External Site">DARING FIREBALL Markdown</a> 
-- <a href="https://www.markdownlang.com/" target="_blank" title="External Site">Markdown Lang Home</a> 
-- <a href="https://marked.js.org/" target="_blank" title="External Site">Marked Documentation</a> 
-- [Supplemet to marked.d.ts](#pageId:docs/supplements/doc-marked-0100 "Internal Documents")
+- <a href="https://daringfireball.net/projects/markdown/">DARING FIREBALL Markdown</a> 
+- <a href="https://www.markdownlang.com/"  >Markdown Lang Home</a> 
+- <a href="https://marked.js.org/">Marked Documentation</a> 
+- [Supplemet to marked.d.ts](#pageId:docs/supplements/doc-marked-0100 "pageId: doc-marked-0100")
 - [Lexer and Parser](#pageId:docs/supplements/doc-marked-0200 "Internal Documents")
-- <a href="https://markdown-it.github.io/markdown-it/" target="_blank" title="External Site">Markdown-it Documentation</a> 
+- <a href="https://markdown-it.github.io/markdown-it/">Markdown-it Documentation</a> 
 
 ## 4. Mermaid Document
-- <a href="https://www.mostlylucid.net/blog/switchingthemesformermaid" target="_blank" title="External Site">Switching Themes for Mermaid</a> 
+- <a href="https://www.mostlylucid.net/blog/switchingthemesformermaid">Switching Themes for Mermaid</a> 
 
 ## 5. Web APIS, etc.
-- [requestAnimationFrame vs queueMicrotask](#pageId:docs/supplements/doc-webapi-0100 "docId: doc-webapi-0100")
-- [queueMicrotask vs signal](#pageId:docs/supplements/doc-webapi-0120 "docId: doc-webapi-0120")
+- [requestAnimationFrame vs queueMicrotask](#pageId:docs/supplements/doc-webapi-0100 "pageID: doc-webapi-0100")
+- [queueMicrotask vs signal](#pageId:docs/supplements/doc-webapi-0120 "pageID: doc-webapi-0120")
 
 ## 6. Plugins
-- [ULDE Integratiom](#pageId:docs/supplements/doc-ulde-0100 "docId: doc-ulde-0100")
-- [Unified Documentation + ULDE Lifecycle](#pageId:doc-ulde-0110 "docId: doc-ulde-0110")
-- [Plugin API Design](#pageId:docs/supplements/doc-ulde-0120 "docId: doc-ulde-0120")
-- [Angular Integration — Where ULDE Lives in Your Real System](#pageId:docs/supplements/doc-ulde-0130 "docId: doc-ulde-0130")
-- [Map Your Existing Documentation System Into the ULDE Architecture](#pageId:docs/supplements/doc-ulde-0140 "docId: doc-ulde-0140")
-- [ULDE Project Sleleton](#pageId:docs/supplements/doc-ulde-0150 "docId: doc-ulde-0150")
-- [Add a Real Layout Shell - Sidebar, Header, Toc, Content Area](#pageId:docs/supplements/doc-ulde-0160 "docId: doc-ulde-0160")
-- [Add a Markdown Rendering Plugin](#pageId:docs/supplements/doc-ulde-0170 "docId: doc-ulde-0170")
-- [Add a Mermaid Rendering Plugin](#pageId:docs/supplements/doc-ulde-0180 "docId: doc-ulde-0180")
+- [ULDE Integratiom](#pageId:docs/supplements/doc-ulde-0100 "pageID: doc-ulde-0100")
+- [Unified Documentation + ULDE Lifecycle](#pageId:doc-ulde-0110 "pageID: doc-ulde-0110")
+- [Plugin API Design](#pageId:docs/supplements/doc-ulde-0120 "pageID: doc-ulde-0120")
+- [Angular Integration — Where ULDE Lives in Your Real System](#pageId:docs/supplements/doc-ulde-0130 "pageID: doc-ulde-0130")
+- [Map Your Existing Documentation System Into the ULDE Architecture](#pageId:docs/supplements/doc-ulde-0140 "pageID: doc-ulde-0140")
+- [ULDE Project Sleleton](#pageId:docs/supplements/doc-ulde-0150 "pageID: doc-ulde-0150")
+- [Add a Real Layout Shell - Sidebar, Header, Toc, Content Area](#pageId:docs/supplements/doc-ulde-0160 "pageID: doc-ulde-0160")
+- [Add a Markdown Rendering Plugin](#pageId:docs/supplements/doc-ulde-0170 "pageID: doc-ulde-0170")
+- [Add a Mermaid Rendering Plugin](#pageId:docs/supplements/doc-ulde-0180 "pageID: doc-ulde-0180")
 
 
 ## 7. Plugins Vesrion 2
-- [ULDE v2 Project](#pageId:docs/supplements/doc-ulde2-0200 "docId: doc-ulde2-0200")
-- [Implement plugin-registry.ts](#pageId:docs/supplements/doc-ulde2-0210 "docId: doc-ulde2-0210")
-- [Implement content-engine.ts](#pageId:docs/supplements/doc-ulde2-0220 "docId: doc-ulde2-0220")
-- [Wire ContentEngine into UldeService](#pageId:docs/supplements/doc-ulde2-0222 "docId: doc-ulde2-0222")
-- [Implement the full &lt;ulde-viewer> component](#pageId:docs/supplements/doc-ulde2-0230 "docId: doc-ulde2-0230")
-- [DOM Plugin API + Debug Overlay](#pageId:docs/supplements/doc-ulde2-0240 "docId: doc-ulde2-0240")
+- [ULDE v2 Project](#pageId:docs/supplements/doc-ulde2-0200 "pageID: doc-ulde2-0200")
+- [Implement plugin-registry.ts](#pageId:docs/supplements/doc-ulde2-0210 "pageID: doc-ulde2-0210")
+- [Implement content-engine.ts](#pageId:docs/supplements/doc-ulde2-0220 "pageID: doc-ulde2-0220")
+- [Wire ContentEngine into UldeService](#pageId:docs/supplements/doc-ulde2-0222 "pageID: doc-ulde2-0222")
+- [Implement the full &lt;ulde-viewer> component](#pageId:docs/supplements/doc-ulde2-0230 "pageID: doc-ulde2-0230")
+- [DOM Plugin API + Debug Overlay](#pageId:docs/supplements/doc-ulde2-0240 "pageID: doc-ulde2-0240")

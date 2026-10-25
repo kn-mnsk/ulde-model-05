@@ -1,7 +1,6 @@
 // src/ulde/plugins/registry/ulde-plugin-registry.ts
 
 import {
-  ULDEExternalLinkPlugin,
   ULDECodeblockPlugin, ULDEFrontmatterNormalizerPlugin
 } from '@ulde/plugins/system/content';
 
@@ -16,7 +15,8 @@ import {
 } from '@ulde/plugins/system/layout';
 
 import {
-  ULDENavigationBreadcrumbsPlugin, UldeInternalLinkPlugin
+  ULDENavigationBreadcrumbsPlugin, UldeInternalLinkPlugin,
+  ULDEExternalLinkPlugin
 } from '@ulde/plugins/system/navigation';
 
 import {

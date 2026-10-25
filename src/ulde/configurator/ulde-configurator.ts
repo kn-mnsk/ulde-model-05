@@ -87,14 +87,15 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     const markdown = await this.contenEngine.load(pageId);
     if (!markdown) return;
 
-    const tokens = await this.contenEngine.transform(markdown);
+    // const tokens = await this.contenEngine.transform(markdown);
     // const tokens = this.md.parse(markdown, {});
 
     return {
       pageId: this.$page().id,
       source: {
         raw: markdown,
-        tokens: tokens
+        tokens: [],
+        // tokens: tokens
       },
       meta: {},
     };
