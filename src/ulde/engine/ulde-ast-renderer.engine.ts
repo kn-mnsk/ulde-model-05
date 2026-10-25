@@ -104,20 +104,19 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         const href = escapeHtml(node.href);
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
-          : '';
-        const target =
-          node.target
-            ? ` target="${escapeHtml(node.target)}"`
-            : '';
+          : ` title="External Site"`;
+        const target = node.target
+          ? ` target="${escapeHtml(node.target)}"`
+          : ' target="_blank"';
 
-        const rel = node.rel ?? 'nonopener nonreferrer'
-          // node.rel
-          //   ? ` rel="${escapeHtml(node.rel)}"`
-          //   : '';
+        const rel = node.rel
+          ? ` rel="${escapeHtml(node.rel)}"`
+          : ' rel="nonopener nonreferrer"'
 
         buf.push(`<a href="${href}"${title}${target}${rel}>`);
-        buf.push(escapeHtml(node.text));
-        buf.push(`<\a>`);
+        node.children?.forEach(renderNode);
+        // buf.push(escapeHtml(node.text));
+        buf.push(`</a>`);
 
         break;
       }

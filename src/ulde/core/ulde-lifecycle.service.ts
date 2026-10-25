@@ -6,7 +6,7 @@ import { ULDEArtifacts, ULDEExecutionContext, ULDEPageContext } from '@ulde/type
 import { ULDELifecyclePhase } from '@ulde/types/lifecycle';
 import { ULDEDevtoolsService } from '../devtools';
 
-import { ULDERenderContextBuilderService } from '@ulde/engine';
+import { ContentEngineService, ULDERenderContextBuilderService } from '@ulde/engine';
 
 @Injectable({ providedIn: 'root' })
 export class ULDELifecycleService {
@@ -16,6 +16,7 @@ export class ULDELifecycleService {
     private pluginRegistry: ULDEPluginRegistryService,
     private runtime: ULDERuntimeService,
     private renderContextBuilder: ULDERenderContextBuilderService,
+    private contentEngine: ContentEngineService,
   ) { }
 
 
@@ -79,6 +80,11 @@ export class ULDELifecycleService {
     // LOAD (content + navigation plugins)
     executionContext.lifecyclePhase = 'load';
     await this.runPluginByLifecyclePhase('load', executionContext);
+
+    // generate markdown-it tokens for the next step
+    executionContext.page.source.tokens = await this.contentEngine.transform(executionContext.page.source.raw);
+
+    // console.log(`Log: [ULDELifecycleService] executeLifecycle() generated markdown-it tokens=\n`, executionContext.page.source.tokens);
 
     // RENDER
     // 1. Build initial AST
