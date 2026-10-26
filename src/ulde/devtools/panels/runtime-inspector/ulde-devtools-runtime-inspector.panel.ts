@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/panels/runtime-inspector/ulde-devtools-runtime-inspector.panel.ts
+// src/ulde/devtools/panels/runtime-inspector/ulde-devtools-runtime-inspector.panel.ts
 
 import { JsonPipe } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';

@@ -1,4 +1,4 @@
-// src/ulde/viewer/services/ulde-session-state.service.ts
+// src/ulde/configurator/ulde-session-state.service.ts
 
 import { signal } from '@angular/core';
 

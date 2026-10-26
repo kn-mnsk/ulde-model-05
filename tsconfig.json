@@ -19,53 +19,6 @@
     "module": "preserve", // ✔ TS7-safe if using Angular CLI
     // "moduleResolution": "node"           // "bundler" for TS7
 
-    // ULDE Alias path map
-    // "paths": {
-    //   "@ulde/core": [
-    //     "./src/ulde/core/index"
-    //   ],
-    //   "@ulde/core/*": [
-    //     "./src/ulde/core/*"
-    //   ],
-    //   "@ulde/engine": [
-    //     "./src/ulde/engine/index"
-    //   ],
-    //   "@ulde/engine/*": [
-    //     "./src/ulde/engine/*"
-    //   ],
-    //   "@ulde/plugins": [
-    //     "./src/ulde/plugins/index"
-    //   ],
-    //   "@ulde/plugins/*": [
-    //     "./src/ulde/plugins/*"
-    //   ],
-    //   "@ulde/tools": [
-    //     "./src/ulde/tools/index"
-    //   ],
-    //   "@ulde/tools/*": [
-    //     "./src/ulde/tools/*"
-    //   ],
-    //   "@ulde/types": [
-    //     "./src/ulde/types/index"
-    //   ],
-    //   "@ulde/types/*": [
-    //     "./src/ulde/types/*"
-    //   ],
-    //   "@ulde/viewer": [
-    //     "./src/ulde/viewer/index"
-    //   ],
-    //   "@ulde/viewer/*": [
-    //     "./src/ulde/viewer/*"
-    //   ],
-    //   "@ulde/configurator": [
-    //     "./src/ulde/configurator/index"
-    //   ],
-    //   "@ulde/configurator/*": [
-    //     "./src/ulde/configurator/*"
-    //   ]
-    // }
-
-
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false, // ✔ TS7-safe

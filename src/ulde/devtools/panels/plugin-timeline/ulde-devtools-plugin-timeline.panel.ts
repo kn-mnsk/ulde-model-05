@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/panels/plugin-timeline/ulde-devtools-plugin-timeline.panel.ts
+// src/ulde/devtools/panels/plugin-timeline/ulde-devtools-plugin-timeline.panel.ts
 
 import { Component, computed, input } from '@angular/core';
 import { ULDEPluginKind } from '@ulde/types/plugin';

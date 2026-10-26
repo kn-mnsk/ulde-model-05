@@ -1,12 +1,12 @@
-// src/ulde/plugins/system/ulde/ulde-overlay-custom-panel.plugin.ts
+// src/ulde/plugins/system/ulde/ulde-devtools-panel.plugin.ts
 
 import { ULDEExecutionContext } from "@ulde/types";
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
-export class ULDEOverlayCustomPanelPlugin implements ULDEPluginInstance {
+export class ULDEDevToolsPanelPlugin implements ULDEPluginInstance {
   pluginKind: ULDEPluginKind = 'ulde';
-  pluginName = "ULDEOverlayCustomPanelPlugin";
-  description = "Adds a custom panel to the ULDE overlay";
+  pluginName = "ULDEDevToolsPanelPlugin";
+  description = "Adds a custom panel to the ULDE Devtools";
   enabled = true;
   // onInit() {
   //   const panel = document.createElement("div");

@@ -88,38 +88,75 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
       }
 
       case 'internalLink': {
+
         const href = escapeHtml(node.href ?? '');
+
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
           : '';
-        buf.push(`<a href="${href}" ${title}>`);
+
+        buf.push(`<a href="${href}"${title}>`);
+
         node.children?.forEach(renderNode);
+
         buf.push('</a>');
+
         break;
       }
 
       case 'externalLink': {
-        // console.log(`Log: [AstRenderer] externalLink \nnode=`, node);
 
-        const href = escapeHtml(node.href);
-        const title = node.title
-          ? ` title="${escapeHtml(node.title)}"`
-          : ` title="External Site"`;
-        const target = node.target
-          ? ` target="${escapeHtml(node.target)}"`
-          : ' target="_blank"';
+        const href =
+          escapeHtml(node.href);
 
-        const rel = node.rel
-          ? ` rel="${escapeHtml(node.rel)}"`
-          : ' rel="nonopener nonreferrer"'
+        const title =
+          node.title
+            ? ` title="${escapeHtml(node.title)}"`
+            : ` title="External Site (opens in a new tab)"`;
 
-        buf.push(`<a href="${href}"${title}${target}${rel}>`);
-        node.children?.forEach(renderNode);
-        // buf.push(escapeHtml(node.text));
+        buf.push(
+          `<a href="${href}"
+       target="_blank"
+       rel="noopener noreferrer"
+       ${title}>`
+        );
+
+        node.children?.forEach(
+          renderNode
+        );
+
         buf.push(`</a>`);
 
         break;
       }
+
+      // case 'externalLink': {
+      //   // console.log(`Log: [AstRenderer] externalLink \nnode=`, node);
+
+      //   const href = escapeHtml(node.href);
+      //   const title = node.title
+      //     ? ` title="${escapeHtml(node.title)}"`
+      //     : ` title="External Sit On New Tab"`;
+
+      //   // force new tab
+      //   const target = ' target="_blank"';
+      //   // const target = node.target
+      //   //   ? ` target="${escapeHtml(node.target)}"`
+      //   //   : ' target="_blank"';
+
+      //   // for the security to force "nonopener nonreferrer"'
+      //   const rel = ' rel="noopener noreferrer"';
+      //   // const rel = node.rel
+      //   //   ? ` rel="${escapeHtml(node.rel)}"`
+      //   //   : ' rel="nonopener nonreferrer"'
+
+      //   buf.push(`<a href="${href}"${title}${target}${rel}>`);
+      //   node.children?.forEach(renderNode);
+      //   // buf.push(escapeHtml(node.text));
+      //   buf.push(`</a>`);
+
+      //   break;
+      // }
 
       case 'image': {
         const src = escapeHtml(node.src ?? '');
@@ -287,4 +324,3 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-

@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/panels/diagnostics/ulde-devtools-diagnostics.panel.ts
+// src/ulde/devtools/panels/diagnostics/ulde-devtools-diagnostics.panel.ts
 
 import { Component, input, signal, ViewChild, ElementRef } from '@angular/core';
 import { ULDEDiagnostic } from '@ulde/types/diagnostics';

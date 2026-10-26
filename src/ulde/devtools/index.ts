@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/index.ts
+// src/ulde/devtools/index.ts
 
 export * from './panels';
 export * from "./ulde-devtools.service";

@@ -29,23 +29,3 @@ export class ULDEFrontmatterNormalizerPlugin implements ULDEPluginInstance {
 
   }
 }
-
-
-
-
-// legacy
-// import { ULDEPlugin } from '@ulde/types/plugin';
-
-// export const ULDEFrontmatterNormalizerPlugin: ULDEPlugin = {
-//   pluginKind: 'content',
-//   pluginName: "FrontmatterNormalizer",
-//   description: "Normalizes frontmatter fields",
-//   enabled: true,
-//   hooks: {
-//     onPageLoad(ctx) {
-//       ctx.meta['title'] ??= "Untitled";
-//       ctx.meta['tags'] ??= [];
-//       ctx.meta['updated'] ??= new Date().toISOString();
-//     }
-//   }
-// };

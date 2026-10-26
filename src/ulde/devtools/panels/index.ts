@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/panels/index.ts
+// src/ulde/devtools/panels/index.ts
 
 export * from "./diagnostics";
 export * from "./frame-timeline";

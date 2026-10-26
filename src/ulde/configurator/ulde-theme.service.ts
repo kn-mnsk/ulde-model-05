@@ -1,4 +1,4 @@
-// app/core/services/theme.service.ts
+// src/ulde/configurator/ulde-theme.service.ts
 
 import { Injectable } from '@angular/core';
 import { isBrowser } from '../../app/global.utils/global.utils';

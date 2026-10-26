@@ -269,6 +269,7 @@ export interface ULDELinkNodeBase
 
 export interface ULDEInternalLinkNode
   extends ULDELinkNodeBase {
+
   type: 'internalLink';
 }
 
@@ -278,17 +279,6 @@ export interface ULDEExternalLinkNode
 
   type: 'externalLink';
 
-  /**
-   * Browser target.
-   * Usually "_blank".
-   */
-  target?: string;
-
-  /**
-   * Security attributes.
-   */
-  rel?: string;
-
 }
 
 export interface ULDEImageNode extends ULDEAstNodeBase {
@@ -296,11 +286,6 @@ export interface ULDEImageNode extends ULDEAstNodeBase {
   src: string;
   alt?: string;
   title?: string;
-  // meta: {
-  //   src: string;
-  //   alt?: string;
-  //   title?: string;
-  // };
 }
 
 // Structural Nodes
@@ -312,10 +297,6 @@ export interface ULDESectionNode extends ULDEAstNodeBase {
   type: 'section';
   id?: string;
   depth?: number;
-  // meta: {
-  //   id?: string;
-  //   depth?: number;
-  // };
 }
 
 export interface ULDEFrontmatterNode extends ULDEAstNodeBase {

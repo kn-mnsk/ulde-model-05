@@ -49,15 +49,6 @@ export class ULDERenderContextBuilderService {
 
     // 2. Inject diagnostics into AST
     const diagnostics = this.devtoolsService.$diagnostics();
-    // const diagnosticNodes: ULDEDiagnosticNode[] = diagnostics.map((d: ULDEDiagnostic) => ({
-    //   type: 'diagnostic',
-    //   level: d.level,
-    //   message: d.message,
-    //   code: "",
-    //   pluginName: d.pluginName,
-    //   pluginKind: d.pluginKind,
-    //   lifecyclePhase: d.lifecyclePhase,
-    // }));
 
     const finalAst = sectionAst;
     // const finalAst = [...sectionAst, ...diagnosticNodes];
@@ -77,14 +68,8 @@ export class ULDERenderContextBuilderService {
 
     const currentFrame = this.devtoolsService.$currentFrame() ?? undefined;
     executionCtx.artifacts.frame = currentFrame;
-    // const artifacts = { ...executionCtx.artifacts, diagnostics, frame: currentFrame };
-
-    // const render = { ...executionCtx.render, ast: finalAst, html, layout: 'sections', artifacts: executionCtx.artifacts };
-
-    // executionCtx = {...executionCtx, render, artifacts};
 
   }
-
 
 }
 

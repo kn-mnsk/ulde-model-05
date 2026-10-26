@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/panels/frame-timeline/ulde-devtools-frame-timeline.panel.ts
+// src/ulde/devtools/panels/frame-timeline/ulde-devtools-frame-timeline.panel.ts
 
 import { Component, input } from '@angular/core';
 import { DatePipe } from '@angular/common';

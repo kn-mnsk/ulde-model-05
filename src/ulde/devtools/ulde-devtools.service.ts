@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/ulde-devtools.service.ts
+// src/ulde/devtools/ulde-devtools.service.ts
 
 import { computed, Injectable, signal, Signal } from '@angular/core';
 import { ULDEDevtoolsSnapshot, ULDEExecutionContext, ULDEHeatmapCell, ULDEPluginKind, ULDEPluginStatistics, ULDETimelinePoint, ULDETrendSnapshot } from '@ulde/types';

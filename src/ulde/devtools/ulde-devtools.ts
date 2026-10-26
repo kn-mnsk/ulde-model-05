@@ -1,4 +1,4 @@
-// src/ulde/core/devtools/ulde-devtools.ts
+// src/ulde/devtools/ulde-devtools.ts
 
 import { DatePipe, DecimalPipe, JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';

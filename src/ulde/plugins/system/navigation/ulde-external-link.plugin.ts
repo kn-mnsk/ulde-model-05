@@ -1,4 +1,4 @@
-// src/ulde/plugins/system/content/ulde-externallink.plugin.ts
+// src/ulde/plugins/system/navigation/ulde-externallink.plugin.ts
 
 import { ULDEExecutionContext } from "@ulde/types";
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";

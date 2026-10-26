@@ -152,9 +152,25 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
         for (const child of t.children || []) {
 
           switch (child.type) {
-            case 'text':
-              push({ type: 'text', value: child.content });
+            case 'text': {
+
+              const value =
+                child.content.replace(
+                  /^external:/,
+                  ''
+                );
+
+              push({
+                type: 'text',
+                value
+              });
+
+              console.log(`Log: [buildUldeAst] inline -> text type \nvalue=`, value);
+
+              // push({ type: 'text', value: child.content });
+
               break;
+            }
 
             case 'html_inline':
               // reserved for future ULDEHtmlNode
@@ -181,27 +197,12 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
               const href = child.attrGet('href') || '';
               const title = child.attrGet('title') || '';
 
-              const content = t.content;
-              const isExternal = content.includes('external:');
-
-              if (isExternal) {
-                // const text = getInlineLinkText(content);
-                // console.log(`Log: [AstBuilder] link-open isExternal=`, isExternal, href, text);
-
-                // open({
-                //   type: 'externalLink',
-                //   href,
-                //   text,
-                //   title
-
-                // });
+              if (isExternalLink(t)) {
 
                 open({
                   type: 'externalLink',
                   href,
-                  title,
-                  target: '_blank',
-                  rel: 'noopener noreferrer'
+                  title
                 })
 
               } else {
@@ -247,56 +248,23 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
   return root;
 }
 
-// function getInlineLinkText(content: string): string {
+// helper for external link
+function isExternalLink(
+  inlineToken: Token
+): boolean {
 
-//   const reg = /\[external:\s*([^\]]+)\]/;
-//   const linkText = reg.exec(content) ?? '';
-
-//   return linkText[1];
-// }
-
-// function getInlineLinkText(
-//   children?: Token[]
-// ): string {
-//   return (children ?? [])
-//     .filter(
-//       child => child.type === 'text'
-//     )
-//     .map(
-//       child => child.content
-//     )
-//     .join('');
-// }
+  return (
+    inlineToken.children?.some(
+      child =>
+        child.type === 'text' &&
+        child.content.startsWith(
+          'external:'
+        )
+    ) ?? false
+  );
+}
 
 
-// function parseExternalAnchor(
-//   html: string
-// ): ULDEExternalLinkNode | undefined {
-
-//   const href =
-//     html.match(/href="([^"]+)"/)?.[1];
-
-//   if (!href) {
-//     return undefined;
-//   }
-
-//   const reg = /<a[^>]*>([^<]+)<\/a>/g;
-//   const text = reg.exec(html)?.[1] ?? '';
-
-//   // console.log(`Log: [AstBuildr] parseExternalAnchor \ntext=`, text, href)
-
-//   return {
-//     type: 'externalLink',
-
-//     href,
-
-//     text,
-
-//     target: '_blank',
-
-//     rel: 'noopener noreferrer'
-//   };
-// }
 //-----------------------------------------
 // NOTE:
 // If addinng custom tokens (for frontmatter, demos, ULDE blocks) later, can extend this switch with those types and map them to ULDEFrontmatterNode, ULDEDemoNode, ULDEUldeBlockNode, etc.
