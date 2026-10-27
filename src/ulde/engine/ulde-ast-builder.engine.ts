@@ -165,7 +165,7 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
                 value
               });
 
-              console.log(`Log: [buildUldeAst] inline -> text type \nvalue=`, value);
+              // console.log(`Log: [buildUldeAst] inline -> text type \nvalue=`, value);
 
               // push({ type: 'text', value: child.content });
 

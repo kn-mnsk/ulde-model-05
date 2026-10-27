@@ -30,36 +30,65 @@ export class ULDEExternalLinkPlugin
 
   destroy(): void { }
 
+
   private normalizeExternalLinks(
     raw: string
   ): string {
 
-    // const pattern = /<a\s+href="([^"]+)"[^&]*\s+title="([^"]+)"[^&]*>([^<]+)<\/a>/gi;
-
-    // Regex to capture href, optional title, and inner text
-    // Group 1: href
-    // Group 2: title (optional)
-    // Group 3: inner text
-    const pattern = /<a\s+href="([^"]+)"(?:\s+title="([^"]*)")?>(.*?)<\/a>/gi;
+    const pattern =
+      /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
 
     const normalized = raw.replace(
       pattern,
-      (_, href, title, text) => {
+      (_, attrs, text) => {
+        const hrefMatch = attrs.match(
+          /\bhref\s*=\s*"([^"]*)"/i
+        );
 
-        const safeHref = (href || '').trim();
-        const safeTitle = (title || '').trim();
+        const titleMatch = attrs.match(
+          /\btitle\s*=\s*"([^"]*)"/i
+        );
+
+        const safeHref = hrefMatch?.[1]?.trim() ?? '';
+        const safeTitle = titleMatch?.[1]?.trim() ?? '';
         const safeText = (text || '').trim();
 
-        // If title exists, include it in markdown
         return safeTitle
           ? `[external:${safeText}](${safeHref} "${safeTitle}")`
           : `[external:${safeText}](${safeHref})`;
       }
     );
 
-    // console.log(`Log: [ULDEExternalLinkPlugin] \nnormalized raw=\n`, normalized);
-
     return normalized;
 
   }
+
+  // private normalizeExternalLinks(
+  //   raw: string
+  // ): string {
+
+  //   const pattern = /<a\s+href="([^"]+)"(?:\s+title="([^"]*)")?>(.*?)<\/a>/gi;
+
+  //   const normalized = raw.replace(
+  //     pattern,
+  //     (_, href, title, text) => {
+
+  //       const safeHref = (href || '').trim();
+  //       const safeTitle = (title || '').trim();
+  //       const safeText = (text || '').trim();
+
+  //       // If title exists, include it in markdown
+  //       return safeTitle
+  //         ? `[external:${safeText}](${safeHref} "${safeTitle}")`
+  //         : `[external:${safeText}](${safeHref})`;
+  //     }
+  //   );
+
+  //   // console.log(`Log: [ULDEExternalLinkPlugin] \nnormalized raw=\n`, normalized);
+
+  //   return normalized;
+
+  // }
+
+
 }

@@ -4,8 +4,9 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, inp
 import { ULDEDevtools, ULDEDevtoolsService } from '@ulde/devtools';
 import { ULDEFrame } from '@ulde/types/frame';
 import type { ULDERendererState } from '@ulde/types/renderer';
-import { ULDERendererService } from '@ulde/viewer/services';
+import { UldeNavigationRuntimeService, ULDERendererService, UldeScrollRestorationService, UldeScrollspyService } from '@ulde/viewer/services';
 import { isBrowser } from '../../app/global.utils/global.utils';
+import { ULDEExecutionContext } from '@ulde/types';
 
 @Component({
   selector: 'ulde-viewer',
@@ -36,6 +37,9 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   constructor(
     public rendererService: ULDERendererService,
     private devtoolsService: ULDEDevtoolsService,
+    private navigationRuntimeService: UldeNavigationRuntimeService,
+    private scrollSpy: UldeScrollspyService,
+    private scrollRestore: UldeScrollRestorationService
   ) {
     // 🔥1  React to ULDE lifecycle phases
     effect(() => {
@@ -50,6 +54,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       this.rendererService.setState({
         executionContext: state.executionContext
       });
+
+
 
     });
 
@@ -94,9 +100,16 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       // const input = this.$currentRendererState();
       if (!state || !state.executionContext) return;
 
-
       this.syncSignalInput(state);
       // this.$reload.update(n => n + 1);
+
+      this.navigationRuntimeService.bind(this.hostRef.nativeElement, state.executionContext);
+
+      this.scrollSpy.disconnect();
+      this.scrollSpy.observe(this.hostRef.nativeElement, state.executionContext)
+
+      this.scrollTracking(state.executionContext, this.hostRef.nativeElement);
+
       console.log(`Log: [UldeViewer] effect(): 🔥4`, state.executionContext);
     });
   }
@@ -119,10 +132,13 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     // Push initial state after init
     // this.syncSignalInput();
+
   }
 
   ngOnDestroy(): void {
+    this.scrollRestore.removeScrollEvent(this.hostRef.nativeElement);
     this.rendererService.dispose();
+    this.scrollSpy.disconnect();
   }
 
   private syncSignalInput(state: ULDERendererState): void {
@@ -130,7 +146,11 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     // if (!input || !input.executionContext) return;
 
     if (!state.executionContext) return;
-    state.devtoolsSnapshot = this.devtoolsService.$generateDevtoolsSnapshot(state.executionContext)();
+
+    state.devtoolsSnapshot = this.devtoolsService.
+
+
+      $generateDevtoolsSnapshot(state.executionContext)();
 
     // const state = {
     //   modelId: input.modelId,
@@ -171,5 +191,23 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
   // }
 
+
+  private scrollTracking(ctx: ULDEExecutionContext, host: HTMLElement) {
+    const pageId =
+      ctx.page.pageId;
+
+    this.scrollRestore
+      .restore(
+        host,
+        pageId
+      );
+
+    this.scrollRestore.removeScrollEvent(host);
+    this.scrollRestore
+      .startTracking(
+        host,
+        pageId
+      );
+  }
 
 }

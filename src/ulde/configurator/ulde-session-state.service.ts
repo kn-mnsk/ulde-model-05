@@ -3,21 +3,34 @@
 import { signal } from '@angular/core';
 
 // Session State
-export type SessionSelector = 'app-root' | 'app-docs-viewer' | 'app-ulde-viewer';
+export type SessionSelector =
+  | 'app-root'
+  | 'ulde-viewer';
+
 export interface SessionState {
   selector: SessionSelector;
-  docId: string | null;
-  prevDocId: string | null;
+  pageId: string | null;
+  prevPageId: string | null;
   scrollTop: number;
   prevScrollTop: number;
   refreshed: boolean;
   docTheme: string;
+
+  // for future extension
+  archiveAnchor?: string;
+  archiveSection?: string;
+  history?: {
+    pageId: string;
+    scrollTop: number;
+  };
 }
+
 const SESSION_STATE_KEY = 'sessionState';
+
 const SESSION_STATE_DEFAULT: SessionState = {
-  selector: 'app-docs-viewer',
-  docId: 'docs/index',
-  prevDocId: 'docs/index',
+  selector: 'ulde-viewer',
+  pageId: 'docs/index',
+  prevPageId: 'docs/index',
   scrollTop: 0,
   prevScrollTop: 0,
   refreshed: false,
@@ -44,9 +57,9 @@ export function readSessionState(isBrowser: boolean): SessionState {
   try {
     const parsed = JSON.parse(raw) as Partial<SessionState>;
     return {
-      selector: parsed.selector ?? 'app-docs-viewer',
-      docId: parsed.docId ?? null,
-      prevDocId: parsed.prevDocId ?? null,
+      selector: parsed.selector ?? 'ulde-viewer',
+      pageId: parsed.pageId ?? null,
+      prevPageId: parsed.prevPageId ?? null,
       scrollTop: parsed.scrollTop ?? 0,
       prevScrollTop: parsed.prevScrollTop ?? 0,
       refreshed: parsed.refreshed ?? false,
