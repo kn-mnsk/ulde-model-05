@@ -44,7 +44,7 @@ ___This document is the master reference for the entire documentation rendering 
 
 ## 3. Markdown Documents
 - <a href="https://daringfireball.net/projects/markdown/">DARING FIREBALL Markdown</a> 
-- <a href="https://www.markdownlang.com/"  >Markdown Lang Home</a> 
+- <a href="https://www.markdownlang.com/">Markdown Lang Home</a>
 - <a href="https://marked.js.org/">Marked Documentation</a> 
 - [Supplemet to marked.d.ts](#pageId:docs/supplements/doc-marked-0100 "pageId: doc-marked-0100")
 - [Lexer and Parser](#pageId:docs/supplements/doc-marked-0200 "Internal Documents")

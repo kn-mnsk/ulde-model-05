@@ -8,7 +8,7 @@ import { ULDEPageContext } from '@ulde/types/context';
 import { ULDEDevtools } from '@ulde/devtools';
 import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
-import { UldeViewer } from '@ulde/viewer';
+import { UldeScrollRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
 
 @Component({
@@ -58,7 +58,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
 
-
+  private restoredPosition: number = 0;
 
 
   @ViewChild('configurator', { static: true })
@@ -66,7 +66,9 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(
     private contenEngine: ContentEngineService,
-    private lifecycleService: ULDELifecycleService) {
+    private lifecycleService: ULDELifecycleService,
+    private restorationService: UldeScrollRestorationService
+  ) {
 
     effect(() => {
 
@@ -86,6 +88,8 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     // load markdown file
     const markdown = await this.contenEngine.load(pageId);
     if (!markdown) return;
+
+    // this.restoredPosition = this.restorationService.restore(pageId);
 
     // const tokens = await this.contenEngine.transform(markdown);
     // const tokens = this.md.parse(markdown, {});
@@ -149,7 +153,9 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
     // console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
 
-
+    window.scrollTo(
+      0, this.restoredPosition
+    );
 
     document.addEventListener('keydown', this.onKeyDown);
     // this.configuratorRef.nativeElement.addEventListener('keydown', this.handleKey.bind(this.onKeyDown));

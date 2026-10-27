@@ -172,17 +172,35 @@ export interface ULDEArtifacts {
   // Diagnostics
   diagnostics: ULDEDiagnostic[];
 
+  // navigation
+  navigation?: ULDENavigationArtifact;
+
   // Runtime
   frame?: ULDEFrame;
 
   // Plugin Extension Area
   pluginData: Record<string, unknown>;
-}
 
+};
+
+
+
+export interface ULDENavigationArtifact {
+  pageId: string;
+  activeSection?: string;
+  activeAnchor?: string;
+  scrollPosition?: number;
+}
 
 export interface ULDELayout {
   id: string;
-  type: string;
+  type:
+    | 'book'
+    | 'sidebar'
+    | 'article'
+    | 'api'
+    | 'landing';
+  responsive?: boolean;
   version?: string;
 }
 

@@ -398,7 +398,7 @@ because those runtime/navigation concerns usually influence layout, TOC behavior
 
 ## 2. Current Folder Structure (In Part 4)
 
-```
+```code
 src/
   app/
     demo/
@@ -7432,3 +7432,444 @@ export default defineConfig({
 });
 
 ```
+
+<br>
+
+# Copilot Feedback
+
+Excellent. I have successfully loaded and reviewed the complete ULDE-Implementation Part 5 plan.md and the entire current Part 4 codebase snapshot.
+
+We can continue Part 5 from exactly the point defined in the plan:
+
+1. Official Part 5 Roadmap
+2. Folder Structure Review
+3. Map old ULDE features
+4. Navigation & Recovery
+5. Scroll Restoration
+6. ScrollSpy
+7. Layout Architecture
+8. Theme System Review
+8. DevTools Phase 2
+10. Plugin Audit
+11. Architecture Stabilization
+
+as specified in the Part 5 planning document.
+
+## Step 1 Review
+
+**Current Architecture Assessment**
+
+After reviewing the current structure, here's my first-pass ownership map.
+
+**Configurator Layer**
+
+Current:
+```code
+configurator/
+ ├─ ulde-configurator.ts
+ ├─ ulde-session-state.service.ts
+ └─ ulde-theme.service.ts
+```
+
+Current responsibility:
+
+1. Application shell
+2. Session persistence
+3. Theme persistence
+4. Viewer orchestration
+5. DevTools orchestration
+
+
+Assessment:
+
+✅ Correct location
+
+Part 5 additions:
+
+ULDENavigationRecoveryService
+
+
+future:
+```code
+configurator/
+ ├─ ulde-configurator.ts
+ ├─ ulde-session-state.service.ts
+ ├─ ulde-theme.service.ts
+ └─ ulde-navigation-recovery.service.ts
+```
+
+Configurator should own:
+
+1. browser state
+2. localStorage
+3. session restoration
+4. theme restoration
+5. startup hydration
+
+
+not Viewer.
+
+**Core Layer**
+
+Current:
+```code
+core/
+ ├─ ulde-lifecycle.service.ts
+ ├─ ulde-plugin-registry.service.ts
+ └─ ulde-runtime.service.ts
+```
+
+Assessment:
+
+✅ Very clean
+
+Do NOT move Navigation into Core.
+
+Core should remain:
+
+1. Lifecycle ownership
+2. Plugin execution
+3. Runtime measurements
+
+
+Nothing UI-related.
+
+**Engine Layer**
+
+Current:
+```code
+engine/
+ ├─ ast-builder
+ ├─ ast-renderer
+ ├─ content-engine
+ ├─ layout-engine
+ └─ render-context-builder
+```
+
+Assessment:
+
+✅ Good
+
+But LayoutEngine is currently underutilized.
+
+Today:
+
+ULDELayoutEngineService.buildSections()
+
+
+Only does:
+
+Heading -> Section
+
+
+Part 5 will likely evolve it toward:
+```ts
+buildLayout()
+buildSections()
+buildNavigationArtifacts()
+```
+
+but not immediately.
+
+**Viewer Layer**
+
+Current:
+```code
+viewer/
+ ├─ services/
+ │   └─ ulde-renderer.service.ts
+ └─ ulde-viewer.ts
+```
+
+This is the area that will grow most in Part 5.
+
+Current Viewer responsibilities:
+
+1. Render HTML
+2. Attach events
+3. Highlight sections
+4. TOC interaction
+5. Demo interaction
+
+
+Several of these should move out.
+
+### Major Finding #1
+
+Currently:
+```ts
+ULDERendererService
+```
+
+contains:
+```ts
+window.addEventListener('scroll', ...)
+```
+
+for:
+
+1. active sections
+2. toc highlighting
+3. anchor behavior
+
+
+This is runtime navigation logic.
+
+It does NOT belong in renderer.
+
+Renderer should only:
+
+1. render HTML
+2. update DOM
+3. emit events
+
+
+not observe navigation state.
+
+**Recommended New Runtime Services**
+
+Part 5 probably needs:
+```code
+viewer/services/
+
+ ├─ ulde-renderer.service.ts
+ ├─ ulde-scrollspy.service.ts
+ ├─ ulde-navigation-runtime.service.ts
+ └─ ulde-scroll-restoration.service.ts
+```
+
+ownership:
+
+**ULDEScrollSpyService**
+
+1. Observe sections
+2. Track active section
+3. Track visibility ratios
+4. Track heading changes
+
+**ULDENavigationRuntimeService**
+
+1. Anchor clicks
+2. TOC clicks
+3. Jump-to-section
+4. Internal navigation
+
+**ULDEScrollRestorationService**
+
+1. Save scroll position
+2. Restore scroll position
+3. Refresh recovery
+4. Back/forward recovery
+
+### Major Finding #2
+
+Current SessionState already contains:
+
+```ts
+export interface SessionState {
+  selector: SessionSelector;
+  docId: string | null;
+  prevDocId: string | null;
+  scrollTop: number;
+  prevScrollTop: number;
+  refreshed: boolean;
+  docTheme: string;
+}
+```
+
+This is already ~70% of what Part 5 Navigation Recovery needs.
+
+Very important observation:
+
+You already solved persistence.
+
+Part 5 should NOT invent a second persistence model.
+
+Instead extend SessionState.
+
+Likely:
+```ts
+export interface SessionState {
+  ...
+  activeAnchor?: string;
+
+  activeSection?: string;
+
+  history?: {
+    pageId: string;
+    scrollTop: number;
+  }[];
+}
+```
+
+### Major Finding #3
+
+Artifacts Model
+
+Current:
+```ts
+artifacts = {
+  toc,
+  anchors,
+  sections,
+  internalLinks,
+  externalLinks,
+  codeBlocks,
+  diagnostics
+}
+```
+
+This is already almost perfect.
+
+For Part 5 I recommend adding:
+```ts
+navigation?: {
+  pageId: string;
+  activeSection?: string;
+  activeAnchor?: string;
+  scrollPosition?: number;
+};
+```
+
+Example:
+```ts
+artifacts.navigation = {
+  pageId: 'docs/angular',
+  activeSection: 'dependency-injection',
+  activeAnchor: 'constructor-injection',
+  scrollPosition: 486
+};
+```
+
+This matches the Part 5 plan almost exactly.
+
+### Major Finding #4
+
+Layout Ownership
+
+Current:
+```ts
+render.layout = {
+  id: 'technical-docs',
+  type: 'book'
+};
+```
+
+This is currently a placeholder.
+
+Part 5 should formalize:
+```ts
+export interface ULDELayout {
+  id: string;
+  type:
+    | 'book'
+    | 'sidebar'
+    | 'article'
+    | 'api'
+    | 'landing';
+
+  responsive?: boolean;
+}
+```
+
+Then future plugins can produce:
+```ts
+layout.type = 'sidebar';
+```
+
+or
+```ts
+layout.type = 'api';
+```
+
+without Viewer needing special logic.
+
+### Major Finding #5
+
+DevTools Ownership
+
+Current DevTools already display:
+
+1. AST
+2. TOC
+3. Anchors
+4. Sections
+5. Timeline
+6. Diagnostics
+
+
+Excellent foundation.
+
+Part 5 Navigation DevTools tab becomes very natural:
+
+```code
+Inspector
+ ├─ AST
+ ├─ TOC
+ ├─ Anchors
+ ├─ Sections
+ ├─ Navigation
+ └─ Runtime
+```
+
+Where Navigation displays:
+```ts
+artifacts.navigation
+```
+
+directly.
+
+### Recommendation For Next Session
+
+Following the plan and what I found in the codebase, I would proceed in this order:
+
+**Part 5.1**
+
+Design:
+```ts
+ULDENavigationArtifact
+```
+
+Add:
+```ts
+artifacts.navigation
+```
+
+**Part 5.2**
+
+Design:
+```ts
+ULDEScrollRestorationService
+```
+
+using existing:
+```ts
+SessionState
+```
+
+**Part 5.3**
+
+Design:
+```ts
+ULDEScrollSpyService
+```
+
+using:
+```ts
+artifacts.sections
+artifacts.anchors
+```
+
+**Part 5.4**
+
+Move navigation logic out of:
+```ts
+ULDERendererService
+```
+
+into:
+```ts
+ULDENavigationRuntimeService
+```
+
+My overall assessment is that Part 4 produced a surprisingly solid foundation. The biggest architectural issue I see is that **navigation/runtime concerns are currently living insideULDERendererService**, and Part 5 should focus on extracting those concerns into dedicated runtime services while using the already-existing SessionState and Artifacts systems rather than introducing new parallel models.

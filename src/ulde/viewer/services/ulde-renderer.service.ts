@@ -1,5 +1,14 @@
 // src/ulde/viewer/services/ulde-renderer.service.ts
 
+/**
+ * Ownership should be
+ *
+1. render HTML
+2. update DOM
+3. emit event
+ */
+
+
 import { ElementRef, Injectable } from '@angular/core';
 import { ULDERenderContext, } from '@ulde/types/context';
 import { ULDEDiagnostic } from '@ulde/types/diagnostics';
@@ -159,17 +168,17 @@ export class ULDERendererService {
 
 
       // TOC links: .ulde-toc a[href="#section-id"]
-      container.querySelectorAll('.ulde-toc a').forEach(a => {
-        a.addEventListener('click', ev => {
-          ev.preventDefault();
-          const href = (ev.currentTarget as HTMLAnchorElement).getAttribute('href');
-          if (!href) return;
-          const target = container.querySelector(href);
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        });
-      });
+      // container.querySelectorAll('.ulde-toc a').forEach(a => {
+      //   a.addEventListener('click', ev => {
+      //     ev.preventDefault();
+      //     const href = (ev.currentTarget as HTMLAnchorElement).getAttribute('href');
+      //     if (!href) return;
+      //     const target = container.querySelector(href);
+      //     if (target) {
+      //       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      //     }
+      //   });
+      // });
 
       // Anchors: a[data-ulde-anchor="id"]
       container.querySelectorAll('a[data-ulde-anchor]').forEach(a => {
@@ -207,23 +216,23 @@ export class ULDERendererService {
     }
 
 
-    const bindNavigate = (container: HTMLElement) => {
+    // const bindNavigate = (container: HTMLElement) => {
 
-      // const handleNavigate = (e: any) => {
-      //   const pageId = e.detail.pageId;
+    //   // const handleNavigate = (e: any) => {
+    //   //   const pageId = e.detail.pageId;
 
-      //   const executionContext = state.executionContext;
-      //   if (!executionContext) return;
-      //   executionContext.page.pageId = pageId;
+    //   //   const executionContext = state.executionContext;
+    //   //   if (!executionContext) return;
+    //   //   executionContext.page.pageId = pageId;
 
-      //   this.handle?.setState({ ...state, executionContext });
+    //   //   this.handle?.setState({ ...state, executionContext });
 
-      //   console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId);
+    //   //   console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId);
 
-      // };
+    //   // };
 
-      // container.addEventListener('ulde:navigate', handleNavigate);
-    }
+    //   // container.addEventListener('ulde:navigate', handleNavigate);
+    // }
 
 
     return {
@@ -236,18 +245,18 @@ export class ULDERendererService {
           renderFromContext(state.executionContext?.render);
 
           // internal docrouting
-          config.container.addEventListener('ulde:navigate', (e: any) => {
-            const pageId = e.detail.pageId;
+          // config.container.addEventListener('ulde:navigate', (e: any) => {
+          //   const pageId = e.detail.pageId;
 
-            const executionContext = state.executionContext;
-            if (!executionContext) return;
-            executionContext.page.pageId = pageId;
+          //   const executionContext = state.executionContext;
+          //   if (!executionContext) return;
+          //   executionContext.page.pageId = pageId;
 
-            this.setState({ ...state, executionContext });
+          //   this.setState({ ...state, executionContext });
 
-            console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId, state);
+          //   console.log(`Log: [UldeRendererService] bindNavigate pageId=`, pageId, state);
 
-          });
+          // });
 
 
 
