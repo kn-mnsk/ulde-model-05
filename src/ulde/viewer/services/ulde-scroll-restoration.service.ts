@@ -9,7 +9,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { writeSessionState, readSessionState } from '@ulde/configurator';
+import { writeSessionState, readSessionState, ULDESessionState, getPagePosition, setPagePosition } from '@ulde/configurator';
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
 @Injectable({
@@ -18,7 +18,9 @@ import { isBrowser } from '../../../app/global.utils/global.utils';
 export class UldeScrollRestorationService {
 
   private saveTimer?: number;
-  private handleScroll!: () => {};
+  private handleScroll!: () => void;
+  // private handleScroll!: () => {};
+
 
   /**
    * Begin tracking scroll position
@@ -68,21 +70,17 @@ export class UldeScrollRestorationService {
       return;
     }
 
-    const state =
-      readSessionState(
-        isBrowser()
-      );
+    // const sessionState =
+    //   readSessionState(
+    //     isBrowser()
+    //   );
 
-    if (
-      state.pageId !== pageId
-    ) {
-      return;
-    }
+    const scrollTop =
+      getPagePosition(pageId, isBrowser());
 
     requestAnimationFrame(() => {
 
-      host.scrollTop =
-        state.scrollTop;
+      host.scrollTop = scrollTop;
 
     });
   }
@@ -92,36 +90,63 @@ export class UldeScrollRestorationService {
    */
   private onScroll(
     host: HTMLElement,
-    pageId: string
+    pageId: string,
+  ): void {
+
+    clearTimeout(
+      this.saveTimer
+    );
+
+    this.saveTimer =
+      window.setTimeout(
+        () => {
+
+          setPagePosition(
+            pageId,
+            host.scrollTop,
+            isBrowser()
+          );
+
+          // const scrollTop = host.scrollTop;
+
+          // const sessionState = readSessionState(isBrowser());
+
+          // const pagePositions = sessionState.pagePositions ?? {};
+
+          // pagePositions[pageId] = {
+          //   scrollTop: scrollTop,
+          //   // archiveAnchor: '',
+          //   // archiveSection: ''
+          // };
+
+          // writeSessionState({
+          //   ...sessionState,
+          //   pageId,
+          //   scrollTop,
+          //   pagePositions
+          // },
+          //   isBrowser()
+          // );
+        },
+        200
+      );
+
+  }
+
+  removeScrollEvent(
+    host: HTMLElement
   ) {
 
-    return () => {
+    host.removeEventListener(
+      'scroll',
+      this.handleScroll
+    );
 
+    if (this.saveTimer) {
       clearTimeout(
         this.saveTimer
       );
+    }
 
-      this.saveTimer =
-        window.setTimeout(
-          () => {
-
-            writeSessionState(
-              {
-                pageId: pageId,
-                scrollTop:
-                  host.scrollTop
-              },
-              isBrowser()
-            );
-
-          },
-          200
-        );
-
-    };
-  }
-
-  removeScrollEvent(host: HTMLElement) {
-    host.removeEventListener('scroll', this.handleScroll);
   }
 }

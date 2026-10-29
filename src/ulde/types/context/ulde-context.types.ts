@@ -186,10 +186,14 @@ export interface ULDEArtifacts {
 
 
 export interface ULDENavigationArtifact {
+
   pageId: string;
-  activeSection?: string;
-  activeAnchor?: string;
-  scrollPosition?: number;
+
+  scrollPosition: number;
+
+  activeSectionId?: string;
+  
+  activeAnchorId?: string;
 }
 
 export interface ULDELayout {
