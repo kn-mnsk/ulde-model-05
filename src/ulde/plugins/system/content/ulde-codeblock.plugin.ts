@@ -14,13 +14,13 @@ export class ULDECodeblockPlugin implements ULDEPluginInstance {
     if (ctx.page.source.raw === undefined) return;
 
 
-    console.log('Log: [ULDECodeblockPlugin] run');
+    // console.log('Log: [ULDECodeblockPlugin] run');
 
     ctx.page.source.raw = ctx.page.source.raw.replace(/```(\w+)/g, ((m: any, lang: any) => {
       return `\`\`\`${lang} data-lang="${lang}"`;
     }));
 
-    console.log('Log: [ULDECodeblockPlugin] finished');
+    // console.log('Log: [ULDECodeblockPlugin] finished');
   }
 
 }

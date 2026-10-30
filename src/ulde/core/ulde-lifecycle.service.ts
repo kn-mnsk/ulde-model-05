@@ -85,10 +85,10 @@ export class ULDELifecycleService {
     executionContext.lifecyclePhase = 'load';
     await this.runPluginByLifecyclePhase('load', executionContext);
 
-    // generate markdown-it tokens for the next step
+    // GENERATE markdown-it tokens for the next step
     executionContext.page.source.tokens = await this.contentEngine.transform(executionContext.page.source.raw);
 
-    // console.log(`Log: [ULDELifecycleService] executeLifecycle() generated markdown-it tokens=\n`, executionContext.page.source.tokens);
+    console.log(`Log: [ULDELifecycleService] executeLifecycle() generated markdown-it tokens=\n`, executionContext.page.source.tokens);
 
     // RENDER
     // 1. Build initial AST

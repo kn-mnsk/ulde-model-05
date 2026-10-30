@@ -14,7 +14,7 @@ export class ULDETocPlugin implements ULDEPluginInstance {
     if (ctx.lifecyclePhase !== 'render') return;
     if (!ctx.render) return;
 
-    console.log('Log: [ULDETocPlugin] run');
+    // console.log('Log: [ULDETocPlugin] run');
 
     const headings: { depth: number; text: string }[] = [];
 
@@ -55,7 +55,7 @@ export class ULDETocPlugin implements ULDEPluginInstance {
 
     ctx.artifacts.toc = tocEntries; // ERROR happens here!!
 
-    console.log('Log: [ULDETocPlugin] \nArtifacts TOC Finished');
+    // console.log('Log: [ULDETocPlugin] \nArtifacts TOC Finished');
 
 
   }

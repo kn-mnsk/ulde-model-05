@@ -80,10 +80,12 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     effect(() => {
       const currentFrame = this.devtoolsService.$currentFrame();
       if (!currentFrame) return;
-      console.log(`Log: [UldeViewer] effect(): 🔥3`);
 
       const state = this.rendererService.getState();
       if (!state?.executionContext?.artifacts) return;
+
+
+      console.log(`Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`, currentFrame);
 
       state.executionContext.artifacts.frame = currentFrame;
 
@@ -110,7 +112,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
       this.scrollTracking(state.executionContext, this.hostRef.nativeElement);
 
-      console.log(`Log: [UldeViewer] effect(): 🔥4`, state.executionContext);
+      console.log(`Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`, state.executionContext);
     });
   }
 
@@ -139,6 +141,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     this.scrollRestore.removeScrollEvent(this.hostRef.nativeElement);
     this.rendererService.dispose();
     this.scrollSpy.disconnect();
+
+    console.log(`Log: []UldeViewer ngOnDestroy Completed`);
   }
 
   private syncSignalInput(state: ULDERendererState): void {
@@ -164,6 +168,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     console.log(`Log: [UldeViewer] syncSignalInput()`, state);
 
     this.rendererService.setState(state);
+
 
 
     this.$currentRendererState.set(state); // input for UldeDevtools
@@ -196,6 +201,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     const pageId =
       ctx.page.pageId;
 
+    // restore page position
     this.scrollRestore
       .restore(
         host,

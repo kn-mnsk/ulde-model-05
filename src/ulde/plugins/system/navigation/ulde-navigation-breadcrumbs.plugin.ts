@@ -13,14 +13,14 @@ export class ULDENavigationBreadcrumbsPlugin implements ULDEPluginInstance {
     if (ctx.lifecyclePhase !== 'load') return;
     if (ctx.page.source.raw === undefined) return;
 
-    console.log('Log: [ULDENavigationBreadcrumbsPlugin] run');
+    // console.log('Log: [ULDENavigationBreadcrumbsPlugin] run');
 
     const parts = ctx.page.source.raw.split("/").filter(Boolean);
     const breadCrumbs = parts.map((p, i) => ({ label: p, href: "/" + parts.slice(0, i + 1).join("/") }));
 
     ctx.artifacts.pluginData['breadcrumbs'] = breadCrumbs;
 
-    console.log('Log: [ULDENavigationBreadcrumbsPlugin] finished');
+    // console.log('Log: [ULDENavigationBreadcrumbsPlugin] finished');
 
 
   }

@@ -54,8 +54,12 @@ export class UldeScrollspyService {
 
     const sections =
       host.querySelectorAll(
-        'data-section-id'
+        '[data-section-id]'
+        // 'section'
+        // 'data-section-id'
       );
+
+    console.log(`Log: [UldeScrollspyService] observeSections \nsections=\n`, sections);
 
     this.sectionObserver =
       new IntersectionObserver(
@@ -68,7 +72,7 @@ export class UldeScrollspyService {
           root: host,
           rootMargin:
             '-20% 0px -60% 0px',
-          threshold: 1
+          threshold: 0
         }
       );
 
@@ -87,6 +91,8 @@ export class UldeScrollspyService {
       host.querySelectorAll(
         '[data-anchor-id]'
       );
+
+    console.log(`Log: [UldeScrollspyService] observeAnchors \nanchors=\n`, anchors);
 
     this.anchorObserver =
       new IntersectionObserver(

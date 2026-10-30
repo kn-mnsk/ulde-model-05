@@ -89,7 +89,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
     if (!isBrowser()) return new Promise(() => undefined);
 
 
-    console.log(`Log: [UldeMermaidPlugin] run() Start`);
+    // console.log(`Log: [UldeMermaidPlugin] run() Start`);
 
 
     const { diagnostics } = ctx.artifacts;
@@ -220,7 +220,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
         //   panel.append('No Debug Entries Found');
         // }
 
-        console.log(`Log: [UldeMermaidPlugin] run() Finished`);
+        // console.log(`Log: [UldeMermaidPlugin] run() Finished`);
 
 
       } catch (err: any) {
@@ -253,7 +253,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
 
   async destroy() {
 
-    console.log(`Log: [UldeMermaidPlugin] destroy() start`);
+    // console.log(`Log: [UldeMermaidPlugin] destroy() start`);
     //     return () => {
     //       zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
     //       zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
@@ -264,7 +264,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
     //     }
     //   }
 
-    console.log(`Log: [UldeMermaidPlugin] destroy() start`);
+    // console.log(`Log: [UldeMermaidPlugin] destroy() start`);
 
   }
 
