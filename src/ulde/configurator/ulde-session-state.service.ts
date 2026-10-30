@@ -42,9 +42,9 @@ export interface ULDEPagePosition {
   archiveSectionId?: string;
 }
 
-const ULDE_SESSION_STATE_KEY = 'sessionState';
+const ULDE_SESSION_STATE_KEY = 'UldeSessionState';
 
-const ULDE_SESSION_STATE_DEFAULT: ULDESessionState = {
+export const ULDE_SESSION_STATE_DEFAULT: ULDESessionState = {
   selector: 'ulde-viewer',
   pageId: 'docs/index',
   prevPageId: 'docs/index',

@@ -14,7 +14,7 @@ export class ULDETimelineProfilerPlugin implements ULDEPluginInstance {
 
     if (!ctx.artifacts) return;
 
-    console.log("[ULDE] Timeline profiler initialized");
+    // console.log("[ULDE] Timeline profiler initialized");
   };
 
 }

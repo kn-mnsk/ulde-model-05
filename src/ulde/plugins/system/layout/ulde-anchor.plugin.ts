@@ -14,7 +14,7 @@ export class ULDEAnchorPlugin implements ULDEPluginInstance {
     if (ctx.lifecyclePhase !== 'render') return;
     if (!ctx.render) return;
 
-    console.log(`Log: [ULDEAnchorPlugin] run`);
+    // console.log(`Log: [ULDEAnchorPlugin] run`);
 
     const headings: { id: string; text: string; depth: number;  }[] = [];
 
@@ -46,7 +46,7 @@ export class ULDEAnchorPlugin implements ULDEPluginInstance {
     ctx.artifacts.anchors = anchorEntries;
 
 
-    console.log('Log: [ULDEAnchorPlugin] \nArtifacts ANCHORS Finished');
+    // console.log('Log: [ULDEAnchorPlugin] \nArtifacts ANCHORS Finished');
 
   }
 

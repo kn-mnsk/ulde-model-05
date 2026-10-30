@@ -240,15 +240,15 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
 
       case 'anchor': {
         const id = node.id ?? '';
-        buf.push(`<a id="${escapeHtml(id)}" data-ulde-anchor="${escapeHtml(id)}"></a>`);
-
-        // console.log(`Log: [ulde-ast-renderer.engine.ts renderUldeAstToHtml()]  \nnode type=anchor`, id);
-        // buf.push(`<a id="${escapeHtml(id)}"></a>`);
+        buf.push(`<a id="${escapeHtml(id)}" data-anchor-id="${escapeHtml(id)}"></a>`);
         break;
       }
 
       case 'section': {
-        buf.push('<section>');
+
+        const id = node.id ?? '';
+        const depth = (node.depth)?.toString() ?? '';
+        buf.push(`<section id="section-${escapeHtml(id)}" data-section-id="section-${escapeHtml(id)}">`);
         node.children?.forEach(renderNode);
         buf.push('</section>');
         break;

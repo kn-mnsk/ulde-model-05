@@ -12,7 +12,7 @@ export class ULDEFrontmatterNormalizerPlugin implements ULDEPluginInstance {
 
     if (ctx.lifecyclePhase !== 'load') return;
 
-    console.log('Log: [ULDEFrontmatterNormalizerPlugin] run');
+    // console.log('Log: [ULDEFrontmatterNormalizerPlugin] run');
 
     // How and what to be Coded???
     // ctx.meta['title'] ??= "Untitled";
@@ -24,7 +24,7 @@ export class ULDEFrontmatterNormalizerPlugin implements ULDEPluginInstance {
 
     ctx.artifacts.pluginData['frontmatter'] = frontmatter;
 
-    console.log('Log: [ULDEFrontmatterNormalizerPlugin] finished');
+    // console.log('Log: [ULDEFrontmatterNormalizerPlugin] finished');
 
 
   }

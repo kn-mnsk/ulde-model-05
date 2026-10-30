@@ -28,7 +28,7 @@ export class UldeScrollRestorationService {
   startTracking(
     host: HTMLElement,
     pageId: string
-  ) {
+  ): void {
 
     if (!isBrowser()) {
       return;
@@ -49,7 +49,8 @@ export class UldeScrollRestorationService {
    */
   save(
     pageId: string,
-    scrollTop: number) {
+    scrollTop: number)
+    : void {
     writeSessionState({
       pageId,
       scrollTop
@@ -64,7 +65,7 @@ export class UldeScrollRestorationService {
   restore(
     host: HTMLElement,
     pageId: string
-  ) {
+  ): void {
 
     if (!isBrowser()) {
       return;
@@ -106,27 +107,6 @@ export class UldeScrollRestorationService {
             host.scrollTop,
             isBrowser()
           );
-
-          // const scrollTop = host.scrollTop;
-
-          // const sessionState = readSessionState(isBrowser());
-
-          // const pagePositions = sessionState.pagePositions ?? {};
-
-          // pagePositions[pageId] = {
-          //   scrollTop: scrollTop,
-          //   // archiveAnchor: '',
-          //   // archiveSection: ''
-          // };
-
-          // writeSessionState({
-          //   ...sessionState,
-          //   pageId,
-          //   scrollTop,
-          //   pagePositions
-          // },
-          //   isBrowser()
-          // );
         },
         200
       );

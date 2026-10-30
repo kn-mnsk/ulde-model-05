@@ -10,6 +10,7 @@ import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldeScrollRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
+import { readSessionState, ULDE_SESSION_STATE_DEFAULT, ULDEPagePosition, ULDESessionState, writeSessionState } from '@ulde/configurator/ulde-session-state.service';
 
 @Component({
   selector: 'ulde-configurator',
@@ -34,7 +35,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     graphId: ''
   }); // initial value
 
-  $pageId = signal<string>('docs/index'); // initila value
+  $pageId = signal<string | null>(null); // initila value
 
   $reload = signal<number>(0);
   $page = computed(() => {
@@ -60,6 +61,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   private restoredPosition: number = 0;
 
+  private handleKeydown!: () => void;
 
   @ViewChild('configurator', { static: true })
   configuratorRef!: ElementRef<HTMLElement>;
@@ -67,21 +69,92 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
   constructor(
     private contenEngine: ContentEngineService,
     private lifecycleService: ULDELifecycleService,
-    private restorationService: UldeScrollRestorationService
+    private scrollRestore: UldeScrollRestorationService
   ) {
+
+    this.handleKeydown = () => this.onKeyDown
 
     effect(() => {
 
       if (!isBrowser()) return;
 
-      this.UldeLoadAndRender();
+      // const lastPageId = scrollRestore.restore
+
+      const pageId = this.$page().id;
+
+      if (pageId === null) {
+
+        writeSessionState(ULDE_SESSION_STATE_DEFAULT, isBrowser())
+
+        const { pageId, scrollTop } =
+          readSessionState(isBrowser());
+
+        this.$pageId.set(pageId);
+
+        window.scrollTo(
+          0, scrollTop
+        );
+
+        return;
+
+      };
+
+      this.UldeLoadAndRender(pageId);
 
     });
 
   }
 
 
-  private handleKey = (e: KeyboardEvent) => void {};
+  async ngOnInit() {
+    this.$reload.update(n => n + 1); // load current pageId
+  }
+
+  async ngAfterViewInit() {
+
+    if (!isBrowser()) return;
+
+    const { pageId, prevPageId, scrollTop, prevScrollTop } =
+      readSessionState(isBrowser());
+
+    if (this.$pageId() === null) {
+
+      this.$pageId.set(pageId)
+
+      window.scrollTo(
+        0, scrollTop
+      );
+
+    } else {
+
+      this.$pageId.set(prevPageId)
+
+      window.scrollTo(
+        0, prevScrollTop
+      );
+
+    }
+
+    this.configuratorRef.nativeElement
+      .addEventListener(
+        'keydown',
+        this.handleKeydown
+      );
+
+  }
+
+  async ngOnDestroy() {
+
+    this.configuratorRef.nativeElement
+      .removeEventListener(
+        'keydown',
+        this.handleKeydown
+      );
+
+    this.handleKeydown = (): void => { };
+
+
+  }
 
   private async buildPageContext(pageId: string): Promise<ULDEPageContext | void> {
 
@@ -95,101 +168,109 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     // const tokens = this.md.parse(markdown, {});
 
     return {
-      pageId: this.$page().id,
+      pageId: pageId,
       source: {
         raw: markdown,
         tokens: [],
-        // tokens: tokens
       },
       meta: {},
     };
   }
 
-  private async uldeRun() {
-    const pageContext = await this.buildPageContext(this.$pageId());
+  private async uldeRun(pageId: string) {
+
+    const pageContext =
+      await this.buildPageContext(pageId);
+
     if (!pageContext) return undefined;
 
-    const executionContext = await this.lifecycleService.executeLifecycle(pageContext);
-    // const renderContext = executionContext?.render;
-
-    // console.log(`Log: [UldeConfigurator] uldeLoadAndRender executionContext=\n`, executionContext);
-
+    const executionContext =
+      await this.lifecycleService.executeLifecycle(pageContext);
 
     return executionContext;
   }
 
 
-  private async UldeLoadAndRender() {
+  private async UldeLoadAndRender(pageId: string) {
 
-    const executionContext = await this.uldeRun();
+    const executionContext =
+      await this.uldeRun(pageId);
+
     if (!executionContext) {
       console.error(`Error: [${this.component}] UldeLoadAndRender() Render context is not available.`);
       return;
     }
 
-
-    this.$rendererStateMarkdownViewer.update(state => ({ ...state, executionContext }));
+    this.$rendererStateMarkdownViewer.update(
+      state => ({
+        ...state, executionContext
+      })
+    );
 
     console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
 
   }
 
-
-  async ngOnInit() {
-    this.$reload.update(n => n + 1); // load current pageId
-  }
-
-  async ngAfterViewInit() {
-    if (!isBrowser()) return;
-
-    // await this.UldeLoadAndRender();
-    // const executionContext = await this.uldeRun(this.lifecycleService);
-    // if (!executionContext) {
-    //   console.error('Error: [${this.component}] Render context is not available.');
-    //   return;
-    // }
-
-    // this.$rendererStateMarkdownViewer.update(state => ({ ...state, executionContext }));
-
-    // console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
-
-    window.scrollTo(
-      0, this.restoredPosition
-    );
-
-    document.addEventListener('keydown', this.onKeyDown);
-    // this.configuratorRef.nativeElement.addEventListener('keydown', this.handleKey.bind(this.onKeyDown));
-
-  }
-
-  async ngOnDestroy() {
-    if (isBrowser()) {
-      document.removeEventListener('keypress', this.onKeyDown);
-    }
-    // this.configuratorRef.nativeElement.removeEventListener('keydown', this.onKeyDown);
-  }
-
   //React
-  async onMarkdownViewerStateChange(state: ULDERendererState) {
-
+  async onMarkdownViewerStateChange(
+    state: ULDERendererState
+  ) {
 
     this.$rendererStateDevtoolsViewer.set(state);
 
     if (state.executionContext) {
-      this.$pageId.set(state.executionContext.page.pageId);
-      // this.$reload.update(n => n + 1)
 
-      // await this.UldeLoadAndRender()
+      const newPageId =
+        state.executionContext.page.pageId;
+
+      await this.updateSessionState(newPageId);
+
+      this.$pageId.set(
+        newPageId
+      );
     }
     console.log(`Log: [${this.component}] onViewerStateChanged state=`, state);
-    // sync UI or analytics
+
   }
 
   onErrorMarkdownViewer(error: Error) {
+
     console.error(`Log: [${this.component}] onError error=`, JSON.stringify(error, null, 2));
 
   }
 
+  private async updateSessionState(
+    newPageId: string
+  ): Promise<void> {
+
+    const currentPage =
+      readSessionState(isBrowser());
+
+    currentPage.pagePositions ??= {};
+
+    currentPage.pagePositions[newPageId]
+      = {
+      ...currentPage.pagePositions[newPageId],
+      ...{ scrollTop: 0 }
+    }
+
+    const newPage =
+    {
+      pageId: newPageId,
+      prevPageId: currentPage.pageId ?? '',
+      scrollTop: currentPage.pagePositions[newPageId].scrollTop,
+      prevScrollTop: currentPage.scrollTop ?? 0,
+      pagePositions: currentPage.pagePositions
+    };
+
+    writeSessionState(
+      {
+        ...currentPage, ...newPage
+      },
+      isBrowser()
+    )
+
+  }
 
   /**
    * Theme Switcher
@@ -199,28 +280,22 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
     this.$theme.set(theme);
 
-    // coding
-    /**
-     * use local session
-     * Reload from the lifecyclephase 'hydrate', by theme plugin */
-
-    // this.hostRef.nativeElement.setAttribute('data-theme', theme);
   }
 
-
   private onKeyDown = (e: KeyboardEvent) => {
-    // e.preventDefault();
 
     if (e.ctrlKey && e.key === 'k') {
-      // if (e.ctrlKey && e.shiftKey && e.key === 'd') {
+
       e.preventDefault();
-      console.log(`Log: [${this.component}] onkeyDown`, e);
+
+      // console.log(`Log: [${this.component}] onkeyDown`, e);
+
       this.$visibility.update(b =>
         b == 'hidden' ? 'visible' : 'hidden'
       );
+
     }
 
   };
-
 
 }

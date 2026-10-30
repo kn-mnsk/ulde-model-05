@@ -18,7 +18,7 @@ export class UldeKatexPlugin implements ULDEPluginInstance {
 
     if (!isBrowser()) return;
 
-    console.log(`Log: [UldeKatexPlugin] run() Start`);
+    // console.log(`Log: [UldeKatexPlugin] run() Start`);
 
     const { diagnostics } = ctx.artifacts;
 
@@ -65,7 +65,7 @@ export class UldeKatexPlugin implements ULDEPluginInstance {
       });
     });
 
-    console.log(`Log: [UldeKatexPlugin] run() Finish`);
+    // console.log(`Log: [UldeKatexPlugin] run() Finish`);
 
 
   }
