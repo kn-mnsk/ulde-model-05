@@ -66,7 +66,8 @@ export class ULDELifecycleService {
       codeBlocks: [],
       diagnostics: [],
       navigation: {
-        pageId: pageContext.pageId
+        pageId: pageContext.pageId,
+        scrollPosition: 0
       },
       pluginData: {}
     };
