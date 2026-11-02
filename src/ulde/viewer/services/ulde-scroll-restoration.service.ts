@@ -33,13 +33,20 @@ export class UldeScrollRestorationService {
     if (!isBrowser()) {
       return;
     }
+    console.log(`Log: [UldeScrollrestorationService] scrollTracking() begin`);
 
     this.handleScroll = () => this.onScroll(host, pageId);
 
     host.addEventListener(
+    // document.addEventListener(
       'scroll',
+      // () => this.onScroll(host, pageId)
       this.handleScroll
     );
+
+    console.log(`Log: [UldeScrollrestorationService] scrollTracking() end`);
+
+
   }
 
   /**
@@ -101,6 +108,8 @@ export class UldeScrollRestorationService {
     this.saveTimer =
       window.setTimeout(
         () => {
+
+          console.log(`Log: [UldeScrollRestorationService] onScroll \n(pageId=${pageId}, scrollTop=${host.scrollTop})`);
 
           setPagePosition(
             pageId,

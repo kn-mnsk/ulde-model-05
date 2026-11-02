@@ -65,6 +65,8 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   @ViewChild('configurator', { static: true })
   configuratorRef!: ElementRef<HTMLElement>;
+  @ViewChild('markdwonContainer', { static: true })
+  markdwonRef!: ElementRef<HTMLElement>;
 
   constructor(
     private contenEngine: ContentEngineService,
@@ -86,6 +88,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
         writeSessionState(ULDE_SESSION_STATE_DEFAULT, isBrowser())
 
+        // const { pageId, scrollTop } =
         const { pageId, scrollTop } =
           readSessionState(isBrowser());
 
@@ -100,6 +103,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       };
 
       this.UldeLoadAndRender(pageId);
+
 
     });
 
@@ -125,6 +129,11 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         0, scrollTop
       );
 
+
+      requestAnimationFrame(() => {
+        this.scrollTracking(pageId ?? '', this.markdwonRef.nativeElement);
+      });
+
     } else {
 
       this.$pageId.set(prevPageId)
@@ -133,7 +142,20 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         0, prevScrollTop
       );
 
+
+      requestAnimationFrame(() => {
+        this.scrollTracking(prevPageId ?? '', this.markdwonRef.nativeElement);
+      });
+
+
+
+
+
     }
+
+
+
+
 
     this.configuratorRef.nativeElement
       .addEventListener(
@@ -297,5 +319,30 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
     }
 
   };
+
+
+
+  private scrollTracking(pageId: string, host: HTMLElement) {
+
+    console.log(`Log: [UldeCOnfigurator] scrollTracking() beging`);
+
+    // restore page position
+    this.scrollRestore
+      .restore(
+        host,
+        pageId
+      );
+
+    this.scrollRestore.removeScrollEvent(host);
+    this.scrollRestore
+      .startTracking(
+        host,
+        pageId
+      );
+
+    console.log(`Log: [UldeCOnfigurator] scrollTracking() end`);
+
+  }
+
 
 }

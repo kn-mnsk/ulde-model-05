@@ -138,21 +138,24 @@ export function setPagePosition(
   state.prevScrollTop =
     state.scrollTop;
 
+  const newState = {...state, ...{pageId: pageId, scrollTop: scrollTop, pagePositions: {...state.pagePositions[pageId],  scrollTop}}};
+
+  console.log(`Log: [UldeSessionStateService] setPagePosition() \n newState=`, newState);
+
   state.pageId =
     pageId;
 
   state.scrollTop =
     scrollTop;
 
-  state.pagePositions[pageId] = {
-    ...state.pagePositions[pageId],
-    scrollTop
-  };
+  state.pagePositions[pageId].scrollTop
+    = scrollTop
 
-  writeSessionState(
-    state,
-    isBrowser
-  );
+
+writeSessionState(
+  state,
+  isBrowser
+);
 }
 
 
