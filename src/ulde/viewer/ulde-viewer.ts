@@ -19,6 +19,7 @@ import { ULDEExecutionContext } from '@ulde/types';
 })
 export class UldeViewer implements AfterViewInit, OnDestroy {
   @ViewChild('markdownHost', { static: true })
+  // @ViewChild('uldeMarkdwonViewer', { static: true })
   hostRef!: ElementRef<HTMLElement>;
 
   // Full renderer state comes in as a signal input
@@ -108,9 +109,9 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       this.navigationRuntimeService.bind(this.hostRef.nativeElement, state.executionContext);
 
       this.scrollSpy.disconnect();
-      this.scrollSpy.observe(this.hostRef.nativeElement, state.executionContext)
+      this.scrollSpy.observe(this.hostRef.nativeElement, state.executionContext);
 
-      this.scrollTracking(state.executionContext, this.hostRef.nativeElement);
+      // this.scrollTracking(state.executionContext, this.hostRef.nativeElement);
 
       console.log(`Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`, state.executionContext);
     });
@@ -151,10 +152,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     if (!state.executionContext) return;
 
-    state.devtoolsSnapshot = this.devtoolsService.
-
-
-      $generateDevtoolsSnapshot(state.executionContext)();
+    state.devtoolsSnapshot = this.devtoolsService.$generateDevtoolsSnapshot(state.executionContext)();
 
     // const state = {
     //   modelId: input.modelId,
@@ -169,9 +167,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     this.rendererService.setState(state);
 
-
-
     this.$currentRendererState.set(state); // input for UldeDevtools
+
   }
 
   // /**
@@ -198,6 +195,9 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
 
   private scrollTracking(ctx: ULDEExecutionContext, host: HTMLElement) {
+
+    console.log(`Log: [UldeViewer] scrollTracking() beging`);
+
     const pageId =
       ctx.page.pageId;
 
@@ -214,6 +214,9 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
         host,
         pageId
       );
+
+    console.log(`Log: [UldeViewer] scrollTracking() end`);
+
   }
 
 }
