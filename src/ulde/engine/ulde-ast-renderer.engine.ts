@@ -247,7 +247,7 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
       case 'section': {
 
         const id = node.id ?? '';
-        const depth = (node.depth)?.toString() ?? '';
+        // const depth = (node.depth)?.toString() ?? '';
         buf.push(`<section id="section-${escapeHtml(id)}" data-section-id="section-${escapeHtml(id)}">`);
         node.children?.forEach(renderNode);
         buf.push('</section>');
