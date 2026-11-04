@@ -109,7 +109,10 @@ export class UldeScrollRestorationService {
       window.setTimeout(
         () => {
 
-          console.log(`Log: [UldeScrollRestorationService] onScroll \n(pageId=${pageId}, scrollTop=${host.scrollTop})`);
+          console.log(
+            `Log: [UldeScrollRestorationService] onScroll \n(pageId=${pageId},
+            scrollTop=${host.scrollTop})
+            `);
 
           setPagePosition(
             pageId,

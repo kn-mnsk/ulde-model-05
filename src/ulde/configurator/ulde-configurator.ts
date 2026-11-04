@@ -111,14 +111,28 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
 
   async ngOnInit() {
+
     this.$reload.update(n => n + 1); // load current pageId
+
   }
 
   async ngAfterViewInit() {
 
     if (!isBrowser()) return;
 
-    const { pageId, prevPageId, scrollTop, prevScrollTop } =
+    const host = document.querySelector<HTMLElement>('.ulde-markdown-host-container');
+      console.log(`Log: [UldeConfigurator] ngAfterViewInit() host`, host);
+
+    if (!host) {
+      console.error(`Error`)
+      return;
+    }
+
+    const {
+      pageId,
+      prevPageId,
+      scrollTop,
+      prevScrollTop } =
       readSessionState(isBrowser());
 
     if (this.$pageId() === null) {
@@ -129,11 +143,6 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         0, scrollTop
       );
 
-
-      requestAnimationFrame(() => {
-        this.scrollTracking(pageId ?? '', this.markdwonRef.nativeElement);
-      });
-
     } else {
 
       this.$pageId.set(prevPageId)
@@ -141,21 +150,16 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       window.scrollTo(
         0, prevScrollTop
       );
-
-
-      requestAnimationFrame(() => {
-        this.scrollTracking(prevPageId ?? '', this.markdwonRef.nativeElement);
-      });
-
-
-
-
-
     }
 
-
-
-
+    requestAnimationFrame(() => {
+      this.scrollTracking(
+        // this.markdwonRef.nativeElement,
+        // this.configuratorRef.nativeElement,
+        host,
+        this.$page().id ?? ''
+      );
+    });
 
     this.configuratorRef.nativeElement
       .addEventListener(
@@ -322,7 +326,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
 
 
-  private scrollTracking(pageId: string, host: HTMLElement) {
+  private scrollTracking(host: HTMLElement, pageId: string) {
 
     console.log(`Log: [UldeCOnfigurator] scrollTracking() beging`);
 
