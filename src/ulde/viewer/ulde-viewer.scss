@@ -7,11 +7,6 @@
 // @use './styles/ulde-viewer-theme-light.scss';
 // @use './styles/ulde-viewer-theme-dark.scss';
 
-// .ulde-pane-container {
-//   display: flex;
-//   flex-direction: column;
-// }
-
 .ulde-markdown-viewer {
   display: flex;
 
@@ -20,7 +15,8 @@
 
 .ulde-markdown-host-container{
   display: flex;
-  overflow: scroll;
+  height: 100vh;
+  overflow: auto;
 
 }
 

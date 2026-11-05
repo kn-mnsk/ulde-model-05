@@ -10,7 +10,7 @@ import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldeScrollRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
-import { readSessionState, ULDE_SESSION_STATE_DEFAULT, ULDEPagePosition, ULDESessionState, writeSessionState } from '@ulde/configurator/ulde-session-state.service';
+import { getPagePosition, readSessionState, ULDE_SESSION_STATE_DEFAULT, writeSessionState, ULDE_DEFAULT_PAGE_ID } from '@ulde/configurator';
 
 @Component({
   selector: 'ulde-configurator',
@@ -25,17 +25,14 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   component = 'UldeConfigurator';
 
-
-
-  // renderContext: ULDERenderContext | undefined = undefined;
-
   // for future use
   $contentId = signal<{ pageId: string, graphId: string }>({
     pageId: 'docs/index',
     graphId: ''
   }); // initial value
 
-  $pageId = signal<string | null>(null); // initila value
+
+  $pageId = signal<string | null>(null);
 
   $reload = signal<number>(0);
   $page = computed(() => {
@@ -54,61 +51,60 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
   });
 
   $rendererStateDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateMarkdownViewer());
-  // private md = new MarkdownIt();
 
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
 
-  private restoredPosition: number = 0;
-
-  private handleKeydown!: () => void;
+  private handleKeydown!: (e: Event) => void;
 
   @ViewChild('configurator', { static: true })
   configuratorRef!: ElementRef<HTMLElement>;
-  @ViewChild('markdwonContainer', { static: true })
-  markdwonRef!: ElementRef<HTMLElement>;
 
   constructor(
     private contenEngine: ContentEngineService,
-    private lifecycleService: ULDELifecycleService,
-    private scrollRestore: UldeScrollRestorationService
+    private lifecycleService: ULDELifecycleService
   ) {
 
-    this.handleKeydown = () => this.onKeyDown
+    this.handleKeydown = this.onKeyDown;
 
     effect(() => {
 
-      if (!isBrowser()) return;
+      if (
+        !isBrowser()
+      ) {
+        return;
+      }
 
-      // const lastPageId = scrollRestore.restore
 
-      const pageId = this.$page().id;
+      const sessionState = readSessionState(isBrowser())
 
-      if (pageId === null) {
-
-        writeSessionState(ULDE_SESSION_STATE_DEFAULT, isBrowser())
-
-        // const { pageId, scrollTop } =
-        const { pageId, scrollTop } =
-          readSessionState(isBrowser());
-
-        this.$pageId.set(pageId);
-
-        window.scrollTo(
-          0, scrollTop
+      if (!sessionState) {
+        writeSessionState(
+          ULDE_SESSION_STATE_DEFAULT,
+          isBrowser()
         );
 
-        return;
+        this.$pageId.set(ULDE_DEFAULT_PAGE_ID)
 
-      };
+      } else {
+
+        this.$pageId.set(sessionState.pageId);
+
+      }
+
+      const pageId = this.$page().id;
+      if (!pageId) return;
+
+      console.log(
+        '[UldeConfigurator] effect() pageId=',
+        pageId
+      );
 
       this.UldeLoadAndRender(pageId);
-
 
     });
 
   }
-
 
   async ngOnInit() {
 
@@ -118,48 +114,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   async ngAfterViewInit() {
 
-    if (!isBrowser()) return;
-
-    const host = document.querySelector<HTMLElement>('.ulde-markdown-host-container');
-      console.log(`Log: [UldeConfigurator] ngAfterViewInit() host`, host);
-
-    if (!host) {
-      console.error(`Error`)
-      return;
-    }
-
-    const {
-      pageId,
-      prevPageId,
-      scrollTop,
-      prevScrollTop } =
-      readSessionState(isBrowser());
-
-    if (this.$pageId() === null) {
-
-      this.$pageId.set(pageId)
-
-      window.scrollTo(
-        0, scrollTop
-      );
-
-    } else {
-
-      this.$pageId.set(prevPageId)
-
-      window.scrollTo(
-        0, prevScrollTop
-      );
-    }
-
-    requestAnimationFrame(() => {
-      this.scrollTracking(
-        // this.markdwonRef.nativeElement,
-        // this.configuratorRef.nativeElement,
-        host,
-        this.$page().id ?? ''
-      );
-    });
+    if (!isBrowser() || !this.configuratorRef) return;
 
     this.configuratorRef.nativeElement
       .addEventListener(
@@ -171,27 +126,26 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   async ngOnDestroy() {
 
-    this.configuratorRef.nativeElement
-      .removeEventListener(
-        'keydown',
-        this.handleKeydown
-      );
+    if (this.configuratorRef) {
 
-    this.handleKeydown = (): void => { };
+      this.configuratorRef.nativeElement
+        .removeEventListener(
+          'keydown',
+          this.handleKeydown
+        );
+    }
 
+    this.handleKeydown = (e: Event): void => { };
 
   }
 
   private async buildPageContext(pageId: string): Promise<ULDEPageContext | void> {
 
     // load markdown file
-    const markdown = await this.contenEngine.load(pageId);
+    const markdown =
+      await this.contenEngine.load(pageId);
+
     if (!markdown) return;
-
-    // this.restoredPosition = this.restorationService.restore(pageId);
-
-    // const tokens = await this.contenEngine.transform(markdown);
-    // const tokens = this.md.parse(markdown, {});
 
     return {
       pageId: pageId,
@@ -223,7 +177,10 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       await this.uldeRun(pageId);
 
     if (!executionContext) {
-      console.error(`Error: [${this.component}] UldeLoadAndRender() Render context is not available.`);
+      console.error(
+        `Error: [${this.component}] UldeLoadAndRender() Render context is not available.`
+      );
+
       return;
     }
 
@@ -233,7 +190,10 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       })
     );
 
-    console.log(`Log: [${this.component}] ngAfterViewInit\n rendererState:`, this.$rendererStateMarkdownViewer());
+    console.log(
+      `Log: [${this.component}] ngAfterViewInit \n rendererState:`,
+      this.$rendererStateMarkdownViewer()
+    );
 
   }
 
@@ -255,13 +215,19 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         newPageId
       );
     }
-    console.log(`Log: [${this.component}] onViewerStateChanged state=`, state);
+    console.log(
+      `Log: [${this.component}] onViewerStateChanged state=`,
+      state
+    );
 
   }
 
   onErrorMarkdownViewer(error: Error) {
 
-    console.error(`Log: [${this.component}] onError error=`, JSON.stringify(error, null, 2));
+    console.error(
+      `Log: [${this.component}] onError error=`,
+      JSON.stringify(error, null, 2)
+    );
 
   }
 
@@ -274,11 +240,15 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
     currentPage.pagePositions ??= {};
 
-    currentPage.pagePositions[newPageId]
-      = {
-      ...currentPage.pagePositions[newPageId],
-      ...{ scrollTop: 0 }
-    }
+    // currentPage.pagePositions[newPageId]
+    //   = {
+    //   ...currentPage.pagePositions[newPageId],
+    //   ...{ scrollTop: 0 }
+    // }
+    currentPage.pagePositions[newPageId] ??= {
+      scrollTop: 0
+    };
+
 
     const newPage =
     {
@@ -291,7 +261,8 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
     writeSessionState(
       {
-        ...currentPage, ...newPage
+        ...currentPage,
+        ...newPage
       },
       isBrowser()
     )
@@ -308,45 +279,30 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   }
 
-  private onKeyDown = (e: KeyboardEvent) => {
+  private onKeyDown = (e: Event) => {
 
-    if (e.ctrlKey && e.key === 'k') {
+    const keyBoard =
+      e as KeyboardEvent;
 
-      e.preventDefault();
+    if (
+      keyBoard.ctrlKey &&
+      keyBoard.key ===
+      'k') {
+
+      keyBoard.preventDefault();
 
       // console.log(`Log: [${this.component}] onkeyDown`, e);
 
       this.$visibility.update(b =>
-        b == 'hidden' ? 'visible' : 'hidden'
+        b ==
+          'hidden' ?
+          'visible' :
+          'hidden'
       );
 
     }
 
   };
-
-
-
-  private scrollTracking(host: HTMLElement, pageId: string) {
-
-    console.log(`Log: [UldeCOnfigurator] scrollTracking() beging`);
-
-    // restore page position
-    this.scrollRestore
-      .restore(
-        host,
-        pageId
-      );
-
-    this.scrollRestore.removeScrollEvent(host);
-    this.scrollRestore
-      .startTracking(
-        host,
-        pageId
-      );
-
-    console.log(`Log: [UldeCOnfigurator] scrollTracking() end`);
-
-  }
 
 
 }

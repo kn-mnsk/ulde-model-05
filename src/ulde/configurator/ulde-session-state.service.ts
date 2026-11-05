@@ -44,10 +44,12 @@ export interface ULDEPagePosition {
 
 const ULDE_SESSION_STATE_KEY = 'UldeSessionState';
 
+export const ULDE_DEFAULT_PAGE_ID = 'docs/index';
+
 export const ULDE_SESSION_STATE_DEFAULT: ULDESessionState = {
   selector: 'ulde-viewer',
-  pageId: 'docs/index',
-  prevPageId: 'docs/index',
+  pageId: ULDE_DEFAULT_PAGE_ID,
+  prevPageId: ULDE_DEFAULT_PAGE_ID,
   scrollTop: 0,
   prevScrollTop: 0,
   refreshed: false,
@@ -65,19 +67,24 @@ const $title = signal<string>('[session-state.manage]');
 // Session state helpers
 // -------------------------
 
-export function readSessionState(isBrowser: boolean): ULDESessionState {
+export function readSessionState(
+  isBrowser: boolean
+): ULDESessionState {
 
   if (!isBrowser) {
     return ULDE_SESSION_STATE_DEFAULT;
   }
 
-  const raw = localStorage.getItem(ULDE_SESSION_STATE_KEY);
+  const raw =
+    localStorage.getItem(ULDE_SESSION_STATE_KEY);
   if (!raw) {
     return ULDE_SESSION_STATE_DEFAULT;
   }
 
   try {
-    const parsed = JSON.parse(raw) as Partial<ULDESessionState>;
+    const parsed =
+      JSON.parse(raw) as Partial<ULDESessionState>;
+
     return {
       selector: parsed.selector ?? 'ulde-viewer',
       pageId: parsed.pageId ?? null,
@@ -93,15 +100,25 @@ export function readSessionState(isBrowser: boolean): ULDESessionState {
   }
 }
 
-export function writeSessionState(partial: Partial<ULDESessionState>, isBrowser: boolean): void {
+export function writeSessionState(
+  partial: Partial<ULDESessionState>,
+  isBrowser: boolean
+): void {
+
   if (!isBrowser) return;
 
-  const current = readSessionState(isBrowser);
+  const current =
+    readSessionState(isBrowser);
+
   const next: ULDESessionState = {
     ...current,
     ...partial,
   };
-  localStorage.setItem(ULDE_SESSION_STATE_KEY, JSON.stringify(next));
+
+  localStorage.setItem(
+    ULDE_SESSION_STATE_KEY,
+    JSON.stringify(next)
+  );
 
   // console.log(`Log: ${$title()} writeSessionState called, \ncurrent=${JSON.stringify(current, null, 2)}, \nnext=${JSON.stringify(next, null, 2)}`)
 
@@ -138,9 +155,20 @@ export function setPagePosition(
   state.prevScrollTop =
     state.scrollTop;
 
-  const newState = {...state, ...{pageId: pageId, scrollTop: scrollTop, pagePositions: {...state.pagePositions[pageId],  scrollTop}}};
+  // const newState =
+  // {
+  //   ...state,
+  //   ...{
+  //     pageId: pageId,
+  //     scrollTop: scrollTop,
+  //     pagePositions: {
+  //       ...state.pagePositions[pageId],
+  //       scrollTop
+  //     }
+  //   }
+  // };
 
-  console.log(`Log: [UldeSessionStateService] setPagePosition() \n newState=`, newState);
+  // console.log(`Log: [UldeSessionStateService] setPagePosition() \n newState=`, newState);
 
   state.pageId =
     pageId;
@@ -152,15 +180,23 @@ export function setPagePosition(
     = scrollTop
 
 
-writeSessionState(
-  state,
-  isBrowser
-);
+  writeSessionState(
+    state,
+    isBrowser
+  );
 }
 
 
-export function clearSessionState(isBrowser: boolean): void {
+export function clearSessionState(
+  isBrowser: boolean
+): void {
+
   if (!isBrowser) return;
-  localStorage.removeItem(ULDE_SESSION_STATE_KEY);
+
+  localStorage.removeItem(
+    ULDE_SESSION_STATE_KEY
+  );
+
   console.log(`Log: ${$title()} clearSessionState()`);
+
 }
