@@ -1,8 +1,8 @@
 <!-- src/ulde/configurator/ulde-configurator.html -->
 
-<diV class="ulde-configurator-container" #configurator>
+<diV class="ulde-configurator-container" #configuratorContainer>
 
-  <div class="ulde-markdwon-viewer-container" #markdwonContainer>
+  <div class="ulde-markdwon-viewer-container">
     <ulde-viewer [$rendererState]="$rendererStateMarkdownViewer()"
       ($stateChange)="onMarkdownViewerStateChange($event)" ($error)="onErrorMarkdownViewer($event)">
     </ulde-viewer>

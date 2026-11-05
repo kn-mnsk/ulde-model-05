@@ -9,7 +9,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { writeSessionState, readSessionState, ULDESessionState, getPagePosition, setPagePosition } from '@ulde/configurator';
+import { writeSessionState, getPagePosition, setPagePosition } from '@ulde/configurator';
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
 @Injectable({
@@ -18,14 +18,16 @@ import { isBrowser } from '../../../app/global.utils/global.utils';
 export class UldeScrollRestorationService {
 
   private saveTimer?: number;
-  private handleScroll!: () => void;
-  // private handleScroll!: () => {};
 
+  private handleScroll!: () => void;
 
   /**
    * Begin tracking scroll position
+   * @param host
+   * @param pageId
+   * @returns
    */
-  startTracking(
+  startScrollTracking(
     host: HTMLElement,
     pageId: string
   ): void {
@@ -33,19 +35,54 @@ export class UldeScrollRestorationService {
     if (!isBrowser()) {
       return;
     }
-    console.log(`Log: [UldeScrollrestorationService] scrollTracking() begin`);
 
-    this.handleScroll = () => this.onScroll(host, pageId);
+
+    this.handleScroll =
+      () =>
+        this.onScroll(
+          host,
+          pageId
+        );
 
     host.addEventListener(
-    // document.addEventListener(
       'scroll',
-      // () => this.onScroll(host, pageId)
       this.handleScroll
     );
 
-    console.log(`Log: [UldeScrollrestorationService] scrollTracking() end`);
+    console.log(
+      '[ScrollRestore] addEventLister'
+    );
 
+  }
+
+  stopScrollTracking(
+    host: HTMLElement
+  ): void {
+
+    if (!isBrowser()) {
+      return;
+    }
+
+    host.removeEventListener(
+      'scroll',
+      this.handleScroll
+    );
+
+    console.log(
+      '[ScrollRestore] removeEventLister'
+    );
+
+
+    this.handleScroll =
+      () =>
+        void {};
+
+
+    if (this.saveTimer) {
+      clearTimeout(
+        this.saveTimer
+      );
+    }
 
   }
 
@@ -53,11 +90,13 @@ export class UldeScrollRestorationService {
    * Save scroll position
    * @param pageId
    * @param scrollTop
+   * @deprecated
    */
   save(
     pageId: string,
     scrollTop: number)
     : void {
+
     writeSessionState({
       pageId,
       scrollTop
@@ -67,8 +106,11 @@ export class UldeScrollRestorationService {
   }
 
   /**
-     * Restore saved position
-     */
+   * Restore saved position
+   * @param host
+   * @param pageId
+   * @returns
+   */
   restore(
     host: HTMLElement,
     pageId: string
@@ -78,28 +120,39 @@ export class UldeScrollRestorationService {
       return;
     }
 
-    // const sessionState =
-    //   readSessionState(
-    //     isBrowser()
-    //   );
-
     const scrollTop =
-      getPagePosition(pageId, isBrowser());
+      getPagePosition(
+        pageId,
+        isBrowser()
+      );
 
     requestAnimationFrame(() => {
 
-      host.scrollTop = scrollTop;
+      host.scrollTop =
+        scrollTop;
 
     });
   }
 
   /**
-   * Scroll tracking
+   * scroll event
+   * @param e
+   * @param host
+   * @param pageId
    */
   private onScroll(
     host: HTMLElement,
     pageId: string,
   ): void {
+
+
+    console.log(
+      '[ScrollRestore] onScroll',
+      {
+        pageId,
+        scrollTop: host.scrollTop
+      }
+    );
 
     clearTimeout(
       this.saveTimer
@@ -109,36 +162,16 @@ export class UldeScrollRestorationService {
       window.setTimeout(
         () => {
 
-          console.log(
-            `Log: [UldeScrollRestorationService] onScroll \n(pageId=${pageId},
-            scrollTop=${host.scrollTop})
-            `);
-
           setPagePosition(
             pageId,
             host.scrollTop,
             isBrowser()
           );
         },
-        200
+        // 200
+        100
       );
 
   }
 
-  removeScrollEvent(
-    host: HTMLElement
-  ) {
-
-    host.removeEventListener(
-      'scroll',
-      this.handleScroll
-    );
-
-    if (this.saveTimer) {
-      clearTimeout(
-        this.saveTimer
-      );
-    }
-
-  }
 }
