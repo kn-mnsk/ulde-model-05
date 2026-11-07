@@ -398,21 +398,29 @@ because those runtime/navigation concerns usually influence layout, TOC behavior
 
 ## 2. Current Folder Structure (In Part 4)
 
-```code
+```mermaid
+---
+title: ULDE Folder Structure
+config:
+  treeView:
+    showIcons: true
+---
+
+treeView-beta
 src/
   app/
     demo/
-      example01-01 //  for fure use
+      example01/ :::highlight ## for future use
         example01.html
         example01.scss
-        example-01.ts
-    ...
+        example01.ts
+    .../ :::highlight ## Other folders or files
     app.html
     app.routes.ts
     app.scss
     app.spec.ts
     app.ts
-  ...
+  .../ :::highlight ## Other folders or files
   ulde/
     configurator/
       index.ts
@@ -420,27 +428,27 @@ src/
       ulde-configurator.routes.ts
       ulde-configurator.scss
       ulde-configurator.ts
-      ulde-session-state.service.ts // for part5
-      ulde-theme.service.ts  // for part5
+      ulde-session-state.service.ts :::highlight ## for part5
+      ulde-theme.service.ts :::highlight ## for part5
     core/
       devtools/
         panels/
-          /diagnostics
+          diagnostics/
             index.ts
             ulde-devtools-diagnostics.panel.html
             ulde-devtools-diagnostics.panel.scss
             ulde-devtools-diagnostics.panel.ts
-          /frame-timeline
+          frame-timeline/
             index.ts
             ulde-devtools-frame-timeline.panel.html
             ulde-devtools-frame-timeline.panel.scss
             ulde-devtools-frame-timeline.panel.ts
-          /plugin-timeline
+          plugin-timeline/
             index.ts
             ulde-devtools-plugin-timeline.panel.html
             ulde-devtools-plugin-timeline.panel.scss
             ulde-devtools-plugin-timeline.panel.ts
-          /runtime-inspector
+          runtime-inspector/
             index.ts
             ulde-devtools-runtime-inspector.panel.html
             ulde-devtools-runtime-inspector.panel.scss
@@ -465,10 +473,10 @@ src/
       ulde-layout.engine.service.
       ulde-render-context-builder.engine.service.ts
     plugins/
-      adaptors/ // depricated
+      adaptors/ :::highlight ## depricated
         index.ts
         ulde-plugin-hook-adaptor.ts
-      contributor/ // for the future
+      contributor/ :::highlight ## for the future
       registry/
         index.ts
         ulde-plugin-registry.ts
@@ -497,13 +505,13 @@ src/
           ulde-navigation-breadcrumbs.plugin.ts
         ulde/
          index.ts
-         ulde-devtools-panel.plugin.ts // for future
-         ulde-overlay-custom-panel.plugin.ts // to be depricated
+         ulde-devtools-panel.plugin.ts :::highlight ## for future
+         ulde-overlay-custom-panel.plugin.ts :::highlight ## to be depricated
          ulde-slow-plugin-detector.plugin.ts
          ulde-timeline-profiler.plugin.ts
         index.ts
       index.ts
-    tools/  // for the future
+    tools/  :::highlight ## to be used soon
     types/
       context/
         index.ts
@@ -543,10 +551,10 @@ src/
       ulde-viewer.scss
       ulde-viewer.ts
     index.ts
-  ...
-...
+  .../ :::highlight ## Other folders or files
+.../ :::highlight ## Other folders or files
 tsconfig.paths.json
-...
+.../ :::highlight ## Other folders or files
 vite.config.ts
 
 ```
@@ -7873,3 +7881,58 @@ ULDENavigationRuntimeService
 ```
 
 My overall assessment is that Part 4 produced a surprisingly solid foundation. The biggest architectural issue I see is that **navigation/runtime concerns are currently living insideULDERendererService**, and Part 5 should focus on extracting those concerns into dedicated runtime services while using the already-existing SessionState and Artifacts systems rather than introducing new parallel models.
+
+
+# Misc NotesIs the user logged in?
+
+## 1. Coding Specifications
+
+### 1-1. Page Restoration
+
+**Ownership: UldeVIewer**
+
+1. Page Opening
+
+This logic applies to :
+
+- brand-new document opening
+- page refresh document opening
+
+```mermaid
+---
+title: Page Opening
+config:
+  theme: forest
+  look: handDrawn
+---
+
+flowchart TD
+    Start(["Page Opening"]) --> Q1{"LocalStorage: UldeSessionSate Exists?"}
+    Q1 -->|Yes| A1["Open lastPageId of LocalStorage"]
+    Q1 -->|No| A2["set Default to UldeSessionState"]
+```
+
+```mermaid
+treeView-beta
+    my-project/
+        src/
+            main.ts :::highlight icon(logos:react) ## main component
+            index.js ## entry poin
+            sub/
+              sub.ts
+        package.json
+        README.md
+
+
+```
+
+```mermaid
+treeView-beta
+├── src/
+│   ├── App.tsx :::highlight icon(logos:react) ## main component
+│   └── index.ts ## entry point
+├── .env ## environment variables
+├── Dockerfile
+└── package.json
+
+```

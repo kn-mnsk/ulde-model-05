@@ -139,7 +139,11 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
         this.hostContainerRef.nativeElement
       );
 
-      console.log(`Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`, state.executionContext);
+      console.log(
+        `Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`,
+        state.executionContext
+      );
+
     });
 
   }
@@ -174,7 +178,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     this.scrollSpy.disconnect();
 
-    console.log(`Log: []UldeViewer ngOnDestroy Completed`);
+    // console.log(`Log: []UldeViewer ngOnDestroy Completed`);
   }
 
   private syncSignalInput(state: ULDERendererState): void {
@@ -185,7 +189,10 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       this.devtoolsService.$generateDevtoolsSnapshot(
         state.executionContext)();
 
-    console.log(`Log: [UldeViewer] syncSignalInput()`, state);
+    // console.log(
+    //   `Log: [UldeViewer] syncSignalInput()`,
+    //   state
+    // );
 
     this.rendererService.setState(state);
 
@@ -214,10 +221,10 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     const pageId =
       ctx.page.pageId;
 
-    console.log(
-      '[UldeViewer] attaching tracking for page',
-      pageId
-    );
+    // console.log(
+    //   '[UldeViewer] attaching tracking for page',
+    //   pageId
+    // );
 
     // restore page position
     this.scrollRestore
@@ -232,13 +239,13 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       );
 
 
-    console.log(
-      '[UldeViewer] host dimensions',
-      {
-        clientHeight: host.clientHeight,
-        scrollHeight: host.scrollHeight
-      }
-    );
+    // console.log(
+    //   '[UldeViewer] host dimensions',
+    //   {
+    //     clientHeight: host.clientHeight,
+    //     scrollHeight: host.scrollHeight
+    //   }
+    // );
 
     this.scrollRestore.
       startScrollTracking(
@@ -246,10 +253,10 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
         pageId
       );
 
-    console.log(
-      '[UldeViewer] scroll host',
-      host
-    );
+    // console.log(
+    //   '[UldeViewer] scroll host',
+    //   host
+    // );
 
     // console.log(`Log: [UldeViewer] scrollTracking() end`);
 

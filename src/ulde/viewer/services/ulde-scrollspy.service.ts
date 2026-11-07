@@ -59,7 +59,10 @@ export class UldeScrollspyService {
         // 'data-section-id'
       );
 
-    console.log(`Log: [UldeScrollspyService] observeSections \nsections=\n`, sections);
+    // console.log(
+    //   `Log: [UldeScrollspyService] observeSections \nsections=\n`,
+    //   sections
+    // );
 
     this.sectionObserver =
       new IntersectionObserver(
@@ -92,7 +95,10 @@ export class UldeScrollspyService {
         '[data-anchor-id]'
       );
 
-    console.log(`Log: [UldeScrollspyService] observeAnchors \nanchors=\n`, anchors);
+    // console.log(
+    //   `Log: [UldeScrollspyService] observeAnchors \nanchors=\n`,
+    //   anchors
+    // );
 
     this.anchorObserver =
       new IntersectionObserver(
