@@ -96,7 +96,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       if (!pageId) return;
 
       console.log(
-        '[UldeConfigurator] effect() pageId=',
+        '[UldeConfigurator] effect() 🔥1 \npageId=',
         pageId
       );
 
@@ -190,10 +190,10 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       })
     );
 
-    console.log(
-      `Log: [${this.component}] ngAfterViewInit \n rendererState:`,
-      this.$rendererStateMarkdownViewer()
-    );
+    // console.log(
+    //   `Log: [${this.component}] ngAfterViewInit \n rendererState:`,
+    //   this.$rendererStateMarkdownViewer()
+    // );
 
   }
 
@@ -215,10 +215,10 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         newPageId
       );
     }
-    console.log(
-      `Log: [${this.component}] onViewerStateChanged state=`,
-      state
-    );
+    // console.log(
+    //   `Log: [${this.component}] onViewerStateChanged state=`,
+    //   state
+    // );
 
   }
 

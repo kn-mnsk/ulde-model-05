@@ -49,9 +49,9 @@ export class UldeScrollRestorationService {
       this.handleScroll
     );
 
-    console.log(
-      '[ScrollRestore] addEventLister'
-    );
+    // console.log(
+    //   '[ScrollRestore] addEventLister'
+    // );
 
   }
 
@@ -68,9 +68,9 @@ export class UldeScrollRestorationService {
       this.handleScroll
     );
 
-    console.log(
-      '[ScrollRestore] removeEventLister'
-    );
+    // console.log(
+    //   '[ScrollRestore] removeEventLister'
+    // );
 
 
     this.handleScroll =
@@ -146,13 +146,13 @@ export class UldeScrollRestorationService {
   ): void {
 
 
-    console.log(
-      '[ScrollRestore] onScroll',
-      {
-        pageId,
-        scrollTop: host.scrollTop
-      }
-    );
+    // console.log(
+    //   '[ScrollRestore] onScroll',
+    //   {
+    //     pageId,
+    //     scrollTop: host.scrollTop
+    //   }
+    // );
 
     clearTimeout(
       this.saveTimer
