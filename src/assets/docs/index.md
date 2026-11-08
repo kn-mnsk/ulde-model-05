@@ -1,6 +1,6 @@
 # 1. ULDE Implementation Plan - Part 5
-- [Folder Structure and Codebase](#pageId:docs/ULDE-Implementation-Part-5-Plan)
-- [Coding Specifications](#pageId:docs/ULDE-Implementation-Part-5-Plan)
+- [Folder Structure and Codebase](#pageId:docs/ulde-implementation-part-5-plan)
+- [Coding Specifications](#pageId:docs/ulde-implementation-part-5-plan)
 
 
 # 2. TEST file

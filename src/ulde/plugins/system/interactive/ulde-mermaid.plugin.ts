@@ -293,15 +293,34 @@ function genPostRenderCB(container: HTMLElement): (id: any) => void {
     // console.log(`Log: [UldeMermaidBrowserPlugin] svg=`, svg);
     if (!svg) return;
 
+    // test
+    // svg.setAttribute('width', '40%');
+    // svg.setAttribute('height', '40%');
+    // test
+
     // Initialize Panzoom
     const panzoom = Panzoom(svg as SVGElement, {
       maxScale: 5,
       minScale: 0.5,
-      step: 0.1,
+      step: 0.05,
+      canvas: true,
+      startScale: 0.6,
+      startX: -200,
+      startY: -300,
     });
 
     // code node
     const codeNode = svg.parentNode;
+
+    // debug
+    const code = svg.parentElement;
+    console.log(
+      `[ULDEMermaidPlugin] code htmlelment=\n`,
+      code
+    );
+    code?.classList.remove('data-lang="mermaid"')
+    //debug
+
     // pre node
     const pre = codeNode?.parentElement;
     if (!pre || !codeNode) return;
