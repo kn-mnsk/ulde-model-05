@@ -18,6 +18,10 @@ export class ContentEngineService {
 
   title = "ContentEngineService";
 
+  constructor(
+    private router: Router,
+  ) { }
+
   async load(pageId: string): Promise<string | undefined> {
     /* existing loader */
 
@@ -28,9 +32,11 @@ export class ContentEngineService {
       const response = await fetch(url);
 
       if (response.redirected) {
-        const router = inject(Router);
-        navigate(router, ['PageNotFound']);
-        throw new Error(`Invalid URL: ${url}`);
+        // const router = inject(Router);
+        navigate(this.router, ['PageNotFound']);
+        console.error(`[ContentEngine] load() error`, response.text());
+        throw new Error(
+          `Invalid URL: ${url}`);
       }
 
       const raw = await response.text();

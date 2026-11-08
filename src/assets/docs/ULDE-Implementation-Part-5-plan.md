@@ -7882,8 +7882,9 @@ ULDENavigationRuntimeService
 
 My overall assessment is that Part 4 produced a surprisingly solid foundation. The biggest architectural issue I see is that **navigation/runtime concerns are currently living insideULDERendererService**, and Part 5 should focus on extracting those concerns into dedicated runtime services while using the already-existing SessionState and Artifacts systems rather than introducing new parallel models.
 
+---
 
-# Misc NotesIs the user logged in?
+# Misc Notes 
 
 ## 1. Coding Specifications
 
@@ -7892,11 +7893,10 @@ My overall assessment is that Part 4 produced a surprisingly solid foundation. T
 **Ownership: UldeVIewer**
 
 1. Page Opening
-
 This logic applies to :
-
-- brand-new document opening
-- page refresh document opening
+- book opening
+- page refresh
+- intra-page navigation
 
 ```mermaid
 ---
@@ -7907,32 +7907,11 @@ config:
 ---
 
 flowchart TD
-    Start(["Page Opening"]) --> Q1{"LocalStorage: UldeSessionSate Exists?"}
-    Q1 -->|Yes| A1["Open lastPageId of LocalStorage"]
-    Q1 -->|No| A2["set Default to UldeSessionState"]
-```
-
-```mermaid
-treeView-beta
-    my-project/
-        src/
-            main.ts :::highlight icon(logos:react) ## main component
-            index.js ## entry poin
-            sub/
-              sub.ts
-        package.json
-        README.md
-
-
-```
-
-```mermaid
-treeView-beta
-├── src/
-│   ├── App.tsx :::highlight icon(logos:react) ## main component
-│   └── index.ts ## entry point
-├── .env ## environment variables
-├── Dockerfile
-└── package.json
-
+    Start(["Page Opening"]) -->Q1{"Intra-page navigation?"}
+    Q1 -->|YES - New page opening| Q-A1{"LocalStorage: UldeSessionSate \n pageId in pagePosition exists? "}
+    Q-A1 -->|YES| A1-1["Restore lastScrolltop"]
+    Q-A1 -->|NO| A1-2["set page scrollTop to 0"]
+    Q1 -->|NO| Q2{"LocalStorage: UldeSessionSate Exists?"}
+    Q2 -->|NO - book opening| A2["set Default to UldeSessionState"]
+    Q2 -->|YES - page refresh| A3["Open lastPageId of LocalStorage with scrollTop = lastScrollTop"]
 ```

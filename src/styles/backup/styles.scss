@@ -368,16 +368,22 @@ Source - https://stackoverflow.com/a/79199554
 Posted by grappler
 Retrieved 2026-04-23, License - CC BY-SA 4.0
 */
-.dv-host .mermaid-container {
-  display: block;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  border: 2px solid var(--table-border);
+.markdwon-host pre.mermaid-container {
+  // position: relative;
+  // display: block;
+  display: flex;
+  // width: auto;
+  // height: auto;
+  padding: 20rem;
+  max-width: 600px;
+  height: 400px;
+
+  // overflow: visible;
+  overflow: auto;
+  // border: 2px solid var(--table-border);
   // border: 2px solid var(--text-color);
-  // border: 2px solid #55db50;
-  position: relative;
-  margin-bottom: 10px;
+  border: 2px solid #55db50;
+  // margin-bottom: 10px;
   // transition: background-color 2s 500ms;
 }
 
@@ -385,11 +391,11 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 //   padding: 0.2rem; // cursor: grab;
 // }
 
-.dv-host code.language-mermaid svg {
+.markdwon-host code.language-mermaid svg {
   position: relative;
   display: inline-box;
-  width: auto;
-  height: auto;
+  // width: 200px;
+  // height: 500px;
   // .dv-host code.language-mermaid svg {
   padding: 0.2rem 0.2rem 0.2rem 0.2rem; // cursor: grab;
   border: 10rem green;
@@ -403,7 +409,7 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 }
 
 // to prevent mouse dragging from conflicting with animation and transition
-.dv-host code.language-mermaid svg.dragging {
+.markdwon-host code.language-mermaid svg.dragging {
   // animation-play-state: puased;
   transition: none;
 }
@@ -436,12 +442,12 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 // }
 
 
-.dv-host code.langauge-mermaid svg g text {
+.markdwon-host code.langauge-mermaid svg g text {
   word-wrap: normal;
   // word-wrap: break-word;
 }
 
-.dv-host .mermaid-container .mermaid-button-container {
+.markdwon-host .mermaid-container .mermaid-button-container {
   position: relative;
   display: block;
   align-items: flex-end;
@@ -1008,7 +1014,7 @@ app-docs-viewer {
 
 .dv-artifacts-panel {
   position: fixed;
-  top: 120px;//0px;
+  top: 120px; //0px;
   // right: 24px;
   left: 50px;
   width: 350px;
@@ -1131,18 +1137,19 @@ app-docs-viewer {
   width: 320px;
   max-height: 200px;
   overflow-y: auto;
-  background: var(--bg-color);//rgba(0, 0, 0, 0.75);
-  color: var(--text-color);// #fff;
+  background: var(--bg-color); //rgba(0, 0, 0, 0.75);
+  color: var(--text-color); // #fff;
   font-size: 12px;
   padding: 8px;
   padding: 8px;
   border-radius: 6px;
   border: solid 5px var(--ap-border);
   border-radius: 8px;
-  z-index: 2000;//999999;
+  z-index: 2000; //999999;
   opacity: 0;
   white-space: pre-wrap;
   font-family: monospace;
+
   // opacity: 0.8;
   &.visible {
     opacity: 1;
