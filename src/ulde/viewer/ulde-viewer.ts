@@ -18,7 +18,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   @ViewChild('markdownHost', { static: true })
   hostRef!: ElementRef<HTMLElement>;
 
-  @ViewChild('markdwonHostContainer', { static: true })
+  @ViewChild('markdownHostContainer', { static: true })
   hostContainerRef!: ElementRef<HTMLElement>;
 
   // Full renderer state comes in as a signal input
