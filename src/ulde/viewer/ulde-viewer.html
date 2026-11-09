@@ -1,7 +1,26 @@
 <!-- src/ulde/viewer/ulde-viewer.html -->
+<header class="ulde-viewer-header">
+  <p>[Ulde Viwer Header1] &nbsp;</p>
+  <p>[Ulde Viwer Header2] &nbsp;</p>
+  <p>[Ulde Viwer Header3] &nbsp;</p>
+</header>
 
-  <div #markdwonHostContainer  class="ulde-markdown-host-container">
-    <div #markdownHost class="markdown-host"></div>
-  </div>
+<div class="ulde-progress-bar">
+  <!-- <p>Progress Bar</p> -->
+  <div class="ulde-progress-bar_fill" [style.width.%]="100"></div>
+  <!-- <div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
+</div>
 
+<div class="ulde-viewer-body">
 
+  <aside class="ulde-viewer-toc">
+    <p>Ulde Viewer TOC</p>
+  </aside>
+
+  <main class="ulde-viewer-main">
+    <div #markdownHostContainer class="ulde-markdown-host-container">
+      <div #markdownHost class="markdown-host"></div>
+    </div>
+  </main>
+
+</div>

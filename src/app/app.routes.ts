@@ -1,28 +1,29 @@
 // src/app/app.routes.ts
 
-import type { Routes } from '@angular/router';;
+import type { Routes } from '@angular/router';
+import { App } from './app';
+import { PageNotFound } from './page-not-found/page-not-found';
 
 
 export const routes: Routes = [
-
+  {
+    path: 'home',
+    component: App,
+    // loadComponent: () =>
+    //   import('./app')
+    //     .then(m => m.App)
+  },
+  {
+    path: 'PageNotFound',
+    component: PageNotFound,
+  },
   {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    loadComponent: () =>
-      import('./app')
-        .then(m => m.App)
-  },
-  {
-    path: 'PageNotFound',
-    loadComponent: () => import('./page-not-found/page-not-found').then(m => m.PageNotFound)
-  },
-
-  {
     path: '**',
-    redirectTo: 'PageNotFound'
+    component: PageNotFound,
   }
 ];

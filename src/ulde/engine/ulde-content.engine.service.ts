@@ -33,20 +33,27 @@ export class ContentEngineService {
 
       if (response.redirected) {
         // const router = inject(Router);
-        navigate(this.router, ['PageNotFound']);
-        console.error(`[ContentEngine] load() error`, response.text());
-        throw new Error(
-          `Invalid URL: ${url}`);
+        await this.router.navigate(['/PageNotFound']);
+        // navigate(this.router, ['PageNotFound']);
+        // console.error(
+        //   `[ContentEngine] load() error \nresponse=`,
+        //   response,
+        //   `\nurl=`, url
+        // );
+        throw  new Error(
+          `Invalid URL: ${url}`
+        );
       }
 
       const raw = await response.text();
 
-      // console.log(`Log: ${this.title} load \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
+      console.log(`[${this.title}] load() \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
 
       return raw;
 
     } catch (err) {
-      console.error(`${this.title} load() pageId=${pageId} error:`, err);
+      console.error(
+        `${this.title} load() pageId=${pageId} error:`, err);
       return undefined;
     }
 

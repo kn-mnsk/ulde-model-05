@@ -1,24 +1,28 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
 .ulde-configurator-container {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .ulde-markdown-viewer-container {
+  // position: relative;
   display: flex;
-  // overflow-y: scroll;
-
-  .viewer-host {
-    padding-left: 15px;
-    min-height: 400px;
-  }
-
+  flex: 1;
+  min-height: 0;
 }
 
 .ulde-graph-viewer-container {
   display: flex;
   align-content: center;
   visibility: hidden;
-  cursor:pointer;
+  cursor: pointer;
 
   &.visible {
     width: 600px;
