@@ -2,7 +2,7 @@
 
 import { inject, Injectable } from '@angular/core';
 
-import { navigate } from '../../app/global.utils/global.utils';
+import { fetchWithRetry, navigate } from '../../app/global.utils/global.utils';
 import { Router } from '@angular/router';
 
 
@@ -22,6 +22,23 @@ export class ContentEngineService {
     private router: Router,
   ) { }
 
+  async loadNew(pageId: string): Promise<string | undefined> {
+
+
+    const url = `assets/${pageId}.md`;
+
+    try {
+
+      const raw = await fetchWithRetry<string | undefined>(url, this.router);
+      return raw;
+
+    } catch (err) {
+      console.error("Final fetch error:", err);
+      return undefined;
+    }
+
+  }
+
   async load(pageId: string): Promise<string | undefined> {
     /* existing loader */
 
@@ -30,6 +47,7 @@ export class ContentEngineService {
 
     try {
       const response = await fetch(url);
+
 
       if (response.redirected) {
         // const router = inject(Router);
@@ -40,14 +58,14 @@ export class ContentEngineService {
         //   response,
         //   `\nurl=`, url
         // );
-        throw  new Error(
+        throw new Error(
           `Invalid URL: ${url}`
         );
       }
 
       const raw = await response.text();
 
-      console.log(`[${this.title}] load() \npageId=`, pageId, `\nmarkdwon raw=\n`, raw);
+      console.log(`[${this.title}] load() \npageId=`, pageId, `\nresponse=`, response, `\nmarkdwon raw=\n`, raw);
 
       return raw;
 
@@ -58,6 +76,7 @@ export class ContentEngineService {
     }
 
   }
+
   async transform(raw: string): Promise<Token[]> {
     /* existing parser */
 

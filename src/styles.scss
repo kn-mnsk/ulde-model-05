@@ -86,10 +86,10 @@ body {
   }
 }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
+// body {
+//   background-color: var(--bg-color);
+//   color: var(--text-color);
+// }
 
 /* Links */
 a {
@@ -326,7 +326,6 @@ body[data-theme="light"] {
   th {
     background-color: rgb(206, 14, 78);
   }
-
 
   tr td {
     border: 1px solid #1bee22;
