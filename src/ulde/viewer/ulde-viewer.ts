@@ -1,15 +1,26 @@
 // src/ulde/viewer/ulde-viewer.ts
 
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal, computed } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+
 import { ULDEDevtoolsService } from '@ulde/devtools';
 import type { ULDERendererState } from '@ulde/types/renderer';
 import { UldeNavigationRuntimeService, ULDERendererService, UldeScrollRestorationService, UldeScrollspyService } from '@ulde/viewer/services';
 import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext } from '@ulde/types';
+import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
+import { UldeOverlayService } from '@ulde/viewer/services/ulde-overlay.service';
+import { readSessionState, writeSessionState } from '@ulde/configurator';
+
+import { ULDETocEntry, ULDETocNode } from '@ulde/types';
 
 @Component({
   selector: 'ulde-viewer',
   standalone: true,
+  imports: [
+    UldeViewerTocResizerDirective,
+    NgTemplateOutlet,
+  ],
   templateUrl: 'ulde-viewer.html',
   styleUrl: 'ulde-viewer.scss',
 })
@@ -21,10 +32,32 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   @ViewChild('markdownHostContainer', { static: true })
   hostContainerRef!: ElementRef<HTMLElement>;
 
+  @ViewChild('uldeViewerTocOverlay', { static: false })
+  viewerTocOverlayRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('uldeViewerTOC', { static: false })
+  viewerTocRef!: ElementRef<HTMLElement>;
+
+  @ViewChild('markdownHostOverlay', { static: false })
+  markdownHostOverlayRef?: ElementRef<HTMLElement>;
+
+  $viewerTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
+
   // Full renderer state comes in as a signal input
   $rendererState = input<ULDERendererState>();
 
   $currentRendererState = signal(this.$rendererState());
+
+  $pageId = computed(() =>
+    this.$currentRendererState()?.executionContext?.page.pageId
+  );
+
+  $prevPageId = signal<string | null>(null);
+
+
+  // ULDE outputs
+  $toc = signal<ULDETocEntry[]>([]);
+  // readonly $tocTree = computed(() => this.buildTocTree(this.$toc()));
 
   $ready = output<void>();
   $error = output<Error>();
@@ -35,7 +68,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     private devtoolsService: ULDEDevtoolsService,
     private navigationRuntimeService: UldeNavigationRuntimeService,
     private scrollSpy: UldeScrollspyService,
-    private scrollRestore: UldeScrollRestorationService
+    private scrollRestore: UldeScrollRestorationService,
+    private overlayService: UldeOverlayService,
   ) {
 
     // 🔥1  React to ULDE lifecycle phases
@@ -118,7 +152,10 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
       if (!state || !state.executionContext) return;
 
-      if (!this.hostRef || !this.hostContainerRef) return;
+      if (!this.hostRef || !this.hostContainerRef || !this.viewerTocRef) return;
+
+
+      this.$viewerTocRef.set(this.viewerTocRef);
 
       this.syncSignalInput(state);
 
@@ -139,6 +176,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
         this.hostContainerRef.nativeElement
       );
 
+
+
       console.log(
         `Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`,
         state.executionContext
@@ -151,6 +190,12 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
 
     if (!isBrowser()) return;
+
+    this.overlayService.show(this.viewerTocRef);
+    this.overlayService.show(this.markdownHostOverlayRef);
+
+    const { prevPageId } = readSessionState(isBrowser());
+    this.$prevPageId.set(prevPageId);
 
     this.rendererService.init(
       this.hostRef,
@@ -165,6 +210,8 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       },
     );
 
+    this.overlayService.hide(this.viewerTocRef);
+    this.overlayService.hide(this.markdownHostOverlayRef);
 
   }
 
@@ -261,5 +308,70 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: [UldeViewer] scrollTracking() end`);
 
   }
+
+  onBackToPrevPage() {
+    console.log(`[UldeViewer] onBackToPrevPage 1`);
+
+    const { pageId, prevPageId, scrollTop, prevScrollTop } = readSessionState(isBrowser());
+    writeSessionState({
+      pageId: this.$prevPageId(),
+      prevPageId: this.$pageId(),
+      scrollTop: prevScrollTop,
+      prevScrollTop: scrollTop
+    },
+      isBrowser()
+    );
+
+    // const currentRendererState = this.$currentRendererState();
+    // if (!currentRendererState || !currentRendererState.executionContext) return;
+    // currentRendererState.executionContext.page.pageId = prevPageId ?? '';
+
+    const rendererState =
+      this.rendererService.getState();
+    if (
+      !prevPageId ||
+      !rendererState ||
+      !rendererState.executionContext
+    ) return;
+
+    console.log(`[UldeViewer] onBackToPrevPage 2`);
+
+    rendererState.executionContext.page.pageId
+      = this.$prevPageId() ?? 'docs/index';
+
+    this.syncSignalInput(rendererState);
+    // this.rendererService.setState({
+    //   executionContext: rendererState.executionContext
+    // });
+
+  }
+
+
+
+  // // Build TOC tree
+  // private buildTocTree(entries: ULDETocEntry[]): ULDETocNode[] {
+  //   const root: ULDETocNode[] = [];
+  //   const stack: ULDETocNode[] = [];
+
+  //   for (const entry of entries) {
+  //     const node: ULDETocNode = {
+  //       entry,
+  //       children: [],
+  //       collapsed: false
+  //     };
+
+  //     while (stack.length && stack[stack.length - 1].entry.level >= entry.level) {
+  //       stack.pop();
+  //     }
+
+  //     if (!stack.length) root.push(node);
+  //     else stack[stack.length - 1].children.push(node);
+
+  //     stack.push(node);
+  //   }
+
+  //   return root;
+  // }
+
 
 }

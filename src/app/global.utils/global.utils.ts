@@ -109,3 +109,82 @@ export function setDecimalPlaces(value: number, places: number) : number{
   return Number(value.toFixed(places));
 }
 
+/**
+ * Advanced Fetch Helper with retries, timeout, and JSON parsing.
+ * @param url - The endpoint URL
+ * @param options - Fetch configuration (RequestInit)
+ * @param retries - Number of retry attempts (default: 3)
+ * @param timeoutMs - Timeout in milliseconds (default: 5000)
+ * @returns Promise<T> - Typed response data
+ */
+export async function fetchWithRetry<T>(
+  url: string,
+  router: Router,
+  options: RequestInit = {},
+  retries: number = 3,
+  timeoutMs: number = 5000
+): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // return (await response.json()) as T;
+      return (await response.text()) as T;
+    } catch (error) {
+      clearTimeout(timeout);
+
+      // AbortError or network error handling
+      if (attempt < retries) {
+        console.warn(`Attempt ${attempt} failed. Retrying...`);
+      } else {
+        console.error(`All ${retries} attempts failed.`);
+        await router.navigate(['/PageNotFound']);
+        throw error;
+      }
+    }
+  }
+
+  // This should never be reached
+  throw new Error("Unexpected fetch error");
+}
+
+// // --------------------
+// // Example Usage
+// // --------------------
+// interface User {
+//   id: number;
+//   name: string;
+//   email: string;
+// }
+
+// (async () => {
+//   try {
+//     const user = await fetchWithRetry<User>(
+//       "https://jsonplaceholder.typicode.com/users/1",
+//       {
+//         method: "GET",
+//         headers: {
+//           "Content-Type": "application/json"
+//         }
+//       },
+//       3, // retries
+//       3000 // timeout
+//     );
+
+//     console.log("User fetched:", user.name, "-", user.email);
+//   } catch (err) {
+//     console.error("Final fetch error:", err);
+//   }
+// })();

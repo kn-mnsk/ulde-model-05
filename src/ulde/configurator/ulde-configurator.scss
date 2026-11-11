@@ -9,13 +9,20 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  width: auto;
+  max-width: 800px;
 }
 
 .ulde-markdown-viewer-container {
   // position: relative;
   display: flex;
   flex: 1;
-  min-height: 0;
+
+  width: auto;
+
+  // min-height: 0;
+  // flex-direction: column;
+  // height: 100vh;
 }
 
 .ulde-graph-viewer-container {
