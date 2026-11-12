@@ -1,22 +1,30 @@
-// src/ulde/configurator/ulde-theme.service.ts
+// src/ulde/configuratorservices//ulde-theme.service.ts
 
 import { Injectable } from '@angular/core';
-import { isBrowser } from '../../app/global.utils/global.utils';
-import { readSessionState, writeSessionState } from '@ulde/configurator';
+import { UldeSessionstateManageService } from '@ulde/configurator';
+import { isBrowser } from '../../../app/global.utils/global.utils';
 
 export type ThemeName = 'light' | 'dark';
 export const defaultThemeName: ThemeName = 'dark';
 
 @Injectable({ providedIn: 'root' })
-export class ThemeService {
+export class UldeThemeService {
 
 
   private readonly attrName = 'data-theme';
 
-  constructor() {
+  constructor(
+    private sessionStateService: UldeSessionstateManageService,
+  ) {
     if (!isBrowser()) return;
-    const { docTheme } = readSessionState(isBrowser());
-    const saved = docTheme as ThemeName || defaultThemeName;
+
+    // const { docTheme } = readSessionState(isBrowser());
+    const docTheme =
+      this.sessionStateService.getTheme();
+
+    const saved = docTheme as
+      ThemeName ||
+      defaultThemeName;
     // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
     this.applyTheme(saved, { animate: false });
   }
@@ -27,11 +35,20 @@ export class ThemeService {
     };
     let attr: ThemeName | null = null;
     try {
-      const { docTheme } = readSessionState(isBrowser());
-      attr = docTheme as ThemeName | null;
+
+      // const { docTheme } = readSessionState(isBrowser());
+      const docTheme =
+        this.sessionStateService.getTheme();
+
+      attr = docTheme as
+        ThemeName
+        | null;
       // attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
     } catch (err) {
-      console.error('Error: [ThemeService]:', err);
+      console.error(
+        'Error: [ThemeService]:',
+        err
+      );
     }
     return attr ?? defaultThemeName;;
 
@@ -41,14 +58,19 @@ export class ThemeService {
     // const next: ThemeName = theme;
     // this.applyTheme(theme, { animate: false });
     this.applyTheme(theme, { animate: true });
-    writeSessionState({ docTheme: theme }, isBrowser());
+
+    this.sessionStateService.persistTheme(theme);
+    // writeSessionState({ docTheme: theme }, isBrowser());
     // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
   }
 
   setTheme(theme: ThemeName): void {
     // this.applyTheme(theme, { animate: false });
     this.applyTheme(theme, { animate: true });
-    writeSessionState({ docTheme: theme }, isBrowser());
+
+    this.sessionStateService.persistTheme(theme);
+
+    // writeSessionState({ docTheme: theme }, isBrowser());
     // writeSessionState({ docTheme: theme as string }, isBrowser());
     // sessionStorage.setItem(this.storageKey, theme as string);
     // console.log(`Log: [ThemeService] setTheme =`, theme);

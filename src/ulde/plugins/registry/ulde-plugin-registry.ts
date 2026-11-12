@@ -1,5 +1,6 @@
 // src/ulde/plugins/registry/ulde-plugin-registry.ts
 
+import { UldeThemeService } from '@ulde/configurator';
 import {
   ULDECodeblockPlugin, ULDEFrontmatterNormalizerPlugin
 } from '@ulde/plugins/system/content';

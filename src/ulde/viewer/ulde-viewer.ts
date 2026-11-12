@@ -1,6 +1,6 @@
 // src/ulde/viewer/ulde-viewer.ts
 
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal, computed } from '@angular/core';
+import { OnInit, AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal, computed } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 import { ULDEDevtoolsService } from '@ulde/devtools';
@@ -10,21 +10,22 @@ import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext } from '@ulde/types';
 import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
 import { UldeOverlayService } from '@ulde/viewer/services/ulde-overlay.service';
-import { readSessionState, writeSessionState } from '@ulde/configurator';
+// import { readSessionState, writeSessionState } from '@ulde/configurator';
 
 import { ULDETocEntry, ULDETocNode } from '@ulde/types';
+import { UldeSessionstateManageService } from '@ulde/configurator';
 
 @Component({
   selector: 'ulde-viewer',
   standalone: true,
   imports: [
     UldeViewerTocResizerDirective,
-    NgTemplateOutlet,
+    // NgTemplateOutlet,
   ],
   templateUrl: 'ulde-viewer.html',
   styleUrl: 'ulde-viewer.scss',
 })
-export class UldeViewer implements AfterViewInit, OnDestroy {
+export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('markdownHost', { static: true })
   hostRef!: ElementRef<HTMLElement>;
@@ -70,6 +71,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     private scrollSpy: UldeScrollspyService,
     private scrollRestore: UldeScrollRestorationService,
     private overlayService: UldeOverlayService,
+    private sessionStateService: UldeSessionstateManageService,
   ) {
 
     // 🔥1  React to ULDE lifecycle phases
@@ -79,19 +81,20 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
       if (!phase) return;
 
-      const state =
+      const rendererState =
         this.rendererService.getState();
 
-      if (!state?.executionContext) return;
+      if (
+        !rendererState?.executionContext
+      )
+        return;
 
-      console.log(`Log: [UldeViewer] effect(): 🔥1`);
-
-      state.executionContext.lifecyclePhase =
+      rendererState.executionContext.lifecyclePhase =
         phase.lifecyclePhase;
 
-      this.rendererService.setState({
-        executionContext: state.executionContext
-      });
+      this.syncSignalInput(rendererState);
+
+      console.log(`Log: [UldeViewer] effect(): 🔥1`);
 
     });
 
@@ -103,19 +106,22 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
       if (diagnostics.length < 1) return;
 
-      console.log(`Log: [UldeViewer] effect(): 🔥2`);
+      console.log(`Log: [UldeViewer] effect(): 🔥2-1`);
 
-      const state =
+      const rendererState =
         this.rendererService.getState();
 
-      if (!state?.executionContext?.artifacts) return;
+      if (
+        !rendererState?.executionContext?.artifacts
+      )
+        return;
 
-      state.executionContext.artifacts.diagnostics =
+      rendererState.executionContext.artifacts.diagnostics =
         diagnostics;
 
-      this.rendererService.setState({
-        executionContext: state.executionContext
-      });
+      this.syncSignalInput(rendererState);
+
+      console.log(`Log: [UldeViewer] effect(): 🔥2-2`);
 
     });
 
@@ -127,65 +133,94 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
       if (!currentFrame) return;
 
-      const state =
+      const rendererState =
         this.rendererService.getState();
 
-      if (!state?.executionContext?.artifacts) return;
+      if (
+        !rendererState?.executionContext?.artifacts
+      )
+        return;
 
 
-      console.log(`Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`, currentFrame);
+      // console.log(`Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`, currentFrame);
 
-      state.executionContext.artifacts.frame =
+      rendererState.executionContext.artifacts.frame =
         currentFrame;
 
-      this.rendererService.setState({
-        executionContext: state.executionContext
-      });
+      // this.rendererService.setState({
+      //   executionContext: rendererState.executionContext
+      // });
+      this.syncSignalInput(rendererState);
+
+      console.log(
+        // `Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`,
+        // currentFrame
+        `Log: [UldeViewer] effect(): 🔥3`
+      );
 
     });
 
     // 🔥4 React to rendererState signal input (without re-init)
     effect(() => {
 
-      const state =
+      const rendererState =
         this.$rendererState();
 
-      if (!state || !state.executionContext) return;
+      if (
+        !rendererState ||
+        !rendererState.executionContext
+      )
+        return;
 
-      if (!this.hostRef || !this.hostContainerRef || !this.viewerTocRef) return;
+      if (
+        !this.hostRef ||
+        !this.hostContainerRef ||
+        !this.viewerTocRef
+      )
+        return;
 
 
       this.$viewerTocRef.set(this.viewerTocRef);
 
-      this.syncSignalInput(state);
+      this.syncSignalInput(rendererState);
 
       this.navigationRuntimeService.bind(
         this.hostRef.nativeElement,
-        state.executionContext
+        rendererState.executionContext
       );
 
       this.scrollSpy.disconnect();
 
       this.scrollSpy.observe(
         this.hostRef.nativeElement,
-        state.executionContext
+        rendererState.executionContext
       );
 
       this.scrollTracking(
-        state.executionContext,
+        rendererState.executionContext,
         this.hostContainerRef.nativeElement
       );
 
-
-
       console.log(
-        `Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`,
-        state.executionContext
+        // `Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`,
+        // state.executionContext
+        `Log: [UldeViewer] effect(): 🔥4 `
       );
 
     });
 
   }
+
+
+  ngOnInit(): void {
+
+    const { prevPageId } =
+      this.sessionStateService.getState();
+
+    this.$prevPageId.set(prevPageId);
+
+  }
+
 
   ngAfterViewInit(): void {
 
@@ -193,9 +228,6 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
 
     this.overlayService.show(this.viewerTocRef);
     this.overlayService.show(this.markdownHostOverlayRef);
-
-    const { prevPageId } = readSessionState(isBrowser());
-    this.$prevPageId.set(prevPageId);
 
     this.rendererService.init(
       this.hostRef,
@@ -228,22 +260,22 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: []UldeViewer ngOnDestroy Completed`);
   }
 
-  private syncSignalInput(state: ULDERendererState): void {
+  private syncSignalInput(rendererState: ULDERendererState): void {
 
-    if (!state.executionContext) return;
+    if (!rendererState.executionContext) return;
 
-    state.devtoolsSnapshot =
+    rendererState.devtoolsSnapshot =
       this.devtoolsService.$generateDevtoolsSnapshot(
-        state.executionContext)();
+        rendererState.executionContext)();
 
     // console.log(
     //   `Log: [UldeViewer] syncSignalInput()`,
     //   state
     // );
 
-    this.rendererService.setState(state);
+    this.rendererService.setState(rendererState);
 
-    this.$currentRendererState.set(state); // input for UldeDevtools
+    this.$currentRendererState.set(rendererState); // input for UldeDevtools
 
   }
 
@@ -268,11 +300,6 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
     const pageId =
       ctx.page.pageId;
 
-    // console.log(
-    //   '[UldeViewer] attaching tracking for page',
-    //   pageId
-    // );
-
     // restore page position
     this.scrollRestore
       .restore(
@@ -286,63 +313,41 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
       );
 
 
-    // console.log(
-    //   '[UldeViewer] host dimensions',
-    //   {
-    //     clientHeight: host.clientHeight,
-    //     scrollHeight: host.scrollHeight
-    //   }
-    // );
-
     this.scrollRestore.
       startScrollTracking(
         host,
         pageId
       );
 
-    // console.log(
-    //   '[UldeViewer] scroll host',
-    //   host
-    // );
-
-    // console.log(`Log: [UldeViewer] scrollTracking() end`);
-
   }
 
   onBackToPrevPage() {
     console.log(`[UldeViewer] onBackToPrevPage 1`);
 
-    const { pageId, prevPageId, scrollTop, prevScrollTop } = readSessionState(isBrowser());
-    writeSessionState({
-      pageId: this.$prevPageId(),
-      prevPageId: this.$pageId(),
-      scrollTop: prevScrollTop,
-      prevScrollTop: scrollTop
-    },
-      isBrowser()
-    );
+    const { pageId }
+      = this.sessionStateService.getState();
 
-    // const currentRendererState = this.$currentRendererState();
-    // if (!currentRendererState || !currentRendererState.executionContext) return;
-    // currentRendererState.executionContext.page.pageId = prevPageId ?? '';
+
+    const newPageId = this.$prevPageId();// prevPageId becomes newPageId
+    if (!newPageId) return;
+    this.sessionStateService.swapState(newPageId);
+
+    this.$prevPageId.set(pageId);
 
     const rendererState =
-      this.rendererService.getState();
+      this.$currentRendererState();
+
     if (
-      !prevPageId ||
       !rendererState ||
       !rendererState.executionContext
     ) return;
 
-    console.log(`[UldeViewer] onBackToPrevPage 2`);
 
     rendererState.executionContext.page.pageId
-      = this.$prevPageId() ?? 'docs/index';
+      = newPageId;
 
     this.syncSignalInput(rendererState);
-    // this.rendererService.setState({
-    //   executionContext: rendererState.executionContext
-    // });
+    console.log(`[UldeViewer] onBackToPrevPage 🔄️`);
 
   }
 

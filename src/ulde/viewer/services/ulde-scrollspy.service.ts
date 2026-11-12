@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { ULDEExecutionContext, ULDENavigationArtifact } from '@ulde/types';
-import { readSessionState, ULDEPagePosition, writeSessionState } from '@ulde/configurator';
+import {  UldeSessionstateManageService } from '@ulde/configurator';
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
 
@@ -34,6 +34,10 @@ export class UldeScrollspyService {
   private activeSectionId?: string;
 
   private activeAnchorId?: string;
+
+  constructor(
+    private sessionStateService: UldeSessionstateManageService,
+  ){}
 
   observe(
     host: HTMLElement,
@@ -176,7 +180,8 @@ export class UldeScrollspyService {
       }
     );
 
-    this.persistSessionState(
+    this.sessionStateService.persistPagePosition(
+    // this.persistSessionState(
       ctx.page.pageId,
       {
         archiveSectionId: sectionId
@@ -220,7 +225,8 @@ export class UldeScrollspyService {
       }
     );
 
-    this.persistSessionState(
+    this.sessionStateService.persistPagePosition(
+    // this.persistSessionState(
       ctx.page.pageId,
       {
         archiveAnchorId: anchorId
@@ -246,34 +252,35 @@ export class UldeScrollspyService {
   }
 
 
-  private persistSessionState(
-    pageId: string,
-    partial: Partial<ULDEPagePosition>
-  ): void {
+  // private persistSessionState(
+  //   pageId: string,
+  //   partial: Partial<ULDEPagePosition>
+  // ): void {
 
-    const sessionState =
-      readSessionState(
-        isBrowser()
-      );
+  //   const sessionState =
+  //     readSessionState(
+  //       isBrowser()
+  //     );
 
-    sessionState.pagePositions ??= {};
+  //   sessionState.pagePositions ??= {};
 
-    const current =
-      sessionState.pagePositions[pageId] ?? {
-        scrollTop: 0
-      };
+  //   const current =
+  //     sessionState.pagePositions[pageId] ?? {
+  //       scrollTop: 0
+  //     };
 
-    sessionState.pagePositions[pageId] = {
-      ...current,
-      ...partial
-    };
+  //   sessionState.pagePositions[pageId] = {
+  //     ...current,
+  //     ...partial
+  //   };
 
-    writeSessionState(
-      sessionState,
-      isBrowser()
-    );
+  //   writeSessionState(
+  //     sessionState,
+  //     isBrowser(),
+  //     '[UldeScrollService] persistSessionState()'
+  //   );
 
-  }
+  // }
 
 
 

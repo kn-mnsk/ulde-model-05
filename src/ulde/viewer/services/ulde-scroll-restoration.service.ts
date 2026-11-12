@@ -9,7 +9,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { writeSessionState, getPagePosition, setPagePosition } from '@ulde/configurator';
+import { UldeSessionstateManageService } from '@ulde/configurator';
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
 @Injectable({
@@ -20,6 +20,10 @@ export class UldeScrollRestorationService {
   private saveTimer?: number;
 
   private handleScroll!: () => void;
+
+  constructor(
+    private sessionStateService: UldeSessionstateManageService,
+  ) { }
 
   /**
    * Begin tracking scroll position
@@ -92,18 +96,19 @@ export class UldeScrollRestorationService {
    * @param scrollTop
    * @deprecated
    */
-  save(
-    pageId: string,
-    scrollTop: number)
-    : void {
+  // save(
+  //   pageId: string,
+  //   scrollTop: number)
+  //   : void {
 
-    writeSessionState({
-      pageId,
-      scrollTop
-    },
-      isBrowser()
-    );
-  }
+  //   writeSessionState({
+  //     pageId,
+  //     scrollTop
+  //   },
+  //     isBrowser(),
+  //     '[UldeScrollRestorationService] save()'
+  //   );
+  // }
 
   /**
    * Restore saved position
@@ -121,7 +126,7 @@ export class UldeScrollRestorationService {
     }
 
     const scrollTop =
-      getPagePosition(
+      this.sessionStateService.getPagePosition(
         pageId,
         isBrowser()
       );
@@ -162,7 +167,7 @@ export class UldeScrollRestorationService {
       window.setTimeout(
         () => {
 
-          setPagePosition(
+          this.sessionStateService.setPagePosition(
             pageId,
             host.scrollTop,
             isBrowser()
