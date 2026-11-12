@@ -10,7 +10,7 @@ import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldeScrollRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
-import { getPagePosition, readSessionState, ULDE_SESSION_STATE_DEFAULT, writeSessionState, ULDE_DEFAULT_PAGE_ID } from '@ulde/configurator';
+import { ULDE_SESSION_STATE_DEFAULT, ULDE_DEFAULT_PAGE_ID, UldeSessionstateManageService, UldeThemeService } from '@ulde/configurator';
 
 @Component({
   selector: 'ulde-configurator',
@@ -62,7 +62,9 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(
     private contenEngine: ContentEngineService,
-    private lifecycleService: ULDELifecycleService
+    private lifecycleService: ULDELifecycleService,
+    private sessionStateService: UldeSessionstateManageService,
+    private themeService: UldeThemeService,
   ) {
 
     this.handleKeydown = this.onKeyDown;
@@ -76,15 +78,15 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       }
 
 
-      const sessionState = readSessionState(isBrowser())
+      const sessionState = this.sessionStateService.getState();
 
       if (!sessionState) {
-        writeSessionState(
-          ULDE_SESSION_STATE_DEFAULT,
-          isBrowser()
-        );
 
-        this.$pageId.set(ULDE_DEFAULT_PAGE_ID)
+        this.sessionStateService.initState();
+
+        this.$pageId.set(
+          this.sessionStateService.getDefaultPageId()
+        );
 
       } else {
 
@@ -210,7 +212,8 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
       const newPageId =
         state.executionContext.page.pageId;
 
-      await this.updateSessionState(newPageId);
+      // await this.updateSessionState(newPageId);
+      this.sessionStateService.swapState(newPageId);
 
       this.$pageId.set(
         newPageId
@@ -232,43 +235,44 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   }
 
-  private async updateSessionState(
-    newPageId: string
-  ): Promise<void> {
+  // private async updateSessionState(
+  //   newPageId: string
+  // ): Promise<void> {
 
-    const currentPage =
-      readSessionState(isBrowser());
+  //   const currentPage =
+  //     readSessionState(isBrowser());
 
-    currentPage.pagePositions ??= {};
+  //   currentPage.pagePositions ??= {};
 
-    // currentPage.pagePositions[newPageId]
-    //   = {
-    //   ...currentPage.pagePositions[newPageId],
-    //   ...{ scrollTop: 0 }
-    // }
-    currentPage.pagePositions[newPageId] ??= {
-      scrollTop: 0
-    };
+  //   // currentPage.pagePositions[newPageId]
+  //   //   = {
+  //   //   ...currentPage.pagePositions[newPageId],
+  //   //   ...{ scrollTop: 0 }
+  //   // }
+  //   currentPage.pagePositions[newPageId] ??= {
+  //     scrollTop: 0
+  //   };
 
 
-    const newPage =
-    {
-      pageId: newPageId,
-      prevPageId: currentPage.pageId ?? '',
-      scrollTop: currentPage.pagePositions[newPageId].scrollTop,
-      prevScrollTop: currentPage.scrollTop ?? 0,
-      pagePositions: currentPage.pagePositions
-    };
+  //   const newPage =
+  //   {
+  //     pageId: newPageId,
+  //     prevPageId: currentPage.pageId ?? '',
+  //     scrollTop: currentPage.pagePositions[newPageId].scrollTop,
+  //     prevScrollTop: currentPage.scrollTop ?? 0,
+  //     pagePositions: currentPage.pagePositions
+  //   };
 
-    writeSessionState(
-      {
-        ...currentPage,
-        ...newPage
-      },
-      isBrowser()
-    )
+  //   writeSessionState(
+  //     {
+  //       ...currentPage,
+  //       ...newPage
+  //     },
+  //     isBrowser(),
+  //     '[UldeConfigurator] updateSessionState()'
+  //   )
 
-  }
+  // }
 
   /**
    * Theme Switcher
@@ -276,6 +280,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
    */
   setTheme(theme: 'light' | 'dark') {
 
+    this.themeService.setTheme(theme);
     this.$theme.set(theme);
 
   }

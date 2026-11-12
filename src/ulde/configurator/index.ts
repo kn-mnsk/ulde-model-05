@@ -1,7 +1,5 @@
 // src/ulde/configurator/index.ts
 
+export * from "./services";
 export * from "./ulde-configurator";
-export * from "./ulde-navigation-recovery.service";
-export * from "./ulde-session-state.service";
-export * from "./ulde-theme.service";
 

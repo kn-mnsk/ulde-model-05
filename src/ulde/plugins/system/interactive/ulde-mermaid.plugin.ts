@@ -1,4 +1,5 @@
 // ulde/plugins/interactive/ulde-mermaid.plugin.ts
+import { inject } from '@angular/core'
 
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
@@ -8,7 +9,8 @@ import { isBrowser } from "../../../../app/global.utils/global.utils";
 import mermaid from 'mermaid';
 import type { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
-import { readSessionState } from '@ulde/configurator';
+import { UldeThemeService } from "@ulde/configurator";
+// import { readSessionState } from '@ulde/configurator';
 
 
 /* ---------------------------------------------------------
@@ -81,25 +83,42 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
   description = "render mermaid graph";
   enabled = true;
 
+  private themeService!: UldeThemeService;
+
+  constructor() {
+
+    this.themeService =
+      inject(UldeThemeService);
+
+  }
+
   // async run(ctx: ULDEExecutionContext){
   async run(ctx: ULDEExecutionContext): Promise<() => void | undefined> {
 
-    if (ctx.lifecyclePhase !== 'hydrate') return new Promise(() => undefined);
-    if (!ctx.render) return new Promise(() => undefined);
-    if (!isBrowser()) return new Promise(() => undefined);
+    if (ctx.lifecyclePhase !== 'hydrate') {
+      return new Promise(() => undefined);
+    };
+
+    if (!ctx.render) {
+      return new Promise(() => undefined);
+    };
+
+    if (!isBrowser()) {
+      return new Promise(() => undefined);
+    };
 
 
     // console.log(`Log: [UldeMermaidPlugin] run() Start`);
 
-
-    const { diagnostics } = ctx.artifacts;
+    const { diagnostics }
+      = ctx.artifacts;
     // clear the contents as initializing to prevent duplication in case of re-run;
     // const panel = document.querySelector('.dv-mermaid-debug-panel-content') as HTMLDivElement;
     // panel.innerHTML = '';
 
     // console.log(`Log: [UldeMermaidBrowserPlugin] init, \ncounter(called)=`, counter++, `\ncontainer=`, container, `\npanel=`, panel);
 
-    const { docTheme } = readSessionState(isBrowser());
+    const docTheme = this.themeService.currentTheme;
 
 
 
@@ -108,7 +127,10 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
 
     // requestAnimationFrame(() => {
 
-    container = document.querySelector<HTMLElement>('.markdown-host');
+    container =
+      document.querySelector<HTMLElement>(
+        '.markdown-host'
+      );
 
     // requestAnimationFrame(() => {
     //   requestAnimationFrame(() => {
@@ -124,14 +146,19 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
     }
 
 
-    const postRenderCB = genPostRenderCB(container);
+    const postRenderCB =
+      genPostRenderCB(container);
 
     // console.log(`Log: [UldeMermaidPlugin] container`, container);
 
 
     requestAnimationFrame(() => {
 
-      mermaidNodes = container.querySelectorAll<HTMLElement>('pre code.language-mermaid');
+      mermaidNodes =
+        container.querySelectorAll<HTMLElement>(
+          'pre code.language-mermaid'
+        )
+        ;
       if (mermaidNodes.length < 1) {
         diagnostics.push({
           level: "info",
@@ -184,7 +211,10 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
             // Do not preventDefault globally; just log
           }
         };
-        window.addEventListener('error', handleEventError);
+        window.addEventListener(
+          'error',
+          handleEventError
+        );
 
         handleEventUnhandle = (event: any) => {
           const reason: any = event.reason;
@@ -200,21 +230,30 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
             // logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
           }
         };
-        window.addEventListener('unhandledrejection', handleEventUnhandle);
+        window.addEventListener(
+          'unhandledrejection',
+          handleEventUnhandle
+        );
 
         // Initialize Mermaid AFTER nodes exist
 
-        mermaid.initialize({
-          ...(docTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
-
-        });
+        mermaid.initialize(
+          {
+            ...(docTheme === 'dark' ?
+              mermaidConfigDarkTheme :
+              mermaidConfigLightTheme
+            ),
+          }
+        );
 
         // Run Mermaid
-        mermaid.run({
-          // await mermaid.run({
-          nodes: mermaidNodes,
-          postRenderCallback: postRenderCB
-        });
+        mermaid.run(
+          {
+            // await mermaid.run({
+            nodes: mermaidNodes,
+            postRenderCallback: postRenderCB
+          }
+        );
 
         // if (panel.innerHTML == '') {
         //   panel.append('No Debug Entries Found');
@@ -226,18 +265,20 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
       } catch (err: any) {
         // Only log to debug panel, not console
 
-        diagnostics.push({
-          level: "error",
-          lifecyclePhase: ctx.lifecyclePhase,
-          message: `[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`,
-          pluginKind: this.pluginKind,
-          pluginName: this.pluginName
-        });
+        diagnostics.push(
+          {
+            level: "error",
+            lifecyclePhase: ctx.lifecyclePhase,
+            message: `[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`,
+            pluginKind: this.pluginKind,
+            pluginName: this.pluginName
+          }
+        );
         // logMermaidDebug(`[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`
         // );
       }
-
-    });
+    }
+    );
     // });
     return () => {
       // tear down process
@@ -313,11 +354,12 @@ function genPostRenderCB(container: HTMLElement): (id: any) => void {
     const codeNode = svg.parentNode;
 
     // debug
+    /**  'data-lang=mermaid' is added in the class  , somewhere in the pipeline*/
     const code = svg.parentElement;
-    console.log(
-      `[ULDEMermaidPlugin] code htmlelment=\n`,
-      code
-    );
+    // console.log(
+    //   `[ULDEMermaidPlugin] code htmlelment=\n`,
+    //   code
+    // );
     code?.classList.remove('data-lang="mermaid"')
     //debug
 
