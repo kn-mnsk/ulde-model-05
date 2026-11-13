@@ -1,6 +1,6 @@
 // src/ulde/plugins/registry/ulde-plugin-registry.ts
 
-import { UldeThemeService } from '@ulde/configurator';
+import { UldeSessionstateManageService, UldeThemeService } from '@ulde/configurator';
 import {
   ULDECodeblockPlugin, ULDEFrontmatterNormalizerPlugin
 } from '@ulde/plugins/system/content';
@@ -56,7 +56,11 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
   hydrate: [
     () => new UldeInternalLinkPlugin(),
     () => new ULDEPlaygroundInjectorPlugin(),
-    () => new UldeMermaidPlugin(),
+    () => new UldeMermaidPlugin(
+      new UldeThemeService(
+        new UldeSessionstateManageService()
+      )
+    ),
     () => new UldeKatexPlugin(),
   ],
 
