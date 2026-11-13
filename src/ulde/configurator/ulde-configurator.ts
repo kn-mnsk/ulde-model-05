@@ -8,7 +8,7 @@ import { ULDEPageContext } from '@ulde/types/context';
 import { ULDEDevtools } from '@ulde/devtools';
 import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
-import { UldeScrollRestorationService, UldeViewer } from '@ulde/viewer';
+import { UldePageRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDE_SESSION_STATE_DEFAULT, ULDE_DEFAULT_PAGE_ID, UldeSessionstateManageService, UldeThemeService } from '@ulde/configurator';
 
@@ -16,91 +16,100 @@ import { ULDE_SESSION_STATE_DEFAULT, ULDE_DEFAULT_PAGE_ID, UldeSessionstateManag
   selector: 'ulde-configurator',
   standalone: true,
   imports: [
-    UldeViewer, ULDEDevtools
+    UldeViewer,
+    ULDEDevtools
   ],
   templateUrl: 'ulde-configurator.html',
   styleUrl: 'ulde-configurator.scss',
 })
-export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
+export class UldeConfigurator implements
+  AfterViewInit,
+  OnInit,
+  OnDestroy {
 
   component = 'UldeConfigurator';
 
   // for future use
-  $contentId = signal<{ pageId: string, graphId: string }>({
-    pageId: 'docs/index',
-    graphId: ''
-  }); // initial value
+  $contentId =
+    signal<{ pageId: string, graphId: string }>({
+      pageId: 'docs/index',
+      graphId: ''
+    }); // initial value
+
+  // private pageId: string | null = null;
+  private $pageId = signal<string | null>(null);
+
+  // $reload = signal<number>(0);
+  // $page = computed(() => {
+  //   return { id: this.$pageId(), reload: this.$reload() };
+  // })
 
 
-  $pageId = signal<string | null>(null);
+  $rendererStateMarkdownViewer = signal<ULDERendererState>(
+    {
+      modelId: 'ulde-demo-05',
+      variantId: 'default',
+      zoom: 1,
+      rotation: { x: 0, y: 0, z: 0 },
 
-  $reload = signal<number>(0);
-  $page = computed(() => {
-    return { id: this.$pageId(), reload: this.$reload() };
-  })
-
-
-  $rendererStateMarkdownViewer = signal<ULDERendererState>({
-    modelId: 'ulde-demo-01',
-    variantId: 'default',
-    zoom: 1,
-    rotation: { x: 0, y: 0, z: 0 },
-
-    executionContext: undefined,
-    devtoolsSnapshot: undefined
-  });
+      executionContext: undefined,
+      devtoolsSnapshot: undefined
+    }
+  );
 
   $rendererStateDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateMarkdownViewer());
 
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
 
-  private handleKeydown!: (e: Event) => void;
+  private handleKeydown!: (e: KeyboardEvent) => void;
 
-  @ViewChild('configurator', { static: true })
+  @ViewChild('configuratorContainer', { static: true })
   configuratorRef!: ElementRef<HTMLElement>;
 
   constructor(
     private contenEngine: ContentEngineService,
     private lifecycleService: ULDELifecycleService,
-    private sessionStateService: UldeSessionstateManageService,
+    private restorePage: UldePageRestorationService,
     private themeService: UldeThemeService,
   ) {
 
+    // this.onKeyDown = this.onKeyDown.bind(this);
     this.handleKeydown = this.onKeyDown;
+
+    const recoveredPageId = this.restorePage.recoverPageIdAfterRefresh();
+
+    if (!recoveredPageId) return;
+
+    console.log(
+      '[UldeConfigurator] effect() 🔥1 \nrecovered pageId=',
+      recoveredPageId
+    );
+
+    this.$pageId.set(recoveredPageId);
+
 
     effect(() => {
 
-      if (
-        !isBrowser()
-      ) {
-        return;
-      }
+      if (!isBrowser()) return;
 
-
-      const sessionState = this.sessionStateService.getState();
-
-      if (!sessionState) {
-
-        this.sessionStateService.initState();
-
-        this.$pageId.set(
-          this.sessionStateService.getDefaultPageId()
-        );
-
-      } else {
-
-        this.$pageId.set(sessionState.pageId);
-
-      }
-
-      const pageId = this.$page().id;
+      const pageId = this.$pageId();
       if (!pageId) return;
+      // const sessionState =
+      //   this.sessionStateService.getState();
 
-      console.log(
-        '[UldeConfigurator] effect() 🔥1 \npageId=',
-        pageId
-      );
+      // if (!sessionState) {
+
+      //   this.sessionStateService.initState();
+
+      //   this.$pageId.set(
+      //     this.sessionStateService.getDefaultPageId()
+      //   );
+
+      // } else {
+
+      //   this.$pageId.set(sessionState.pageId);
+
 
       this.UldeLoadAndRender(pageId);
 
@@ -110,34 +119,44 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   async ngOnInit() {
 
-    this.$reload.update(n => n + 1); // load current pageId
+    // this.$reload.update(n => n + 1); // load current pageId
+    // this.handleKeydown = this.onKeyDown;
+  }
+
+  ngAfterViewInit() {
+
+    console.log(`[UldeConfigurator] ngAfterViewInit 1`);
+
+    if (
+      !isBrowser() ||
+      !this.configuratorRef
+    )
+      return;
+
+    console.log(`[UldeConfigurator] ngAfterViewInit 2`);
+    // this.configuratorRef.nativeElement.addEventListener(
+    document.addEventListener(
+      'keydown',
+      this.handleKeydown
+    );
+
 
   }
 
-  async ngAfterViewInit() {
+  ngOnDestroy() {
 
-    if (!isBrowser() || !this.configuratorRef) return;
+    // if (this.configuratorRef) {
 
-    this.configuratorRef.nativeElement
-      .addEventListener(
-        'keydown',
-        this.handleKeydown
-      );
+    // this.configuratorRef.nativeElement.removeEventListener(
+    // document.removeEventListener(
+    //   'keydown',
+    //   this.handleKeydown
+    // );
 
-  }
-
-  async ngOnDestroy() {
-
-    if (this.configuratorRef) {
-
-      this.configuratorRef.nativeElement
-        .removeEventListener(
-          'keydown',
-          this.handleKeydown
-        );
-    }
+    // }
 
     this.handleKeydown = (e: Event): void => { };
+    this.onKeyDown.bind(null);
 
   }
 
@@ -213,7 +232,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
         state.executionContext.page.pageId;
 
       // await this.updateSessionState(newPageId);
-      this.sessionStateService.swapState(newPageId);
+      // this.sessionStateService.swapState(newPageId);
 
       this.$pageId.set(
         newPageId
@@ -285,17 +304,18 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
 
   }
 
-  private onKeyDown = (e: Event) => {
+  private onKeyDown = (e: KeyboardEvent) => {
 
-    const keyBoard =
-      e as KeyboardEvent;
+    console.log(
+      `[UldeConfigurator] onKeyDown`
+    );
 
     if (
-      keyBoard.ctrlKey &&
-      keyBoard.key ===
-      'k') {
+      e.ctrlKey &&
+      e.key === 'k'
+    ) {
 
-      keyBoard.preventDefault();
+      e.preventDefault();
 
       // console.log(`Log: [${this.component}] onkeyDown`, e);
 
@@ -306,7 +326,7 @@ export class UldeConfigurator implements AfterViewInit, OnInit, OnDestroy {
           'hidden'
       );
 
-    }
+    };
 
   };
 

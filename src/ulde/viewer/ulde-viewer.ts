@@ -5,7 +5,7 @@ import { NgTemplateOutlet } from '@angular/common';
 
 import { ULDEDevtoolsService } from '@ulde/devtools';
 import type { ULDERendererState } from '@ulde/types/renderer';
-import { UldeNavigationRuntimeService, ULDERendererService, UldeScrollRestorationService, UldeScrollspyService } from '@ulde/viewer/services';
+import { UldeNavigationRuntimeService, ULDERendererService, UldePageRestorationService, UldeScrollspyService } from '@ulde/viewer/services';
 import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext } from '@ulde/types';
 import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
@@ -69,7 +69,7 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
     private devtoolsService: ULDEDevtoolsService,
     private navigationRuntimeService: UldeNavigationRuntimeService,
     private scrollSpy: UldeScrollspyService,
-    private scrollRestore: UldeScrollRestorationService,
+    private pageRestore: UldePageRestorationService,
     private overlayService: UldeOverlayService,
     private sessionStateService: UldeSessionstateManageService,
   ) {
@@ -249,7 +249,7 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
 
-    this.scrollRestore.stopScrollTracking(
+    this.pageRestore.stopScrollTracking(
       this.hostContainerRef.nativeElement
     );
 
@@ -301,19 +301,19 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
       ctx.page.pageId;
 
     // restore page position
-    this.scrollRestore
-      .restore(
+    this.pageRestore.
+      restoreScrollPosition(
         host,
         pageId
       );
 
-    this.scrollRestore.
+    this.pageRestore.
       stopScrollTracking(
         host
       );
 
 
-    this.scrollRestore.
+    this.pageRestore.
       startScrollTracking(
         host,
         pageId
@@ -347,7 +347,12 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
       = newPageId;
 
     this.syncSignalInput(rendererState);
-    console.log(`[UldeViewer] onBackToPrevPage 🔄️`);
+
+    console.log(
+      `[UldeViewer] onBackToPrevPage 🔄️`,
+      `\ncurrent Page=`, newPageId,
+      `\nprev Page=`, this.$prevPageId()
+    );
 
   }
 

@@ -15,11 +15,11 @@ import { isBrowser } from '../../../app/global.utils/global.utils';
 @Injectable({
   providedIn: 'root',
 })
-export class UldeScrollRestorationService {
+export class UldePageRestorationService {
 
   private saveTimer?: number;
 
-  private handleScroll!: () => void;
+  private handleScroll!: (e: Event) => void;
 
   constructor(
     private sessionStateService: UldeSessionstateManageService,
@@ -42,8 +42,9 @@ export class UldeScrollRestorationService {
 
 
     this.handleScroll =
-      () =>
+      (e) =>
         this.onScroll(
+          e,
           host,
           pageId
         );
@@ -94,21 +95,19 @@ export class UldeScrollRestorationService {
    * Save scroll position
    * @param pageId
    * @param scrollTop
-   * @deprecated
    */
-  // save(
-  //   pageId: string,
-  //   scrollTop: number)
-  //   : void {
+  saveScrollPosition(
+    pageId: string,
+    scrollTop: number
+  ): void {
 
-  //   writeSessionState({
-  //     pageId,
-  //     scrollTop
-  //   },
-  //     isBrowser(),
-  //     '[UldeScrollRestorationService] save()'
-  //   );
-  // }
+    this.sessionStateService.setPagePosition(
+      pageId,
+      scrollTop,
+      isBrowser(),
+    );
+
+  }
 
   /**
    * Restore saved position
@@ -116,7 +115,7 @@ export class UldeScrollRestorationService {
    * @param pageId
    * @returns
    */
-  restore(
+  restoreScrollPosition(
     host: HTMLElement,
     pageId: string
   ): void {
@@ -146,6 +145,7 @@ export class UldeScrollRestorationService {
    * @param pageId
    */
   private onScroll(
+    e: Event,
     host: HTMLElement,
     pageId: string,
   ): void {
@@ -154,6 +154,7 @@ export class UldeScrollRestorationService {
     // console.log(
     //   '[ScrollRestore] onScroll',
     //   {
+    //     target: e.target,
     //     pageId,
     //     scrollTop: host.scrollTop
     //   }
@@ -167,15 +168,32 @@ export class UldeScrollRestorationService {
       window.setTimeout(
         () => {
 
-          this.sessionStateService.setPagePosition(
+          this.saveScrollPosition(
             pageId,
-            host.scrollTop,
-            isBrowser()
+            host.scrollTop
           );
+
         },
         // 200
         100
       );
+
+  };
+
+  recoverPageIdAfterRefresh(): string | null{
+
+    const sessionState =
+      this.sessionStateService.getState();
+
+    if (!sessionState) {
+
+      this.sessionStateService.initState();
+
+      return this.sessionStateService.getDefaultPageId();
+
+    }
+
+    return sessionState.pageId;
 
   }
 
