@@ -1,6 +1,6 @@
 # ULDE Implementation Part 5
 
-## 1. Plan To Do
+## § 1. Plan To Do
 
 ULDE Implementation Part 5
 Runtime Experience, Navigation, Layout, and Viewer Intelligence
@@ -396,7 +396,7 @@ ScrollSpy
 
 because those runtime/navigation concerns usually influence layout, TOC behavior, and DevTools, making them the best foundation for the remainder of Part 5.
 
-## 2. Current Folder Structure (In Part 4)
+## § 2. Current Folder Structure (In Part 4)
 
 ```mermaid
 ---
@@ -559,7 +559,7 @@ vite.config.ts
 
 ```
 
-## 3. File contents by the folder structure
+## § 3. File contents by the folder structure
 
 ### 1. app/
 

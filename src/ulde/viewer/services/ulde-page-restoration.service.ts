@@ -180,7 +180,7 @@ export class UldePageRestorationService {
 
   };
 
-  recoverPageIdAfterRefresh(): string | null{
+  getCurrentPageId(): string | null {
 
     const sessionState =
       this.sessionStateService.getState();
@@ -194,6 +194,39 @@ export class UldePageRestorationService {
     }
 
     return sessionState.pageId;
+
+  }
+
+  getPrevPageId(): string | null {
+
+
+    const sessionState =
+      this.sessionStateService.getState();
+
+    if (!sessionState) {
+
+      this.sessionStateService.initState();
+
+      return this.sessionStateService.getDefaultPageId();
+
+    }
+
+    return sessionState.prevPageId;
+
+  }
+
+
+
+
+
+
+  /**
+   * swap Page State
+   * @param newPageId
+   */
+  swapPage(newPageId: string): void {
+
+    this.sessionStateService.swapPage(newPageId);
 
   }
 

@@ -76,20 +76,27 @@ export class UldeNavigationRuntimeService {
   ) {
 
     host.addEventListener(
-      'ulde:navigate',
+      'ulde:internalnavigate',
       (e: any) => {
 
         const pageId = e.detail.pageId;
+        const scrollTop = e.detail.scrooTop;
 
         executionContext.page.pageId = pageId;
 
-        const state = this.rendererService.getState();
+        const rendererState = this.rendererService.getState();
 
-        this.rendererService.setState({
-          ...state, executionContext
-        });
+        this.rendererService.setState(
+          {
+            ...rendererState,
+            ...executionContext
+          }
+        );
 
-        console.log(`Log: [UldeNavigationRuntimeService] bindInternalNavigate pageId=`, pageId, state);
+        console.log(`Log: [UldeNavigationRuntimeService] bindInternalNavigate()`,
+          `\n\tpageId=`, pageId,
+          `\n\trenderer state=`, rendererState
+        );
 
       });
 

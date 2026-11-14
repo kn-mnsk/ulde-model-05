@@ -36,7 +36,7 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
       // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
 
       internalLinks.forEach(a => {
-        a.addEventListener('click', (e: any) => {
+        a.addEventListener('click', (e: Event) => {
           e.preventDefault();
 
           const href = a.getAttribute('href')!;
@@ -48,13 +48,17 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
 
           // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
 
-          markdownHost.dispatchEvent(new CustomEvent('ulde:navigate', {
-            detail: {
-              pageId: pageId,
-              // scrollTop: e.clientY
-            },
-            bubbles: true
-          }));
+          const InternalNavigateEvent =
+            new CustomEvent('ulde:internalnavigate', {
+              detail: {
+                pageId: pageId,
+                scrollTop: anchorPos,
+              },
+              bubbles: true
+            });
+
+          markdownHost.dispatchEvent(InternalNavigateEvent);
+          
         });
       });
     });

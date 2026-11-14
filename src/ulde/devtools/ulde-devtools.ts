@@ -3,7 +3,7 @@
 import { DatePipe, DecimalPipe, JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { ULDERendererState } from '@ulde/types';
-import { ULDEDevToolsTab } from '@ulde/types/devtools';
+import { ULDEDevtoolsSnapshot, ULDEDevToolsTab } from '@ulde/types/devtools';
 import { ULDEDiagnostic } from '@ulde/types/diagnostics';
 import { ULDEFrame } from '@ulde/types/frame';
 import { ULDELifecyclePhaseTiming } from '@ulde/types/lifecycle';
@@ -26,12 +26,12 @@ import { UldeDevToolsDiagnosticsPanel, UldeDevtoolsFrameTimelinePanel, UldeDevto
 })
 export class ULDEDevtools {
 
-  $rendererState = input<ULDERendererState>()
+  $devtoolsSnapshot = input<ULDEDevtoolsSnapshot>()
 
   $highlight = output<string>();
 
   // Declare signals
-  $snapshot = computed(() => this.$rendererState()?.devtoolsSnapshot);
+  $snapshot = computed(() => this.$devtoolsSnapshot());
   $sparklinePoints!: typeof this.devtoolsService.$sparklinePoints;
 
   $visible!: typeof this.devtoolsService.$visible;

@@ -99,8 +99,7 @@
     @if($activeTab() === 'inspector'){
     <!-- Inspector -->
     <div class="inspector-tab">
-      <ulde-devtools-runtime-inspector-panel [$rendererState]="$rendererState()"
-        [$frame]="$snapshot()?.executionContext?.artifacts?.frame"></ulde-devtools-runtime-inspector-panel>
+      <ulde-devtools-runtime-inspector-panel [$devtoolsSnapshot]="$snapshot()"></ulde-devtools-runtime-inspector-panel>
     </div>
     }
 
