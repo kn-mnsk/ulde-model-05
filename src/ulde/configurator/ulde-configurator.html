@@ -3,8 +3,8 @@
 <diV class="ulde-configurator-container" #configuratorContainer>
 
   <div class="ulde-markdownn-viewer-container">
-    <ulde-viewer [$rendererState]="$rendererStateMarkdownViewer()"
-      ($stateChange)="onMarkdownViewerStateChange($event)" ($error)="onErrorMarkdownViewer($event)">
+    <ulde-viewer [$rendererState]="$rendererState()" ($rendererStateChange)="onRendererStateChange($event)"
+      ($error)="onErrorMarkdownViewer($event)">
     </ulde-viewer>
   </div>
 
@@ -15,7 +15,7 @@
 
 
   <div class="ulde-devtools-viewer-container" [class.hidden]="$visibility()==='hidden' ? true : false">
-    <ulde-devtools [$rendererState]="$rendererStateDevtoolsViewer()"></ulde-devtools>
+    <ulde-devtools [$devtoolsSnapshot]="$devtoolsSnapshot()"></ulde-devtools>
   </div>
 
 

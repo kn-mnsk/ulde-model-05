@@ -5,7 +5,7 @@ import { Component, computed, input, signal } from '@angular/core';
 import { ULDERendererState } from '@ulde/types/renderer';
 import { ULDEAstNode } from '@ulde/types/context';
 import { ULDEFrame } from '@ulde/types/frame';
-import { ULDEDevtoolsInspectorTab } from '@ulde/types/devtools';
+import { ULDEDevtoolsInspectorTab, ULDEDevtoolsSnapshot } from '@ulde/types/devtools';
 
 @Component({
   selector: 'ulde-devtools-runtime-inspector-panel',
@@ -15,15 +15,15 @@ import { ULDEDevtoolsInspectorTab } from '@ulde/types/devtools';
 })
 export class UldeDevtoolsRuntimeInspectorPanel {
 
-  $rendererState = input<ULDERendererState>();
+  $devtoolsSnapshot = input<ULDEDevtoolsSnapshot>();
 
-  $frame = input<ULDEFrame>();
+  $frame = computed(() => this.$devtoolsSnapshot()?.executionContext.artifacts.frame);
   // $frame = input<ULDEFrame | null>(null);
 
   $activeTab = signal<ULDEDevtoolsInspectorTab>('ast');
 
-  $astNodes = computed(() => this.$rendererState()?.executionContext?.render?.ast ?? []);
-  $layout = computed(() => this.$rendererState()?.executionContext?.render?.layout ?? null);
+  $astNodes = computed(() => this.$devtoolsSnapshot()?.executionContext?.render?.ast ?? []);
+  $layout = computed(() => this.$devtoolsSnapshot()?.executionContext?.render?.layout ?? null);
   // $frame = computed(() => this.$rendererState()?.frame ?? null);
   $sections = computed(() => this.extractSections(this.$astNodes()));
   $toc = computed(() => this.extractToc(this.$astNodes()));

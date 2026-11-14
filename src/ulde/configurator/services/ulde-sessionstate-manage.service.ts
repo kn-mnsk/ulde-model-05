@@ -256,7 +256,7 @@ export class UldeSessionstateManageService {
    * @param newpageId
    */
   // updateStateByNewPageId(newPageId: string): void {
-  swapState(newPageId: string): void {
+  swapPage(newPageId: string): void {
 
     const state = this.readSessionState(isBrowser());
 

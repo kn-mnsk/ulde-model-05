@@ -6,11 +6,11 @@
 
   <div class="header">
     <span><strong>Runtime Inspector Panel</strong></span>
-    <span class="meta">model: {{ $rendererState()?.modelId }}</span>
-    <span class="meta">variant: {{ $rendererState()?.variantId }}</span>
+    <!-- <span class="meta">model: {{ $rendererState()?.modelId }}</span>
+    <span class="meta">variant: {{ $rendererState()?.variantId }}</span> -->
   </div>
 
-  @if($rendererState()){
+  @if($devtoolsSnapshot()){
 
   <div class="tabs">
     <button class="tab" [class.active]="$activeTab() === 'ast'" (click)="setTab('ast')">AST</button>

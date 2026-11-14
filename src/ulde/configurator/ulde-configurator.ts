@@ -11,6 +11,7 @@ import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldePageRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDE_SESSION_STATE_DEFAULT, ULDE_DEFAULT_PAGE_ID, UldeSessionstateManageService, UldeThemeService } from '@ulde/configurator';
+import { ULDEDevtoolsSnapshot } from '@ulde/types';
 
 @Component({
   selector: 'ulde-configurator',
@@ -39,25 +40,27 @@ export class UldeConfigurator implements
   // private pageId: string | null = null;
   private $pageId = signal<string | null>(null);
 
-  // $reload = signal<number>(0);
-  // $page = computed(() => {
-  //   return { id: this.$pageId(), reload: this.$reload() };
-  // })
+  $reload = signal<number>(0);
+  $page = computed(() => {
+    return { id: this.$pageId(), reload: this.$reload() };
+  })
 
 
-  $rendererStateMarkdownViewer = signal<ULDERendererState>(
-    {
-      modelId: 'ulde-demo-05',
-      variantId: 'default',
-      zoom: 1,
-      rotation: { x: 0, y: 0, z: 0 },
+  $rendererState =
+    signal<ULDERendererState>(
+      {
+        modelId: 'ulde-demo-05',
+        variantId: 'default',
+        zoom: 1,
+        rotation: { x: 0, y: 0, z: 0 },
 
-      executionContext: undefined,
-      devtoolsSnapshot: undefined
-    }
-  );
+        executionContext: undefined,
+        devtoolsSnapshot: undefined
+      }
+    );
 
-  $rendererStateDevtoolsViewer = signal<ULDERendererState>(this.$rendererStateMarkdownViewer());
+  $devtoolsSnapshot =
+    computed<ULDEDevtoolsSnapshot | undefined>(() => this.$rendererState()?.devtoolsSnapshot);
 
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
@@ -70,48 +73,38 @@ export class UldeConfigurator implements
   constructor(
     private contenEngine: ContentEngineService,
     private lifecycleService: ULDELifecycleService,
-    private restorePage: UldePageRestorationService,
+    private pageRestore: UldePageRestorationService,
     private themeService: UldeThemeService,
   ) {
 
     // this.onKeyDown = this.onKeyDown.bind(this);
     this.handleKeydown = this.onKeyDown;
 
-    const recoveredPageId = this.restorePage.recoverPageIdAfterRefresh();
+    const recoveredPageId =
+      this.pageRestore.getCurrentPageId();
 
     if (!recoveredPageId) return;
 
     console.log(
-      '[UldeConfigurator] effect() 🔥1 \nrecovered pageId=',
-      recoveredPageId
+      `[UldeConfigurator] constructor()`,
+      `\n\trecovered pageId =`, recoveredPageId
     );
 
     this.$pageId.set(recoveredPageId);
 
 
     effect(() => {
-
       if (!isBrowser()) return;
 
-      const pageId = this.$pageId();
+      const pageId = this.$page().id;
       if (!pageId) return;
-      // const sessionState =
-      //   this.sessionStateService.getState();
-
-      // if (!sessionState) {
-
-      //   this.sessionStateService.initState();
-
-      //   this.$pageId.set(
-      //     this.sessionStateService.getDefaultPageId()
-      //   );
-
-      // } else {
-
-      //   this.$pageId.set(sessionState.pageId);
-
 
       this.UldeLoadAndRender(pageId);
+
+      console.log(
+        `[UldeConfigurator] effect()`,
+        `\n\t🔥1 Finished`
+      );
 
     });
 
@@ -125,7 +118,9 @@ export class UldeConfigurator implements
 
   ngAfterViewInit() {
 
-    console.log(`[UldeConfigurator] ngAfterViewInit 1`);
+    console.log(
+      `[UldeConfigurator] ngAfterViewInit() \n\tBegin`
+    );
 
     if (
       !isBrowser() ||
@@ -133,14 +128,16 @@ export class UldeConfigurator implements
     )
       return;
 
-    console.log(`[UldeConfigurator] ngAfterViewInit 2`);
+
     // this.configuratorRef.nativeElement.addEventListener(
     document.addEventListener(
       'keydown',
       this.handleKeydown
     );
 
-
+    console.log(
+      `[UldeConfigurator] ngAfterViewInit() \n\tEnd`
+    );
   }
 
   ngOnDestroy() {
@@ -192,7 +189,6 @@ export class UldeConfigurator implements
     return executionContext;
   }
 
-
   private async UldeLoadAndRender(pageId: string) {
 
     const executionContext =
@@ -206,11 +202,25 @@ export class UldeConfigurator implements
       return;
     }
 
-    this.$rendererStateMarkdownViewer.update(
-      state => ({
-        ...state, executionContext
+    // $rendererState update
+    const newState = this.$rendererState();
+
+    newState.executionContext =
+      executionContext;
+
+    newState.devtoolsSnapshot ??=
+      {} as ULDEDevtoolsSnapshot;
+
+    newState.devtoolsSnapshot.executionContext =
+      executionContext;
+
+    this.$rendererState.
+      update(state =>
+      ({
+        ...state,
+        ...newState
       })
-    );
+      );
 
     // console.log(
     //   `Log: [${this.component}] ngAfterViewInit \n rendererState:`,
@@ -220,30 +230,43 @@ export class UldeConfigurator implements
   }
 
   //React
-  async onMarkdownViewerStateChange(
+  async onRendererStateChange(
     state: ULDERendererState
-  ) {
+  ): Promise<void> {
 
-    this.$rendererStateDevtoolsViewer.set(state);
+    // this.$rendererStateDevtoolsViewer.set(state);
 
-    if (state.executionContext) {
+    const pageId =
+      state.executionContext?.page.pageId;
 
-      const newPageId =
-        state.executionContext.page.pageId;
+    if (!pageId) return;
 
-      // await this.updateSessionState(newPageId);
-      // this.sessionStateService.swapState(newPageId);
+    if (pageId === this.$pageId()) {
 
-      this.$pageId.set(
-        newPageId
-      );
+      return;
     }
+
+    // wap curentt page to prev page, and new page to current page...
+    this.pageRestore.swapPage(pageId)
+
+    /**
+     * invoke effect =>
+     * 1. load new page, and
+     * 2. finally $rendererrState is updated
+     */
+    this.$pageId.set(
+      pageId
+    );
+
+
     // console.log(
     //   `Log: [${this.component}] onViewerStateChanged state=`,
     //   state
     // );
 
   }
+
+
 
   onErrorMarkdownViewer(error: Error) {
 

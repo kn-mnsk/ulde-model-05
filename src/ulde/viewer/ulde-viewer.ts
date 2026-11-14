@@ -62,7 +62,7 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
 
   $ready = output<void>();
   $error = output<Error>();
-  $stateChange = output<ULDERendererState>();
+  $rendererStateChange = output<ULDERendererState>();
 
   constructor(
     public rendererService: ULDERendererService,
@@ -125,42 +125,42 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
 
     });
 
-    // 🔥3 React to frame finalization
-    effect(() => {
+    // // 🔥3 React to frame finalization
+    // effect(() => {
 
-      const currentFrame =
-        this.devtoolsService.$currentFrame();
+    //   const currentFrame =
+    //     this.devtoolsService.$currentFrame();
 
-      if (!currentFrame) return;
+    //   if (!currentFrame) return;
 
-      const rendererState =
-        this.rendererService.getState();
+    //   const rendererState =
+    //     this.rendererService.getState();
 
-      if (
-        !rendererState?.executionContext?.artifacts
-      )
-        return;
+    //   if (
+    //     !rendererState?.executionContext?.artifacts
+    //   )
+    //     return;
 
 
-      // console.log(`Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`, currentFrame);
+    //   // console.log(`Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`, currentFrame);
 
-      rendererState.executionContext.artifacts.frame =
-        currentFrame;
+    //   rendererState.executionContext.artifacts.frame =
+    //     currentFrame;
 
-      // this.rendererService.setState({
-      //   executionContext: rendererState.executionContext
-      // });
-      this.syncSignalInput(rendererState);
+    //   // this.rendererService.setState({
+    //   //   executionContext: rendererState.executionContext
+    //   // });
+    //   this.syncSignalInput(rendererState);
 
-      console.log(
-        // `Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`,
-        // currentFrame
-        `Log: [UldeViewer] effect(): 🔥3`
-      );
+    //   console.log(
+    //     // `Log: [UldeViewer] effect(): 🔥3 \ncurrentFrame=\n`,
+    //     // currentFrame
+    //     `Log: [UldeViewer] effect(): 🔥3`
+    //   );
 
-    });
+    // });
 
-    // 🔥4 React to rendererState signal input (without re-init)
+    // 🔥4 React to change of $rendererState()
     effect(() => {
 
       const rendererState =
@@ -202,9 +202,8 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
       );
 
       console.log(
-        // `Log: [UldeViewer] effect(): 🔥4 \nexecutionContext=\n`,
-        // state.executionContext
-        `Log: [UldeViewer] effect(): 🔥4 `
+        `Log: [UldeViewer] effect()`,
+        `\n\t🔥4 Finished`
       );
 
     });
@@ -214,10 +213,10 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
 
-    const { prevPageId } =
-      this.sessionStateService.getState();
+    // const { prevPageId } =
+    //   this.sessionStateService.getState();
 
-    this.$prevPageId.set(prevPageId);
+    // this.$prevPageId.set(prevPageId);
 
   }
 
@@ -238,8 +237,12 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
       {
         onReady: () => this.$ready.emit(),
         onError: (e) => this.$error.emit(e),
-        onStateChange: (s) => this.$stateChange.emit(s),
+        onStateChange: (s) => this.$rendererStateChange.emit(s),
       },
+    );
+
+    this.$prevPageId.set(
+      this.pageRestore.getPrevPageId()
     );
 
     this.overlayService.hide(this.viewerTocRef);
@@ -324,15 +327,11 @@ export class UldeViewer implements OnInit, AfterViewInit, OnDestroy {
   onBackToPrevPage() {
     console.log(`[UldeViewer] onBackToPrevPage 1`);
 
-    const { pageId }
-      = this.sessionStateService.getState();
-
-
     const newPageId = this.$prevPageId();// prevPageId becomes newPageId
     if (!newPageId) return;
-    this.sessionStateService.swapState(newPageId);
+    // this.sessionStateService.swapState(newPageId);
 
-    this.$prevPageId.set(pageId);
+    // this.$prevPageId.set(pageId);
 
     const rendererState =
       this.$currentRendererState();
