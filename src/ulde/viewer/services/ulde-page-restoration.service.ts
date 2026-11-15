@@ -115,7 +115,7 @@ export class UldePageRestorationService {
    * @param pageId
    * @returns
    */
-  restoreScrollPosition(
+  restorePagelPosition(
     host: HTMLElement,
     pageId: string
   ): void {
@@ -125,10 +125,11 @@ export class UldePageRestorationService {
     }
 
     const scrollTop =
-      this.sessionStateService.getPagePosition(
-        pageId,
-        isBrowser()
-      );
+      this.sessionStateService.
+        getPagePosition(
+          pageId,
+          isBrowser()
+        );
 
     requestAnimationFrame(() => {
 

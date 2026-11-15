@@ -22,7 +22,7 @@ export class ContentEngineService {
     private router: Router,
   ) { }
 
-  async loadNew(pageId: string): Promise<string | undefined> {
+  async loadPage(pageId: string): Promise<string | undefined> {
 
 
     const url = `assets/${pageId}.md`;

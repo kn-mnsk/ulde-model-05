@@ -8,14 +8,30 @@
 3. emit event
  */
 
-
 import { ElementRef, Injectable } from '@angular/core';
-import { ULDERenderContext, } from '@ulde/types/context';
-import { ULDEDiagnostic } from '@ulde/types/diagnostics';
-import { ULDEFrame } from '@ulde/types/frame';
+
 import {
-  ULDERendererConfig, ULDERendererEvents, ULDERendererHandle, ULDERendererState
+  ULDERenderContext,
+  ULDETocNode,
+  ULDETocEntry
+} from '@ulde/types/context';
+
+import {
+  ULDEDiagnostic
+} from '@ulde/types/diagnostics';
+
+import {
+  ULDEFrame
+
+} from '@ulde/types/frame';
+
+import {
+  ULDERendererConfig,
+  ULDERendererEvents,
+  ULDERendererHandle,
+  ULDERendererState
 } from '@ulde/types/renderer';
+
 
 @Injectable({ providedIn: 'root' })
 export class ULDERendererService {
@@ -33,23 +49,30 @@ export class ULDERendererService {
       backgroundColor: '#ffffff'
     };
 
-    this.handle = this.createUldeRenderer(config, events);
+    this.handle =
+      this.createUldeRenderer(config, events);
+
     events?.onReady?.();
   }
 
-  setState(partial: Partial<ULDERendererState>): void {
+  setState(
+    partial: Partial<ULDERendererState>
+  ): void {
     this.handle?.setState(partial);
   }
 
   getState(): ULDERendererState | null {
+
     return this.handle ? this.handle.getState() : null;
   }
 
   highlightDiagnostic(message: string): void {
+
     this.handle?.highlightDiagnostic(message);
   }
 
   dispose(): void {
+
     this.handle?.dispose();
     this.handle = null;
   }
@@ -241,7 +264,7 @@ export class ULDERendererService {
 
 
         if (state.executionContext !== undefined) {
-        // if (partial.executionContext !== undefined) {
+          // if (partial.executionContext !== undefined) {
           renderFromContext(state.executionContext?.render);
 
           // internal docrouting
@@ -299,4 +322,40 @@ export class ULDERendererService {
       }
     };
   }
+
+
+
+  // // Build TOC tree
+  // buildTocTree(entries: ULDETocEntry[]): ULDETocNode[] {
+  //   const root: ULDETocNode[] = [];
+  //   const stack: ULDETocNode[] = [];
+
+  //   for (const entry of entries) {
+  //     const node: ULDETocNode = {
+  //       type: 'toc',
+  //       entry,
+  //       children: [],
+  //       collapsed: false
+  //     };
+
+  //     while (
+  //       stack.length && stack[stack.length - 1].entry.depth
+  //       >= entry.depth
+  //     ) {
+  //       stack.pop();
+  //     }
+
+  //     if (!stack.length) {
+  //       root.push(node);
+  //     } else {
+  //       stack[stack.length - 1].children?.push(node);
+  //     }
+
+  //     stack.push(node);
+  //   }
+
+  //   return root;
+  // }
+
+
 }

@@ -1,58 +1,99 @@
 <!-- src/ulde/viewer/ulde-viewer.html -->
-<header class="ulde-viewer-header">
-  <p>[Ulde Viewer Header1] &nbsp;</p>
-  <p>[Ulde Viewer Header2] &nbsp;</p>
-  <p>[Ulde Viewer Header3] &nbsp;</p>
-  <p>[Ulde Viewer Header4] &nbsp;</p>
-</header>
+<div class="ulde-viewer-container" #uldeViewerContainer>
 
-<div class="ulde-progress-bar">
-  <!-- <p>Progress Bar</p> -->
-  <div class="ulde-progress-bar_fill" [style.width.%]="100"></div>
-  <!-- <div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
-</div>
+  <div class="ulde-viewer-marrkdown-container">
 
-<div class="ulde-viewer-body">
+    <header class="ulde-viewer-header">
+      <p>[Ulde Viewer Header1] &nbsp;</p>
+      <p>[Ulde Viewer Header2] &nbsp;</p>
+      <p>[Ulde Viewer Header3] &nbsp;</p>
+      <p>[Ulde Viewer Header4] &nbsp;</p>
+    </header>
 
-  <aside class="ulde-viewer-toc" #uldeViewerTOC>
+    <div class="ulde-progress-bar">
+      <!-- <p>Progress Bar</p> -->
+      <div class="ulde-progress-bar_fill" [style.width.%]="100"></div>
+      <!-- <div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
+    </div>
 
-    <p>Ulde Viewer TOC</p>
-    <div uldeViewerTocResizerDirective [viewerTocResizer]="$viewerTocRef()?.nativeElement"
-      class="ulde-viewer-toc-resizer"></div>
+    <div class="ulde-viewer-body">
+
+      <aside class="ulde-viewer-toc" #uldeViewerTocResize>
+
+        <p>Ulde Viewer TOC</p>
+        <div uldeViewerTocResizerDirective [viewerTocResizer]="$tocResizeRef()?.nativeElement"
+          class="ulde-viewer-toc-resizer"></div>
 
 
-    <!-- Title -->
-    <h2>{{ `${$pageId()}.md` }}</h2>
-    <h3 [style.padding-left.px]="7">Table of Contents</h3>
+        <!-- Title -->
+        <h2>{{ `${$pageId()}.md` }}</h2>
+        <h3 [style.padding-left.px]="7">Table of Contents</h3>
 
-    <!-- OVERLAY (layout-level, above scroll container) -->
-    <div #uldeViewerTocOverlay class="ulde-viewer-toc-overlay hidden"></div>
+        <!-- OVERLAY (layout-level, above scroll container) -->
+        <div #uldeViewerTocOverlay class="ulde-viewer-toc-overlay hidden"></div>
 
-    <!-- SCROLL CONTAINER -->
-    <div class="ulde-viewer-toc-host-container">
-      <!-- RENDER CONTAINER -->
-      <ul class="ulde-viewer-toc-host">
-        <!-- @for (node of $tocTree(); track node.entry.slug) {
+        <!-- SCROLL CONTAINER -->
+        <div class="ulde-viewer-toc-host-container">
+          <!-- RENDER CONTAINER -->
+          <ul class="ulde-viewer-toc-host">
+            @for (node of $tocTree(); track node.id) {
         <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }">
         </ng-container>
-        } -->
-      </ul>
+        }
+          </ul>
+        </div>
+
+        <hr>
+        <button (click)="onBackToPrevPage()">
+          {{ $prevPageId() }} ← Back to Last Page
+        </button>
+
+      </aside>
+
+      <!-- Markdwon Content -->
+      <main class="ulde-viewer-main">
+        <div #markdownHostContainer class="ulde-markdown-host-container">
+          <div #markdownHostOverlay class="ulde-markdown-host-overlay hidden"></div>
+          <div #markdownHost class="markdown-host"></div>
+        </div>
+      </main>
+
     </div>
 
-    <hr>
-    <button (click)="onBackToPrevPage()">
-      To Previous Doc – {{ $prevPageId() }}
-    </button>
+  </div>
 
-  </aside>
-
-  <!-- Markdwon Content -->
-  <main class="ulde-viewer-main">
-    <div #markdownHostContainer class="ulde-markdown-host-container">
-      <div #markdownHostOverlay class="ulde-markdown-host-overlay hidden"></div>
-      <div #markdownHost class="markdown-host"></div>
-    </div>
-  </main>
+  <div class="ulde-viewer-devtools-container"[class.hidden]="$visibilityDevtools()==='hidden' ? true : false">
+    <ulde-devtools [$devtoolsSnapshot]="$devtoolsSnapshot()"></ulde-devtools>
+  </div>
 
 </div>
 
+
+
+<ng-template #tocNode let-node>
+  <li class="toc-item" [style.padding-left.px]="(node.entry.level - 1) * 16"
+    [class.active]="$activeHeading() === node.entry.slug" [class.parent-active]="isParentActive(node)">
+
+    <div class="toc-line">
+      @if (node.children.length > 0) {
+      <button class="toc-collapse-btn" (click)="node.collapsed = !node.collapsed">
+        {{ node.collapsed ? '▶' : '▼' }}
+      </button>
+      } @else {
+      &nbsp;&nbsp;&nbsp;
+      }
+
+      <a (click)="scrollTo(node.entry.slug)">
+        {{ node.entry.text }}
+      </a>
+    </div>
+
+    @if (!node.collapsed && node.children.length > 0) {
+    <ul class="toc-children">
+      @for (child of node.children; track child.entry.slug) {
+      <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: child }"></ng-container>
+      }
+    </ul>
+    }
+  </li>
+</ng-template>

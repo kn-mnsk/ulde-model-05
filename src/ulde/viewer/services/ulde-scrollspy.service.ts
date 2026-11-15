@@ -16,9 +16,23 @@
   5. TOC manipulation
  */
 
-import { Injectable } from '@angular/core';
-import { ULDEExecutionContext, ULDENavigationArtifact } from '@ulde/types';
-import {  UldeSessionstateManageService } from '@ulde/configurator';
+import {
+  Injectable,
+  computed,
+  signal,
+  ElementRef,
+
+} from '@angular/core';
+
+import {
+  ULDEExecutionContext,
+  ULDENavigationArtifact,
+  ULDETocNode,
+  ULDETocEntry,
+} from '@ulde/types';
+
+import { UldeSessionstateManageService } from '@ulde/configurator';
+
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
 
@@ -35,9 +49,26 @@ export class UldeScrollspyService {
 
   private activeAnchorId?: string;
 
+  //TOC
+  $toc = signal<ULDETocEntry[]>([]);
+
+  $viewerTocRef =
+    signal<ElementRef<HTMLElement> | undefined>(undefined);
+  readonly $isParentActive = computed(() => {
+    const toc = this.$toc();
+    const active = this.$activeHeading();
+    return (item: ULDETocEntry) => this.isParentOfActive(item, toc, active);
+  });
+
+  $activeHeading = signal<string | null>(null);
+
+  readonly isParentActive = (node: ULDETocNode) =>
+    this.isAncestor(node, this.$activeHeading());
+
+
   constructor(
     private sessionStateService: UldeSessionstateManageService,
-  ){}
+  ) { }
 
   observe(
     host: HTMLElement,
@@ -181,7 +212,7 @@ export class UldeScrollspyService {
     );
 
     this.sessionStateService.persistPagePosition(
-    // this.persistSessionState(
+      // this.persistSessionState(
       ctx.page.pageId,
       {
         archiveSectionId: sectionId
@@ -226,7 +257,7 @@ export class UldeScrollspyService {
     );
 
     this.sessionStateService.persistPagePosition(
-    // this.persistSessionState(
+      // this.persistSessionState(
       ctx.page.pageId,
       {
         archiveAnchorId: anchorId
@@ -250,6 +281,117 @@ export class UldeScrollspyService {
     };
 
   }
+
+
+  activateClickedTocItem(
+    tree: ULDETocNode[],
+    slug: string): void {
+
+    for (const node of tree) {
+      if (node.entry?.id === slug) {
+
+        this.$activeHeading.set(slug);
+        return;
+      }
+      this.activateClickedTocItem(node.children as ULDETocNode[], slug);
+    }
+  }
+
+
+  // Build TOC tree
+  buildTocTree(
+    entries: ULDETocEntry[])
+    : ULDETocNode[] {
+    const root: ULDETocNode[] = [];
+    const stack: ULDETocNode[] = [];
+
+    for (const entry of entries) {
+
+      const node: ULDETocNode = {
+        type: 'toc',
+        entry,
+        children: [],
+        collapsed: false
+      };
+
+
+      while (
+        stack?.length && stack[stack.length - 1].entry.depth
+        >= entry.depth
+      ) {
+        stack.pop();
+      }
+
+      if (!stack.length) {
+        root.push(node);
+      } else {
+        stack[stack.length - 1].children?.push(node);
+      }
+
+      stack.push(node);
+    }
+
+    return root;
+  }
+
+
+
+  isParentOfActive(
+    item: ULDETocEntry,
+    toc: ULDETocEntry[],
+    activeSlug: string | null
+  ): boolean {
+
+    const activeIndex =
+      toc.findIndex(t => t.id === activeSlug);
+
+    if (activeIndex === -1) return false;
+
+    const active = toc[activeIndex];
+    return item.depth < active.depth && toc.indexOf(item) < activeIndex;
+  }
+
+  isAncestor(
+    node: ULDETocNode,
+    activeSlug: string | null
+  ): boolean {
+
+    node.children ??= [];
+
+    for (const child of node.children as ULDETocNode[]) {
+
+      if (child.entry?.id === activeSlug) return true;
+
+      if (this.isAncestor(child, activeSlug)) return true;
+    }
+
+    return false;
+  }
+
+
+  // Scroll to heading
+  scrollTo(slug: string) {
+    const el = document.getElementById(slug);
+    if (!el) return;
+
+    // this.scrollSpy.suppress();
+
+    // queueMicrotask(() => {
+    //   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    //   this.highlightElement(el);
+    // });
+
+    // this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
+    //   this.activateClickedTocItem(this.$tocTree(), slug);
+
+    //   // this.$savedScrollTop.set(this.scrollSpy.lastScrollTop);
+    //   // console.log(`Log: [DocsViewer] scrollTo queuesMicroTask`);
+    //   this.scrollSpy.allow();
+
+    // });
+
+  }
+
 
 
   // private persistSessionState(
