@@ -3,6 +3,7 @@
 import type { Routes } from '@angular/router';
 import { App } from './app';
 import { PageNotFound } from './page-not-found/page-not-found';
+import {Error} from './page-error/error';
 
 
 export const routes: Routes = [
@@ -16,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'PageNotFound',
     component: PageNotFound,
+  },
+  {
+    path: 'PageError',
+    component: Error,
   },
   {
     path: '',

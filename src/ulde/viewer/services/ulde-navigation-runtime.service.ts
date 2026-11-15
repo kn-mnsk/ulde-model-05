@@ -11,6 +11,7 @@
 
 import { Injectable } from '@angular/core';
 import { ULDEExecutionContext } from '@ulde/types';
+import { UldePageRestorationService } from '@ulde/viewer/services/ulde-page-restoration.service';
 import { ULDERendererService } from '@ulde/viewer/services/ulde-renderer.service';
 
 @Injectable({
@@ -19,7 +20,8 @@ import { ULDERendererService } from '@ulde/viewer/services/ulde-renderer.service
 export class UldeNavigationRuntimeService {
 
   constructor(
-    private rendererService: ULDERendererService
+    private rendererService: ULDERendererService,
+    private pageRestore: UldePageRestorationService,
   ) { }
 
   bind(
@@ -29,7 +31,7 @@ export class UldeNavigationRuntimeService {
 
     this.bindTocLinks(host);
 
-    this.bindInternalNavigate(host, ctx);
+    this.bindInterPageLink(host, ctx);
 
   }
 
@@ -67,24 +69,33 @@ export class UldeNavigationRuntimeService {
   }
 
   /**
-   * intra-page routing
+   * inter-page routing
    * @param host
    */
-  private bindInternalNavigate(
+  private bindInterPageLink(
     host: HTMLElement,
     executionContext: ULDEExecutionContext
   ) {
 
     host.addEventListener(
-      'ulde:internalnavigate',
+      'ulde:interpagelink',
       (e: any) => {
 
         const pageId = e.detail.pageId;
         const scrollTop = e.detail.scrooTop;
 
-        executionContext.page.pageId = pageId;
+        // save pagePosition info in SessionState
+        this.pageRestore.saveScrollPosition(
+          pageId,
+          scrollTop
+        );
 
-        const rendererState = this.rendererService.getState();
+        // then update RendererState, and eventually open the pageId in the UldeConfigurator compenent
+        executionContext.page.pageId =
+          pageId;
+
+        const rendererState =
+          this.rendererService.getState();
 
         this.rendererService.setState(
           {
@@ -93,7 +104,8 @@ export class UldeNavigationRuntimeService {
           }
         );
 
-        console.log(`Log: [UldeNavigationRuntimeService] bindInternalNavigate()`,
+        console.log(`Log: [UldeNavigationRuntimeService]`,
+          `\n\tbindInternalNavigate()`,
           `\n\tpageId=`, pageId,
           `\n\trenderer state=`, rendererState
         );

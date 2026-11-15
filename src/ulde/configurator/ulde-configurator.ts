@@ -1,9 +1,10 @@
 // src/ulde/configurator/configurator.ts
 
 import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { ULDELifecycleService } from '@ulde/core';
-import { ULDEPageContext } from '@ulde/types/context';
+import { ULDEExecutionContext, ULDEPageContext } from '@ulde/types/context';
 
 import { ULDEDevtools } from '@ulde/devtools';
 import { ContentEngineService } from '@ulde/engine';
@@ -18,7 +19,7 @@ import { ULDEDevtoolsSnapshot } from '@ulde/types';
   standalone: true,
   imports: [
     UldeViewer,
-    ULDEDevtools
+    // ULDEDevtools
   ],
   templateUrl: 'ulde-configurator.html',
   styleUrl: 'ulde-configurator.scss',
@@ -37,7 +38,6 @@ export class UldeConfigurator implements
       graphId: ''
     }); // initial value
 
-  // private pageId: string | null = null;
   private $pageId = signal<string | null>(null);
 
   $reload = signal<number>(0);
@@ -59,18 +59,19 @@ export class UldeConfigurator implements
       }
     );
 
-  $devtoolsSnapshot =
-    computed<ULDEDevtoolsSnapshot | undefined>(() => this.$rendererState()?.devtoolsSnapshot);
+  // $devtoolsSnapshot =
+  //   computed<ULDEDevtoolsSnapshot | undefined>(() => this.$rendererState()?.devtoolsSnapshot);
 
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
 
-  private handleKeydown!: (e: KeyboardEvent) => void;
+  // private handleKeydown!: (e: KeyboardEvent) => void;
 
   @ViewChild('configuratorContainer', { static: true })
   configuratorRef!: ElementRef<HTMLElement>;
 
   constructor(
+    private router: Router,
     private contenEngine: ContentEngineService,
     private lifecycleService: ULDELifecycleService,
     private pageRestore: UldePageRestorationService,
@@ -78,19 +79,20 @@ export class UldeConfigurator implements
   ) {
 
     // this.onKeyDown = this.onKeyDown.bind(this);
-    this.handleKeydown = this.onKeyDown;
+    // this.handleKeydown = this.onKeyDown;
 
-    const recoveredPageId =
+    const currentPageId =
       this.pageRestore.getCurrentPageId();
 
-    if (!recoveredPageId) return;
+    if (!currentPageId) return;
 
     console.log(
-      `[UldeConfigurator] constructor()`,
-      `\n\trecovered pageId =`, recoveredPageId
+      `[UldeConfigurator]`,
+      `\n\tconstructor()`,
+      `\n\trecovered pageId =`, currentPageId
     );
 
-    this.$pageId.set(recoveredPageId);
+    this.$pageId.set(currentPageId);
 
 
     effect(() => {
@@ -102,7 +104,8 @@ export class UldeConfigurator implements
       this.UldeLoadAndRender(pageId);
 
       console.log(
-        `[UldeConfigurator] effect()`,
+        `[UldeConfigurator]`,
+        `\n\teffect()`,
         `\n\t🔥1 Finished`
       );
 
@@ -119,7 +122,8 @@ export class UldeConfigurator implements
   ngAfterViewInit() {
 
     console.log(
-      `[UldeConfigurator] ngAfterViewInit() \n\tBegin`
+      `[UldeConfigurator]`,
+      `\n\tngAfterViewInit() Begin`
     );
 
     if (
@@ -129,40 +133,33 @@ export class UldeConfigurator implements
       return;
 
 
-    // this.configuratorRef.nativeElement.addEventListener(
-    document.addEventListener(
-      'keydown',
-      this.handleKeydown
-    );
+    // this.configuratorRef.nativeElement.addEventListener( //Note: does not work!
+    // document.addEventListener(
+    //   'keydown',
+    //   this.handleKeydown
+    // );
 
     console.log(
-      `[UldeConfigurator] ngAfterViewInit() \n\tEnd`
+      `[UldeConfigurator]`,
+      `\n\tngAfterViewInit() End`
     );
   }
 
   ngOnDestroy() {
 
-    // if (this.configuratorRef) {
-
-    // this.configuratorRef.nativeElement.removeEventListener(
-    // document.removeEventListener(
-    //   'keydown',
-    //   this.handleKeydown
-    // );
-
-    // }
-
-    this.handleKeydown = (e: Event): void => { };
-    this.onKeyDown.bind(null);
+    // this.handleKeydown = (e: Event): void => { };
+    // this.onKeyDown.bind(null);
 
   }
 
-  private async buildPageContext(pageId: string): Promise<ULDEPageContext | void> {
+  private async buildPageContext(
+    pageId: string
+  ): Promise<ULDEPageContext | void> {
 
     // load markdown file
     const markdown =
       // await this.contenEngine.load(pageId);
-      await this.contenEngine.loadNew(pageId);
+      await this.contenEngine.loadPage(pageId);
 
     if (!markdown) return;
 
@@ -176,7 +173,9 @@ export class UldeConfigurator implements
     };
   }
 
-  private async uldeRun(pageId: string) {
+  private async uldeRun(
+    pageId: string
+  ): Promise<ULDEExecutionContext | undefined> {
 
     const pageContext =
       await this.buildPageContext(pageId);
@@ -189,18 +188,27 @@ export class UldeConfigurator implements
     return executionContext;
   }
 
-  private async UldeLoadAndRender(pageId: string) {
+  private async UldeLoadAndRender(
+    pageId: string
+  ): Promise<void> {
 
     const executionContext =
       await this.uldeRun(pageId);
 
     if (!executionContext) {
       console.error(
-        `Error: [${this.component}] UldeLoadAndRender() Render context is not available.`
+        `Error: [${this.component}]`,
+        `\n\tUldeLoadAndRender()`,
+        `\n\tRenderer context is not available.`
       );
 
-      return;
-    }
+      await this.router.navigate(['/PageError']);
+
+      throw new Error(
+        `Invalid PageId: ${pageId}`
+      );
+
+    };
 
     // $rendererState update
     const newState = this.$rendererState();
@@ -234,8 +242,6 @@ export class UldeConfigurator implements
     state: ULDERendererState
   ): Promise<void> {
 
-    // this.$rendererStateDevtoolsViewer.set(state);
-
     const pageId =
       state.executionContext?.page.pageId;
 
@@ -268,7 +274,9 @@ export class UldeConfigurator implements
 
 
 
-  onErrorMarkdownViewer(error: Error) {
+  onErrorMarkdownViewer(
+    error: Error
+  ): void {
 
     console.error(
       `Log: [${this.component}] onError error=`,
@@ -277,81 +285,44 @@ export class UldeConfigurator implements
 
   }
 
-  // private async updateSessionState(
-  //   newPageId: string
-  // ): Promise<void> {
-
-  //   const currentPage =
-  //     readSessionState(isBrowser());
-
-  //   currentPage.pagePositions ??= {};
-
-  //   // currentPage.pagePositions[newPageId]
-  //   //   = {
-  //   //   ...currentPage.pagePositions[newPageId],
-  //   //   ...{ scrollTop: 0 }
-  //   // }
-  //   currentPage.pagePositions[newPageId] ??= {
-  //     scrollTop: 0
-  //   };
-
-
-  //   const newPage =
-  //   {
-  //     pageId: newPageId,
-  //     prevPageId: currentPage.pageId ?? '',
-  //     scrollTop: currentPage.pagePositions[newPageId].scrollTop,
-  //     prevScrollTop: currentPage.scrollTop ?? 0,
-  //     pagePositions: currentPage.pagePositions
-  //   };
-
-  //   writeSessionState(
-  //     {
-  //       ...currentPage,
-  //       ...newPage
-  //     },
-  //     isBrowser(),
-  //     '[UldeConfigurator] updateSessionState()'
-  //   )
-
-  // }
-
   /**
    * Theme Switcher
    * @param theme
    */
-  setTheme(theme: 'light' | 'dark') {
+  setTheme(
+    theme: 'light' | 'dark'
+  ): void {
 
     this.themeService.setTheme(theme);
     this.$theme.set(theme);
 
   }
 
-  private onKeyDown = (e: KeyboardEvent) => {
+  // private onKeyDown = (e: KeyboardEvent) => {
 
-    console.log(
-      `[UldeConfigurator] onKeyDown`
-    );
+  //   console.log(
+  //     `[UldeConfigurator] onKeyDown`
+  //   );
 
-    if (
-      e.ctrlKey &&
-      e.key === 'k'
-    ) {
+  //   if (
+  //     e.ctrlKey &&
+  //     e.key === 'k'
+  //   ) {
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      // console.log(`Log: [${this.component}] onkeyDown`, e);
+  //     // console.log(`Log: [${this.component}] onkeyDown`, e);
 
-      this.$visibility.update(b =>
-        b ==
-          'hidden' ?
-          'visible' :
-          'hidden'
-      );
+  //     this.$visibility.update(b =>
+  //       b ==
+  //         'hidden' ?
+  //         'visible' :
+  //         'hidden'
+  //     );
 
-    };
+  //   };
 
-  };
+  // };
 
 
 }

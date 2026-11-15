@@ -31,11 +31,11 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
     }
 
     requestAnimationFrame(() => {
-      const internalLinks = markdownHost.querySelectorAll(`a[href^="#pageId:docs/"]`);
+      const interPageLinks = markdownHost.querySelectorAll(`a[href^="#pageId:docs/"]`);
 
       // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
 
-      internalLinks.forEach(a => {
+      interPageLinks.forEach(a => {
         a.addEventListener('click', (e: Event) => {
           e.preventDefault();
 
@@ -48,8 +48,8 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
 
           // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
 
-          const InternalNavigateEvent =
-            new CustomEvent('ulde:internalnavigate', {
+          const InterPageLinkEvent =
+            new CustomEvent('ulde:interpagelink', {
               detail: {
                 pageId: pageId,
                 scrollTop: anchorPos,
@@ -57,8 +57,8 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
               bubbles: true
             });
 
-          markdownHost.dispatchEvent(InternalNavigateEvent);
-          
+          markdownHost.dispatchEvent(InterPageLinkEvent);
+
         });
       });
     });

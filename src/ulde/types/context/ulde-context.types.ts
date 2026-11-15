@@ -192,18 +192,18 @@ export interface ULDENavigationArtifact {
   scrollPosition: number;
 
   activeSectionId?: string;
-  
+
   activeAnchorId?: string;
 }
 
 export interface ULDELayout {
   id: string;
   type:
-    | 'book'
-    | 'sidebar'
-    | 'article'
-    | 'api'
-    | 'landing';
+  | 'book'
+  | 'sidebar'
+  | 'article'
+  | 'api'
+  | 'landing';
   responsive?: boolean;
   version?: string;
 }
@@ -398,6 +398,8 @@ export interface ULDEComponentNode extends ULDEAstNodeBase {
 
 export interface ULDETocNode extends ULDEAstNodeBase {
   type: 'toc';
+  entry: ULDETocEntry;
+  collapsed?: boolean;
 }
 
 export interface ULDEAnchorNode extends ULDEAstNodeBase {

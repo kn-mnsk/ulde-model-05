@@ -34,11 +34,16 @@ export class ULDETocPlugin implements ULDEPluginInstance {
     // Build TOC AST node
     const tocNode: ULDETocNode = {
       type: 'toc',
+      entry: {
+        id: '',
+        text:'',
+        depth: 0
+      },
       children: headings.map(h => ({
         type: 'internalLink',
         href: `#${slugify(h.text)}`,
         title: h.text,
-        children: [{ type: 'text', value: h.text}]
+        children: [{ type: 'text', value: h.text }]
       }))
     };
     // console.log('Log: [ULDETocPlugin] \nBuildTOC AST node Finished');
