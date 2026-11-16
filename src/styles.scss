@@ -345,6 +345,14 @@ body[data-theme="light"] {
 }
 
 
+/* ---------------------------------------------------------
+   Inline Highlight (scroll‑to)
+--------------------------------------------------------- */
+.markdown-host .inline-highlight {
+  background-color: rgba(255, 208, 0, 0.5);
+  transition: background-color 0.7s ease-in-out;
+}
+
 // THE BELOWS ARE DEPRICATED
 /* ---------------------------------------------
    LEFT-SIDE COLLAPSIBLE SIDEBAR

@@ -370,28 +370,38 @@ export class UldeScrollspyService {
 
 
   // Scroll to heading
-  scrollTo(slug: string) {
-    const el = document.getElementById(slug);
+  scrollTo(host: HTMLElement, slug: string) {
+
+    const el = host.querySelector(`a[data-anchor-id="${slug}"]`);
+
+    // console.log(`Log: [UldeScrllSpy]`,
+    //   `\n\tscrollTo()`,
+    //   `\n\tdata-anchor-id=`, slug,
+    //   `\n\t elected element=`, el
+    // );
+
     if (!el) return;
 
-    // this.scrollSpy.suppress();
 
-    // queueMicrotask(() => {
-    //   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    //   this.highlightElement(el);
-    // });
-
-    // this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
-    //   this.activateClickedTocItem(this.$tocTree(), slug);
-
-    //   // this.$savedScrollTop.set(this.scrollSpy.lastScrollTop);
-    //   // console.log(`Log: [DocsViewer] scrollTo queuesMicroTask`);
-    //   this.scrollSpy.allow();
-
-    // });
+    queueMicrotask(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.highlightElement(el as HTMLElement);
+    });
 
   }
 
+
+  private highlightElement(el: HTMLElement) {
+    const parent = el.parentElement ?? el;
+    parent.classList.add('inline-highlight');
+    setTimeout(() => {
+      parent.classList.remove('inline-highlight');
+      // console.log(`Log: [DocsViewer] highlightElement()`);
+    },
+      700
+    );
+
+  }
 
 
   // private persistSessionState(

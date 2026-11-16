@@ -87,7 +87,7 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         break;
       }
 
-      case 'internalLink': {
+      case 'intraPageLink': {
 
         const href = escapeHtml(node.href ?? '');
 

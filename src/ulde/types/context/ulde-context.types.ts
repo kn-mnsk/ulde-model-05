@@ -158,7 +158,8 @@ export interface ULDECodeBlockInfo {
  */
 export interface ULDEArtifacts {
   // Navigation
-  toc: ULDETocEntry[];
+  // toc: ULDETocEntry[];
+  toc: ULDETocNode[];
   anchors: ULDEAnchorEntry[];
   sections: ULDESectionInfo[];
 
@@ -289,11 +290,34 @@ export interface ULDELinkNodeBase
   title?: string;
 }
 
-export interface ULDEInternalLinkNode
+/** intra-page navigation
+ * replacement of ULDEInternalLinkNode
+ */
+export interface ULDEIntraPageLinkNode
   extends ULDELinkNodeBase {
-
-  type: 'internalLink';
+  type: 'intraPageLink';
 }
+
+/**
+ * maybe for future
+ */
+export interface ULDEInterPageLinkNode
+  extends ULDELinkNodeBase {
+  type: 'interPageLink';
+}
+
+// /**
+//  * renamed as ULDEItraPageLinkNode
+//  * @deprecated
+//  */
+// export interface ULDEInternalLinkNode
+//   extends ULDELinkNodeBase {
+//   type: 'internalLink';
+// }
+
+// export type ULDEInternalLinkNode =
+//   | ULDEIntraPageLinkNode
+//   | ULDEInterPageLinkNode;
 
 // web navigation
 export interface ULDEExternalLinkNode
@@ -460,7 +484,8 @@ export type ULDEAstNode =
   | ULDEStrongNode
   | ULDEInlineCodeNode
   | ULDEBreakNode
-  | ULDEInternalLinkNode
+  // | ULDEInternalLinkNode
+  | ULDEIntraPageLinkNode
   | ULDEImageNode
   | ULDERootNode
   | ULDESectionNode

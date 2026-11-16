@@ -36,10 +36,10 @@
         <div class="ulde-viewer-toc-host-container">
           <!-- RENDER CONTAINER -->
           <ul class="ulde-viewer-toc-host">
-            @for (node of $tocTree(); track node.id) {
-        <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }">
-        </ng-container>
-        }
+            @for (node of $tocTree(); track node.entry.id) {
+            <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }">
+            </ng-container>
+            }
           </ul>
         </div>
 
@@ -62,7 +62,7 @@
 
   </div>
 
-  <div class="ulde-viewer-devtools-container"[class.hidden]="$visibilityDevtools()==='hidden' ? true : false">
+  <div class="ulde-viewer-devtools-container" [class.hidden]="$visibilityDevtools()==='hidden' ? true : false">
     <ulde-devtools [$devtoolsSnapshot]="$devtoolsSnapshot()"></ulde-devtools>
   </div>
 
@@ -71,8 +71,8 @@
 
 
 <ng-template #tocNode let-node>
-  <li class="toc-item" [style.padding-left.px]="(node.entry.level - 1) * 16"
-    [class.active]="$activeHeading() === node.entry.slug" [class.parent-active]="isParentActive(node)">
+  <li class="toc-item" [style.padding-left.px]="(node.entry.depth - 1) * 16"
+    [class.active]="$activeHeading() === node.entry.id" [class.parent-active]="isParentActive(node)">
 
     <div class="toc-line">
       @if (node.children.length > 0) {
@@ -83,14 +83,14 @@
       &nbsp;&nbsp;&nbsp;
       }
 
-      <a (click)="scrollTo(node.entry.slug)">
+      <a (click)="scrollTo(hostRef.nativeElement, node.entry.id)">
         {{ node.entry.text }}
       </a>
     </div>
 
     @if (!node.collapsed && node.children.length > 0) {
     <ul class="toc-children">
-      @for (child of node.children; track child.entry.slug) {
+      @for (child of node.children; track child.entry.id) {
       <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: child }"></ng-container>
       }
     </ul>

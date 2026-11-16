@@ -71,15 +71,15 @@ export class UldeViewer implements
   $tocResizeRef =
     signal<ElementRef<HTMLElement> | undefined>(undefined);
 
-  // $toc = computed<ULDETocEntry[]>(() =>
-  //   this.scrollSpy.$toc()
-  // );
+  $toc = signal<ULDETocNode[]>([]);
+  // $toc = signal<ULDETocEntry[]>([]);
 
-  $toc = signal<ULDETocEntry[]>([]);
-
-  readonly $tocTree = computed<ULDETocEntry[]>(() =>
+  readonly $tocTree = computed<ULDETocNode[]>(() =>
     this.$toc()
   );
+  // readonly $tocTree = computed<ULDETocEntry[]>(() =>
+  //   this.$toc()
+  // );
 
   $activeHeading = computed<string | null>(() =>
     this.scrollSpy.$activeHeading()
@@ -180,11 +180,11 @@ export class UldeViewer implements
       },
     );
 
-    const toc =
-      this.$currentRendererState()?.executionContext?.artifacts?.toc;
+    // const toc =
+    //   this.$currentRendererState()?.executionContext?.artifacts?.toc;
 
-    if (toc){
-      this.$toc.set(toc);}
+    // if (toc){
+    //   this.$toc.set(toc);}
 
     this.$prevPageId.set(
       this.pageRestore.getPrevPageId()
@@ -230,6 +230,18 @@ export class UldeViewer implements
         rendererState.executionContext)();
 
     this.rendererService.setState(rendererState);
+
+    const toc = rendererState.executionContext.artifacts.toc;
+
+    // console.log(`[UldeViewer]`,
+    //   `\n\tsyncSingnalInput`,
+    //   `\n\tTOC=`, toc,
+    // );
+    this.$toc.set(toc);
+
+    // if (toc) {
+    //   this.$toc.set(toc);
+    // }
 
     // this.$currentRendererState.set(rendererState); // input for UldeDevtools
 
@@ -348,9 +360,9 @@ export class UldeViewer implements
   }
 
   // Scroll to heading
-  scrollTo(slug: string) {
+  scrollTo(host: HTMLElement, slug: string) {
 
-    this.scrollSpy.scrollTo(slug);
+    this.scrollSpy.scrollTo(host, slug);
 
   }
 
