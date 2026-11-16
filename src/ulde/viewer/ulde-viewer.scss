@@ -10,15 +10,22 @@
 //   overflow: hidden;
 // }
 
-:host {
+// :host {
+//   display: flex;
+//   flex: 1;
+//   min-height: 0;
+//   flex-direction: column;
+//   height: 100vh;
+//   // overflow: hidden;
+// }
+
+.ulde-viewer-container {
   display: flex;
   flex: 1;
   min-height: 0;
   flex-direction: column;
   height: 100vh;
-  // overflow: hidden;
 }
-
 
 .ulde-viewer-markdown-container {
   // position: relative;
@@ -75,7 +82,8 @@
   flex-direction: column;
   /* anchor for resizer + overlay */
   z-index: var(--z-base);
-  width: auto;
+  // width: auto;
+  width: fit-content;
   // min-width: 150px;
   max-width: 250px;
 
@@ -136,11 +144,33 @@
   // position: relative;
   display: flex;
   flex: 1;
+  min-width: 700px;
   min-height: 0;
   // height: 90%;
   overflow: auto; // only scroll container
 
 }
+
+
+.ulde-markdown-host-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+  z-index: var(--z-overlay);
+  /* ABOVE wrapper */
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
 
 .markdown-host {
   // display: flex;
@@ -148,10 +178,12 @@
   // min-height: 0;
   padding-left: 10px;
   padding-right: 10px;
+  width: auto;
   // min-height: 400px;
 
-
 }
+
+
 
 .ulde-viewer-devtools-container {
   position: fixed;

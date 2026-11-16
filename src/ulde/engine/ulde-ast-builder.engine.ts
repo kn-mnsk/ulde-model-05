@@ -208,7 +208,7 @@ export function buildUldeAst(tokens: Token[]): ULDEAstNode[] {
               } else {
 
                 open({
-                  type: 'internalLink',
+                  type: 'intraPageLink',
                   href,
                   title
                 });

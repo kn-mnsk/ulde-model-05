@@ -1,7 +1,14 @@
 // src/ulde/engine/ulde-layout.engine.service.ts
 
 import { Injectable } from '@angular/core';
-import { ULDEAstNode, ULDESectionNode, ULDEHeadingNode } from '@ulde/types/context';
+
+import {
+  ULDEAstNode,
+  ULDESectionNode,
+  ULDEHeadingNode
+ } from '@ulde/types/context';
+
+ import { slugify } from '../../app/global.utils/global.utils';
 
 @Injectable({ providedIn: 'root' })
 export class ULDELayoutEngineService {
@@ -15,7 +22,7 @@ export class ULDELayoutEngineService {
         // start a new section
         const section: ULDESectionNode = {
           type: 'section',
-          id: slugify(collectHeadingText(node)),
+          id: slugify(collectHeadingText(node)) ?? undefined,
           depth: (node as ULDEHeadingNode).depth,
           children: [node]
         };
@@ -42,6 +49,6 @@ function collectHeadingText(node: ULDEAstNode): string {
     .join('');
 }
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-}
+// function slugify(s: string) {
+//   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+// }

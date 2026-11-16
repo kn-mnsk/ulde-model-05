@@ -99,7 +99,7 @@ export async function navigate(router: Router, route: any[]): Promise<boolean | 
   // return results;
 }
 
-export function setDecimalPlaces(value: number, places: number) : number{
+export function setDecimalPlaces(value: number, places: number): number {
   // Validate input
   // if (typeof value !== "number" || typeof places !== "number" || places < 0) {
   //   throw new Error("Invalid input: value must be a number and places must be a non‑negative number.");
@@ -137,6 +137,19 @@ export async function fetchWithRetry<T>(
       clearTimeout(timeout);
 
       if (!response.ok) {
+
+        await router.navigate(['/PageNotFound']);
+
+
+        // for reference only
+        //   someHostElement.innerHTML = `
+        //   <div class="page-not-found">
+        //     <h1>Page not found</h1>
+        //     <p><strong>Invalid URL: ${url}</strong></p>
+        //   </div>
+        // `;
+
+
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 

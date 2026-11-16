@@ -39,6 +39,12 @@ export class ContentEngineService {
 
   }
 
+  /**
+   * Use loadPage
+   * @param pageId
+   * @returns
+   * @depricated
+   */
   async load(pageId: string): Promise<string | undefined> {
     /* existing loader */
 
@@ -51,13 +57,8 @@ export class ContentEngineService {
 
       if (response.redirected) {
         // const router = inject(Router);
-        await this.router.navigate(['/PageNotFound']);
-        // navigate(this.router, ['PageNotFound']);
-        // console.error(
-        //   `[ContentEngine] load() error \nresponse=`,
-        //   response,
-        //   `\nurl=`, url
-        // );
+        await this.router.navigate(['PageNotFound']);
+
         throw new Error(
           `Invalid URL: ${url}`
         );
