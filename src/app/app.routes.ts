@@ -20,6 +20,7 @@ export const routes: Routes = [
   },
   {
     path: 'PageError',
+    title: 'PageError',
     component: Error,
   },
   {
