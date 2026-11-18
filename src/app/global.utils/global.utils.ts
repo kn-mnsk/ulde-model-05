@@ -15,7 +15,10 @@ export function isBrowser(): boolean {
  * @param text
  * @returns
  */
-export function slugify(text: string | null): string | null {
+export function slugify(
+  text: string | null
+): string | null {
+
   if (text == null) return null;
   return text
     .toLowerCase()
@@ -30,20 +33,29 @@ export function slugify(text: string | null): string | null {
  * @param text
  * @returns
  */
-export function unslugifyA(text: string | null): string | null {
+export function unslugifyA(
+  text: string | null
+): string | null {
 
   if (text == null) return null;
 
-  const results = text.replace(/\/(\w+)\/(\w+)\/(\w+)/, (_, p1, p2, p3) => {
-    const hiphenToSpace = (s: string) => s.replace(/-/g, ' '); // replace - with space
+  const results =
+    text.replace(
+      /\/(\w+)\/(\w+)\/(\w+)/, (_, p1, p2, p3) => {
+        const hiphenToSpace = (s: string) =>
+          s.replace(/-/g, ' '); // replace - with space
 
-    const cap = (s: string) => {
-      const spaced = hiphenToSpace(s);
-      return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-    };
-    return `/${cap(p1)}/${cap(p2)}/${cap(p3)}`;
+        const cap = (s: string) => {
 
-  });
+          const spaced = hiphenToSpace(s);
+
+          return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+        };
+
+        return `/${cap(p1)}/${cap(p2)}/${cap(p3)}`;
+
+      }
+    );
 
   return results;
 }
@@ -53,9 +65,12 @@ export function unslugifyA(text: string | null): string | null {
  * @param text
  * @returns
  */
-export function unslugify(text: string): string {
+export function unslugify(
+  text: string
+): string {
 
   return (text.charAt(0).toUpperCase() + text.slice(1)).replace(/-/g, ' ');
+
 }
 
 
@@ -65,26 +80,46 @@ export function unslugify(text: string): string {
 /**
  * Recursively replace non-breaking spaces in text nodes.
  */
-export function sanitizeNodeText(node: Node): void {
+export function sanitizeNodeText(
+  node: Node
+): void {
+
   if (node.nodeType === Node.TEXT_NODE) {
+
     const textNode = node as Text;
-    textNode.textContent = textNode.textContent?.replace(/\u00A0/g, ' ') ?? '';
+
+    textNode.textContent =
+      textNode.textContent?.replace(/\u00A0/g, ' ') ?? '';
+
     return;
   }
 
-  if (node instanceof HTMLElement || node instanceof DocumentFragment) {
-    node.childNodes.forEach(child => sanitizeNodeText(child));
+  if (
+    node instanceof HTMLElement ||
+    node instanceof DocumentFragment
+  ) {
+
+    node.childNodes.
+      forEach(child =>
+        sanitizeNodeText(child)
+      );
+
   }
 }
 
 
 // navigate to a specific route
-export async function navigate(router: Router, route: any[]): Promise<boolean | undefined> {
+export async function navigate(
+  router: Router,
+  route: any[]
+): Promise<boolean | undefined> {
 
   // const url = route.join('/');
   // let results: boolean | undefined;
 
-  const result = await router.navigate(route);
+  const result =
+    await router.navigate(route);
+
   return result;
   // this.router.navigate(route).then(
   //   (resolve) => {
@@ -99,7 +134,10 @@ export async function navigate(router: Router, route: any[]): Promise<boolean | 
   // return results;
 }
 
-export function setDecimalPlaces(value: number, places: number): number {
+export function setDecimalPlaces(
+  value: number,
+  places: number
+): number {
   // Validate input
   // if (typeof value !== "number" || typeof places !== "number" || places < 0) {
   //   throw new Error("Invalid input: value must be a number and places must be a non‑negative number.");
@@ -125,14 +163,25 @@ export async function fetchWithRetry<T>(
   timeoutMs: number = 5000
 ): Promise<T> {
   for (let attempt = 1; attempt <= retries; attempt++) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    const controller =
+      new AbortController();
+
+    const timeout =
+      setTimeout(() =>
+        controller.abort(),
+        timeoutMs
+      );
 
     try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
+      const response
+        = await fetch(
+          url,
+          {
+            ...options,
+            signal: controller.signal
+          }
+        );
 
       clearTimeout(timeout);
 
@@ -150,27 +199,42 @@ export async function fetchWithRetry<T>(
         // `;
 
 
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(
+          `HTTP error! Status: ${response.status}`
+        );
+
       }
 
       // return (await response.json()) as T;
       return (await response.text()) as T;
+
     } catch (error) {
+
       clearTimeout(timeout);
 
       // AbortError or network error handling
       if (attempt < retries) {
-        console.warn(`Attempt ${attempt} failed. Retrying...`);
+
+        console.warn(
+          `Attempt ${attempt} failed. Retrying...`
+        );
+
       } else {
-        console.error(`All ${retries} attempts failed.`);
+        console.error(
+          `All ${retries} attempts failed.`
+        );
+
         await router.navigate(['/PageNotFound']);
+
         throw error;
       }
     }
   }
 
   // This should never be reached
-  throw new Error("Unexpected fetch error");
+  throw new Error(
+    "Unexpected fetch error"
+  );
 }
 
 // // --------------------
@@ -201,3 +265,21 @@ export async function fetchWithRetry<T>(
 //     console.error("Final fetch error:", err);
 //   }
 // })();
+
+/**
+ *
+ * @param s
+ * @returns
+ */
+export function escapeHtml(
+  s: string
+): string {
+
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+}

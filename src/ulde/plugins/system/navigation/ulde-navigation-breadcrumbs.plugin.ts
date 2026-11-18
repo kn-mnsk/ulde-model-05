@@ -15,8 +15,15 @@ export class ULDENavigationBreadcrumbsPlugin implements ULDEPluginInstance {
 
     // console.log('Log: [ULDENavigationBreadcrumbsPlugin] run');
 
-    const parts = ctx.page.source.raw.split("/").filter(Boolean);
-    const breadCrumbs = parts.map((p, i) => ({ label: p, href: "/" + parts.slice(0, i + 1).join("/") }));
+    const parts =
+      ctx.page.source.raw.split("/").
+        filter(Boolean);
+
+    const breadCrumbs =
+      parts.map((p, i) =>
+      (
+        { label: p, href: "/" + parts.slice(0, i + 1).join("/") }
+      ));
 
     ctx.artifacts.pluginData['breadcrumbs'] = breadCrumbs;
 

@@ -35,13 +35,34 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ULDERendererService {
+
   private handle: ULDERendererHandle | null = null;
 
+  // init(
+  //   host: ElementRef<HTMLElement>,
+  //   size: { width: number; height: number },
+  //   events?: ULDERendererEvents
+  // ): void {
+  //   const config: ULDERendererConfig = {
+  //     container: host.nativeElement,
+  //     width: size.width,
+  //     height: size.height,
+  //     backgroundColor: '#ffffff'
+  //   };
+
+  //   this.handle =
+  //     this.createUldeRendererHandle(config, events);
+
+  //   events?.onReady?.();
+  // }
+
   init(
+    rendererState: ULDERendererState,
     host: ElementRef<HTMLElement>,
     size: { width: number; height: number },
     events?: ULDERendererEvents
   ): void {
+
     const config: ULDERendererConfig = {
       container: host.nativeElement,
       width: size.width,
@@ -50,10 +71,16 @@ export class ULDERendererService {
     };
 
     this.handle =
-      this.createUldeRenderer(config, events);
+      this.createUldeRendererHandle(
+        rendererState,
+        config,
+        events
+      );
 
     events?.onReady?.();
   }
+
+
 
   setState(
     partial: Partial<ULDERendererState>
@@ -66,7 +93,9 @@ export class ULDERendererService {
     return this.handle ? this.handle.getState() : null;
   }
 
-  highlightDiagnostic(message: string): void {
+  highlightDiagnostic(
+    message: string
+  ): void {
 
     this.handle?.highlightDiagnostic(message);
   }
@@ -77,32 +106,39 @@ export class ULDERendererService {
     this.handle = null;
   }
 
-  private createUldeRenderer(
+  private createUldeRendererHandle(
+    rendererState: ULDERendererState,
     config: ULDERendererConfig,
     events?: ULDERendererEvents
   ): ULDERendererHandle {
-    let state: ULDERendererState = {
-      modelId: '',
-      variantId: undefined,
-      zoom: 1,
-      rotation: { x: 0, y: 0, z: 0 },
 
-      executionContext: undefined,
-      devtoolsSnapshot: undefined
-    };
+    // let state: ULDERendererState = {
+    //   modelId: '',
+    //   variantId: undefined,
+    //   zoom: 1,
+    //   rotation: { x: 0, y: 0, z: 0 },
+
+    //   executionContext: undefined,
+    //   devtoolsSnapshot: undefined
+    // };
 
     // initial placeholder
     config.container.innerHTML = '<p>ULDE Viewer READY</p>';
 
-    function renderFromContext(renderContext: ULDERenderContext | undefined) {
+    function renderFromContext(
+      renderContext: ULDERenderContext | undefined
+    ): void {
+
       if (!renderContext) return;
+
       config.container.innerHTML = renderContext.html;
       bindInteractivity(config.container);
 
-
     }
 
-    function renderLifecyclePhase(phase: string | undefined) {
+    function renderLifecyclePhase(
+      phase: string | undefined
+    ): void {
       // optional: could add a data attribute or small badge
       if (!phase) {
         delete config.container.dataset['uldeLifecyclePhase'];
@@ -112,17 +148,21 @@ export class ULDERendererService {
       config.container.dataset['uldeLifecyclePhase'] = phase;
     }
 
-    function renderDiagnosticsOverlay(diags: ULDEDiagnostic[] | undefined) {
+    function renderDiagnosticsOverlay(
+      diags: ULDEDiagnostic[] | undefined
+    ): void {
 
       if (!diags || diags.length === 0) {
         delete config.container.dataset['uldeDiagnosticsCount'];
         return;
       }
       config.container.dataset['uldeDiagnosticsCount'] = String(diags.length);
+
     }
 
-
-    function renderFrameInfo(frame: ULDEFrame | undefined) {
+    function renderFrameInfo(
+      frame: ULDEFrame | undefined
+    ): void {
       // optional: could add timing info; keep minimal for now
       if (!frame) {
         delete config.container.dataset['uldeFrameId'];
@@ -134,8 +174,11 @@ export class ULDERendererService {
       config.container.dataset['uldeFrameTimestamp'] = String(frame.timestamp);
     }
 
-    function highlightDiagnostic(message: string) {
-      const nodes = config.container.querySelectorAll('.ulde-diagnostic');
+    function highlightDiagnostic(
+      message: string
+    ): void {
+      const nodes =
+        config.container.querySelectorAll('.ulde-diagnostic');
 
       nodes.forEach(n => {
         if (n.textContent?.includes(message)) {
@@ -146,13 +189,17 @@ export class ULDERendererService {
           }, 1500);
         }
       });
+
     }
 
-    function bindInteractivity(container: HTMLElement) {
+    function bindInteractivity(
+      container: HTMLElement
+    ): void {
       // clear previous listeners by resetting innerHTML already done in renderFromContext
 
       // add event to highlight active section on scroll
-      const sections = Array.from(container.querySelectorAll('section'));
+      const sections =
+        Array.from(container.querySelectorAll('section'));
 
       window.addEventListener('scroll', () => {
         const scrollPos = window.scrollY;
@@ -168,7 +215,8 @@ export class ULDERendererService {
       });
 
       // add event to highlight TOC entry for active section
-      const tocLinks = Array.from(container.querySelectorAll('.ulde-toc a'));
+      const tocLinks =
+        Array.from(container.querySelectorAll('.ulde-toc a'));
 
       window.addEventListener('scroll', () => {
         const scrollPos = window.scrollY;
@@ -204,37 +252,38 @@ export class ULDERendererService {
       // });
 
       // Anchors: a[data-ulde-anchor="id"]
-      container.querySelectorAll('a[data-ulde-anchor]').forEach(a => {
-        a.addEventListener('click', ev => {
-          ev.preventDefault();
-          const id = (ev.currentTarget as HTMLElement).getAttribute('data-ulde-anchor');
-          if (!id) return;
-          const target = container.querySelector(`#${id}`);
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
+      container.
+        querySelectorAll('a[data-ulde-anchor]').
+        forEach(a => {
+          a.addEventListener('click', ev => {
+            ev.preventDefault();
+            const id = (ev.currentTarget as HTMLElement).getAttribute('data-ulde-anchor');
+            if (!id) return;
+            const target = container.querySelector(`#${id}`);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
         });
-      });
 
       // Demo blocks: .ulde-demo[data-demo-code]
-      container.querySelectorAll('.ulde-demo').forEach(demo => {
-        demo.addEventListener('click', () => {
-          const code = demo.getAttribute('data-demo-code');
-          if (!code) return;
-          try {
-            const fn = new Function('console', code);
-            fn(console);
-            // console.log('[ULDE Demo] Running code:', code);
-            // // eslint-disable-next-line no-eval
-            // eval(code);
-          } catch (err) {
-            console.error('[ULDE Demo] Error running code:', err);
-          }
+      container.
+        querySelectorAll('.ulde-demo').
+        forEach(demo => {
+          demo.addEventListener('click', () => {
+            const code = demo.getAttribute('data-demo-code');
+            if (!code) return;
+            try {
+              const fn = new Function('console', code);
+              fn(console);
+              // console.log('[ULDE Demo] Running code:', code);
+              // // eslint-disable-next-line no-eval
+              // eval(code);
+            } catch (err) {
+              console.error('[ULDE Demo] Error running code:', err);
+            }
+          });
         });
-      });
-
-
-
 
     }
 
@@ -259,13 +308,19 @@ export class ULDERendererService {
 
 
     return {
-      setState(partial: Partial<ULDERendererState>) {
-        state = { ...state, ...partial };
 
+      setState(
+        partial: Partial<ULDERendererState>
+      ): void {
 
-        if (state.executionContext !== undefined) {
+        rendererState = {
+          ...rendererState,
+          ...partial
+        };
+
+        if (rendererState.executionContext !== undefined) {
           // if (partial.executionContext !== undefined) {
-          renderFromContext(state.executionContext?.render);
+          renderFromContext(rendererState.executionContext?.render);
 
           // internal docrouting
           // config.container.addEventListener('ulde:navigate', (e: any) => {
@@ -281,13 +336,7 @@ export class ULDERendererService {
 
           // });
 
-
-
         }
-
-        // if (partial.renderContext !== undefined) {
-        //   renderFromContext(state.renderContext);
-        // }
 
         // if (partial.currentLifecyclePhase !== undefined) {
         //   renderLifecyclePhase(state.currentLifecyclePhase);
@@ -301,11 +350,11 @@ export class ULDERendererService {
         //   renderFrameInfo(state.frame);
         // }
 
-        events?.onStateChange?.(state);
+        events?.onStateChange?.(rendererState);
       },
 
       getState() {
-        return state;
+        return rendererState;
       },
 
 
@@ -322,40 +371,5 @@ export class ULDERendererService {
       }
     };
   }
-
-
-
-  // // Build TOC tree
-  // buildTocTree(entries: ULDETocEntry[]): ULDETocNode[] {
-  //   const root: ULDETocNode[] = [];
-  //   const stack: ULDETocNode[] = [];
-
-  //   for (const entry of entries) {
-  //     const node: ULDETocNode = {
-  //       type: 'toc',
-  //       entry,
-  //       children: [],
-  //       collapsed: false
-  //     };
-
-  //     while (
-  //       stack.length && stack[stack.length - 1].entry.depth
-  //       >= entry.depth
-  //     ) {
-  //       stack.pop();
-  //     }
-
-  //     if (!stack.length) {
-  //       root.push(node);
-  //     } else {
-  //       stack[stack.length - 1].children?.push(node);
-  //     }
-
-  //     stack.push(node);
-  //   }
-
-  //   return root;
-  // }
-
 
 }

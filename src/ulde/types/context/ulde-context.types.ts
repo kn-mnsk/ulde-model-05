@@ -484,14 +484,14 @@ export type ULDEAstNode =
   | ULDEStrongNode
   | ULDEInlineCodeNode
   | ULDEBreakNode
-  // | ULDEInternalLinkNode
+  | ULDEInterPageLinkNode
   | ULDEIntraPageLinkNode
+  | ULDEExternalLinkNode
   | ULDEImageNode
   | ULDERootNode
   | ULDESectionNode
   | ULDEFrontmatterNode
   | ULDECodeNode
-  | ULDEExternalLinkNode
   | ULDEFenceNode
   | ULDEMathNode
   | ULDEInlineMathNode

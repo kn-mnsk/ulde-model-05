@@ -62,6 +62,8 @@ export class UldeConfigurator implements
   // $devtoolsSnapshot =
   //   computed<ULDEDevtoolsSnapshot | undefined>(() => this.$rendererState()?.devtoolsSnapshot);
 
+  private debugCounter: number = 0;
+
   $theme = signal<string>('dark');
   $visibility = signal<'visible' | 'hidden'>('hidden');
 
@@ -96,6 +98,21 @@ export class UldeConfigurator implements
 
 
     effect(() => {
+
+      /** debug */
+      this.debugCounter++;
+
+      console.log(
+        `[UldeConfigurator] effect debug count\n\t`,
+        this.debugCounter
+      );
+
+      if (this.debugCounter > 20) {
+        debugger;
+        throw new Error('Loop detected');
+      }
+      /** debug */
+
       if (!isBrowser()) return;
 
       const pageId = this.$page().id;
@@ -108,6 +125,8 @@ export class UldeConfigurator implements
         `\n\teffect()`,
         `\n\t🔥1 Finished`
       );
+
+      // console.trace(`[UldeConfigurator] effect trace`);
 
     });
 

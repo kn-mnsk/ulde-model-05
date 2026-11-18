@@ -34,15 +34,45 @@ export class ULDETocPlugin implements ULDEPluginInstance {
 
     // Collect headings
     visitUldeAst(ctx.render.ast, {
+
       pre(node) {
         if (node.type === 'heading') {
-          const text = node.children
-            ?.filter(c => c.type === 'text')
-            .map(c => c.value)
-            .join('') ?? '';
-          headings.push({ depth: node.depth!, text });
+
+          let text =
+            node.children?.
+              filter(c =>
+                c.type === 'text').
+              map(c =>
+                c.value).
+              join('') ??
+            '';
+
+          let depth = node.depth;
+
+          if (!text || !depth) {
+            ctx.artifacts.diagnostics.push(
+              {
+                pluginKind: 'layout',
+                pluginName: 'ULDETocPlugin',
+                lifecyclePhase: 'render',
+                level: 'error',
+                message: `either text ${text} or depth ${depth}\n might cause problem in TOC handling`
+              }
+            );
+            text ??= '';
+            depth ??= 0;
+          };
+
+          headings.push(
+            {
+              depth,
+              text
+            }
+          );
+
         }
       }
+
     });
 
     // Build TOC AST node
@@ -100,6 +130,11 @@ export class ULDETocPlugin implements ULDEPluginInstance {
     // No teardown needed
   }
 
+  /**
+   * Build TOC tree
+   * @param entries
+   * @returns
+   */
   private buildTocNode(entries: ULDETocEntry[]): ULDETocNode[] {
     const root: ULDETocNode[] = [];
     const stack: ULDETocNode[] = [];

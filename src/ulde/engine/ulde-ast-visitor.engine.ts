@@ -15,6 +15,9 @@ export interface ULDEAstVisitorOptions {
 /**
  * ULDE AST Visitor
  * Walks the AST tree and allows mutation, replacement, or removal of nodes.
+ * @param nodes ULDEAstNode[]
+ * @param options ULDEAstVisitorOptions
+ * @returns
  */
 export function visitUldeAst(
   nodes: ULDEAstNode[],
@@ -23,7 +26,10 @@ export function visitUldeAst(
 
   const { pre, post } = options;
 
-  const walk = (node: ULDEAstNode, parent: ULDEAstNode | null): ULDEAstNode | null => {
+  const walk = (
+    node: ULDEAstNode,
+    parent: ULDEAstNode | null
+  ): ULDEAstNode | null => {
 
     // PRE-VISIT (before children)
     if (pre) {
@@ -40,10 +46,13 @@ export function visitUldeAst(
 
     // Visit children
     if (node.children && node.children.length > 0) {
+
       const newChildren: ULDEAstNode[] = [];
 
       for (const child of node.children) {
+
         const visited = walk(child, node);
+
         if (visited !== null) {
           newChildren.push(visited);
         }
@@ -54,6 +63,7 @@ export function visitUldeAst(
 
     // POST-VISIT (after children)
     if (post) {
+
       const result = post(node, parent);
 
       if (result === null) {
@@ -72,10 +82,13 @@ export function visitUldeAst(
   const result: ULDEAstNode[] = [];
 
   for (const node of nodes) {
+
     const visited = walk(node, null);
+    
     if (visited !== null) {
       result.push(visited);
     }
+
   }
 
   return result;
