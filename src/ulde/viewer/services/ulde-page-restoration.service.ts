@@ -190,7 +190,8 @@ export class UldePageRestorationService {
 
       this.sessionStateService.initState();
 
-      return this.sessionStateService.getDefaultPageId();
+      // return this.sessionStateService.getDefaultPageId();
+      return this.sessionStateService.defaultPageId;
 
     }
 
@@ -208,7 +209,8 @@ export class UldePageRestorationService {
 
       this.sessionStateService.initState();
 
-      return this.sessionStateService.getDefaultPageId();
+      // return this.sessionStateService.getDefaultPageId();
+      return this.sessionStateService.defaultPageId;
 
     }
 

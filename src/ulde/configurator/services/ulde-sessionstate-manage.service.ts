@@ -1,7 +1,6 @@
 // src/ulde/configurator/services/ulde-sessionstate-manage.service.ts
 
 import { Injectable } from '@angular/core';
-import { signal } from '@angular/core';
 
 import { isBrowser } from '../../../app/global.utils/global.utils';
 import { ThemeName } from '@ulde/configurator/services/ulde-theme.service';
@@ -13,7 +12,7 @@ export type ULDESessionSelector =
   | 'ulde-viewer';
 
 export interface ULDESessionState {
-  selector: ULDESessionSelector;
+  selector?: ULDESessionSelector;
 
   pageId: string | null;
   prevPageId: string | null;
@@ -29,16 +28,15 @@ export interface ULDESessionState {
    * key: pageId
    * value: history
    */
-  pagePositions?: Record<
+  pageHistories?: Record<
     string,
     ULDEPagePosition
   >;
 
   // for future
-  lastVisited?: string // last visited pageId
+  lastVisitedPgeId?: string // last visited pageId
 
 }
-
 
 export interface ULDEPagePosition {
   scrollTop: number;
@@ -58,20 +56,17 @@ export const ULDE_SESSION_STATE_DEFAULT: ULDESessionState = {
   prevScrollTop: 0,
   refreshed: false,
   docTheme: 'dark',
-  pagePositions: {
+  pageHistories: {
     'docs/index': {
       scrollTop: 0
     }
   }
 };
 
-
-
 @Injectable({
   providedIn: 'root',
 })
 export class UldeSessionstateManageService {
-
 
   private readonly title = '[UldeSessionstateManageService]';
 
@@ -107,7 +102,7 @@ export class UldeSessionstateManageService {
         prevScrollTop: parsed.prevScrollTop ?? 0,
         refreshed: parsed.refreshed ?? false,
         docTheme: parsed.docTheme ?? 'dark',
-        pagePositions: parsed.pagePositions ?? undefined
+        pageHistories: parsed.pageHistories ?? undefined
       };
     } catch {
       return ULDE_SESSION_STATE_DEFAULT;
@@ -135,12 +130,16 @@ export class UldeSessionstateManageService {
       JSON.stringify(next)
     );
 
-    // console.log(`Log: ${$title()} writeSessionState called, \ncurrent=${JSON.stringify(current, null, 2)}, \nnext=${JSON.stringify(next, null, 2)}`)
-
     /**Debug purpose */
-    const debugMsg = debug !== undefined ? `\n[Debug: called from ${debug}]` : '';
+    const debugMsg =
+      debug !== undefined ?
+        `\n[Debug: called from ${debug}]` :
+        '';
+
     console.log(
-      `Log: [${this.title} writeSessionState call finished  ${debugMsg}`
+      `Debug: [${this.title}]`,
+      `\n\twriteSessionState call finished`,
+      `\n\tDebug message=`, debugMsg,
     );
 
   }
@@ -155,13 +154,15 @@ export class UldeSessionstateManageService {
 
   }
 
-  getDefaultPageId(): string {
+  get defaultPageId()
+    : string {
 
     return ULDE_DEFAULT_PAGE_ID;
 
   }
 
-  getPageId(): { pageId: string | null, prevPageId: string | null } {
+  getPageId()
+    : { pageId: string | null, prevPageId: string | null } {
 
     const pageIdPair: { pageId: string | null, prevPageId: string | null }
       = this.readSessionState(isBrowser())
@@ -171,8 +172,11 @@ export class UldeSessionstateManageService {
   };
 
 
-  getState(): ULDESessionState {
+  getState()
+    : ULDESessionState {
+
     return this.readSessionState(isBrowser())
+
   }
 
   /**
@@ -190,7 +194,7 @@ export class UldeSessionstateManageService {
       this.readSessionState(isBrowser);
 
     return (
-      state.pagePositions?.[pageId]?.scrollTop
+      state.pageHistories?.[pageId]?.scrollTop
       ?? 0
     );
   }
@@ -210,7 +214,7 @@ export class UldeSessionstateManageService {
     const state =
       this.readSessionState(isBrowser);
 
-    state.pagePositions ??= {};
+    state.pageHistories ??= {};
 
     state.prevPageId =
       state.pageId;
@@ -224,7 +228,7 @@ export class UldeSessionstateManageService {
     state.scrollTop =
       scrollTop;
 
-    state.pagePositions[pageId].scrollTop
+    state.pageHistories[pageId].scrollTop
       = scrollTop
 
 
@@ -260,9 +264,9 @@ export class UldeSessionstateManageService {
 
     const state = this.readSessionState(isBrowser());
 
-    state.pagePositions ??= {};
+    state.pageHistories ??= {};
 
-    state.pagePositions[newPageId] ??= {
+    state.pageHistories[newPageId] ??= {
       scrollTop: 0
     };
 
@@ -271,9 +275,9 @@ export class UldeSessionstateManageService {
     const newState = {
       pageId: newPageId,
       prevPageId: state.pageId ?? '',
-      scrollTop: state.pagePositions[newPageId].scrollTop,
+      scrollTop: state.pageHistories[newPageId].scrollTop,
       prevScrollTop: state.scrollTop ?? '',
-      pagePositions: state.pagePositions
+      pagePositions: state.pageHistories
     };
 
 
@@ -283,6 +287,7 @@ export class UldeSessionstateManageService {
         ...newState
       },
       isBrowser(),
+      
       `[${this.title}] updateStateByNewPageId()'`
     )
 
@@ -303,14 +308,14 @@ export class UldeSessionstateManageService {
         isBrowser()
       );
 
-    sessionState.pagePositions ??= {};
+    sessionState.pageHistories ??= {};
 
     const current =
-      sessionState.pagePositions[pageId] ?? {
+      sessionState.pageHistories[pageId] ?? {
         scrollTop: 0
       };
 
-    sessionState.pagePositions[pageId] = {
+    sessionState.pageHistories[pageId] = {
       ...current,
       ...partial
     };
