@@ -49,7 +49,7 @@ export class UldeViewer implements
   markdownHostOverlayRef?: ElementRef<HTMLElement>;
 
   // Full renderer state comes in as a signal input
-  $rendererState = input<ULDERendererState>();
+  $rendererState = input.required<ULDERendererState>();
 
   $ready = output<void>();
   $error = output<Error>();
@@ -168,6 +168,7 @@ export class UldeViewer implements
     this.overlayService.show(this.markdownHostOverlayRef);
 
     this.rendererService.init(
+      this.$currentRendererState(),
       this.hostRef,
       {
         width: this.hostRef.nativeElement.clientWidth,

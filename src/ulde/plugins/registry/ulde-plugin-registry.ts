@@ -16,7 +16,7 @@ import {
 } from '@ulde/plugins/system/layout';
 
 import {
-  ULDENavigationBreadcrumbsPlugin, UldeInternalLinkPlugin,
+  ULDENavigationBreadcrumbsPlugin, UldeInterPageLinkPlugin,
   ULDEExternalLinkPlugin
 } from '@ulde/plugins/system/navigation';
 
@@ -54,7 +54,7 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
 
   // Interactive: operate on rendered HTML / DOM
   hydrate: [
-    () => new UldeInternalLinkPlugin(),
+    () => new UldeInterPageLinkPlugin(),
     () => new ULDEPlaygroundInjectorPlugin(),
     () => new UldeMermaidPlugin(
       new UldeThemeService(

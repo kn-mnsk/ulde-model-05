@@ -82,7 +82,7 @@ export class UldeNavigationRuntimeService {
       (e: any) => {
 
         const pageId = e.detail.pageId;
-        const scrollTop = e.detail.scrooTop;
+        const scrollTop = e.detail.scrollTop as number;
 
         // save pagePosition info in SessionState
         this.pageRestore.saveScrollPosition(

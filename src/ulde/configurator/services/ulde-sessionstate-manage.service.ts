@@ -214,7 +214,6 @@ export class UldeSessionstateManageService {
     const state =
       this.readSessionState(isBrowser);
 
-    state.pageHistories ??= {};
 
     state.prevPageId =
       state.pageId;
@@ -228,8 +227,17 @@ export class UldeSessionstateManageService {
     state.scrollTop =
       scrollTop;
 
-    state.pageHistories[pageId].scrollTop
-      = scrollTop
+
+    if (!state.pageHistories) {
+      state.pageHistories = {};
+    };
+
+    state.pageHistories[pageId] = {
+      scrollTop: scrollTop
+    };
+
+    // state.pageHistories[pageId].scrollTop
+    //   = scrollTop;
 
 
     this.writeSessionState(
@@ -287,7 +295,7 @@ export class UldeSessionstateManageService {
         ...newState
       },
       isBrowser(),
-      
+
       `[${this.title}] updateStateByNewPageId()'`
     )
 

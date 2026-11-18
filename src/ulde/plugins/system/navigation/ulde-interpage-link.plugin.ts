@@ -2,24 +2,31 @@
 
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
-import { createComponent, EnvironmentInjector } from "@angular/core";
 import { Example01 } from "../../../../app/demo/example01/example01"; // TBD
 import { ULDEExecutionContext } from "@ulde/types";
 import { isBrowser } from "../../../../app/global.utils/global.utils";
 
-export class UldeInternalLinkPlugin implements ULDEPluginInstance {
+export class UldeInterPageLinkPlugin implements
+  ULDEPluginInstance {
+
   pluginKind: ULDEPluginKind = 'navigation';
   pluginName = "UldeInternalLinkPlugin";
   description = "register internal link as event lisner to load a new document or angular component";
   enabled = true;
-  async run(ctx: ULDEExecutionContext) {
+
+  async run(
+    ctx: ULDEExecutionContext
+  ): Promise<void> {
 
     if (ctx.lifecyclePhase !== 'hydrate') return;
     if (!ctx.render) return;
     if (!isBrowser()) return;
 
-    const markdownHost = document.querySelector('.markdown-host');
+    const markdownHost =
+      document.querySelector('.markdown-host');
+
     if (!markdownHost) {
+
       ctx.artifacts.diagnostics.push({
         level: "error",
         message: `'Can't find the htmlelement with class "markdown-host"`,
@@ -31,38 +38,53 @@ export class UldeInternalLinkPlugin implements ULDEPluginInstance {
     }
 
     requestAnimationFrame(() => {
-      const interPageLinks = markdownHost.querySelectorAll(`a[href^="#pageId:docs/"]`);
+      requestAnimationFrame(() => {
+        const interPageLinks =
+          markdownHost.querySelectorAll(
+            `a[href^="#pageId:docs/"]`
+          );
 
-      // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing \ninternalLinks=`, internalLinks, `\nmarkdownContainer=`, markdownHost);
+        console.log(
+          `Log: [UldeInterPageLinkPlugin]`,
+          `\n\tInterPage Routing`,
+          `\n\tinterPageLinks=`, interPageLinks,
+          `\n\tmarkdownContainer=`, markdownHost
+        );
 
-      interPageLinks.forEach(a => {
-        a.addEventListener('click', (e: Event) => {
-          e.preventDefault();
+        interPageLinks.forEach(a => {
+          a.addEventListener('click', (e: Event) => {
 
-          const href = a.getAttribute('href')!;
-          const pageId = href.replace('#pageId:', '');
+            e.preventDefault();
 
-          const rect = a.getBoundingClientRect();
-          const containerRect = markdownHost.getBoundingClientRect();
-          const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+            const href = a.getAttribute('href')!;
+            const pageId = href.replace('#pageId:', '');
 
-          // console.log(`Log: [UldeInternalLinkPlugin] Internal Doc Routing pageId=`, pageId);
+            const rect = a.getBoundingClientRect();
+            const containerRect = markdownHost.getBoundingClientRect();
+            const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
 
-          const InterPageLinkEvent =
-            new CustomEvent('ulde:interpagelink', {
-              detail: {
-                pageId: pageId,
-                scrollTop: anchorPos,
-              },
-              bubbles: true
-            });
+            console.log(
+              `Log: [UldeInternalLinkPlugin]`,
+              `\n\tInterPage Routing pageId=`, pageId,
+              `\n\tanchoPos=`, anchorPos
+            );
 
-          markdownHost.dispatchEvent(InterPageLinkEvent);
+            const InterPageLinkEvent =
+              new CustomEvent('ulde:interpagelink', {
+                detail: {
+                  pageId: pageId,
+                  scrollTop: anchorPos,
+                },
+                bubbles: true
+              });
 
+            markdownHost.dispatchEvent(InterPageLinkEvent);
+
+          });
         });
       });
-    });
 
+    });
 
   }
 

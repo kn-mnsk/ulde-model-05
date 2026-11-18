@@ -1,5 +1,7 @@
 // src/ulde/engine/ulde-ast-renderer.engine.ts
 
+import { escapeHtml } from '../../app/global.utils/global.utils';
+
 import { ULDEAstNode } from '@ulde/types/context';
 
 export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
@@ -87,7 +89,7 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
         break;
       }
 
-      case 'intraPageLink': {
+      case 'interPageLink': {
 
         const href = escapeHtml(node.href ?? '');
 
@@ -110,15 +112,13 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
           escapeHtml(node.href);
 
         const title =
-          node.title
-            ? ` title="${escapeHtml(node.title)}"`
-            : ` title="External Site (opens in a new tab)"`;
+          node.title ?
+            ` title="${escapeHtml(node.title)}"` :
+            ` title="External Site (opens in a new tab)"`
+          ;
 
         buf.push(
-          `<a href="${href}"
-       target="_blank"
-       rel="noopener noreferrer"
-       ${title}>`
+          `<a href="${href}" target="_blank" rel="noopener noreferrer"${title}>`
         );
 
         node.children?.forEach(
@@ -316,11 +316,11 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
   return html;
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+// function escapeHtml(s: string): string {
+//   return s
+//     .replace(/&/g, '&amp;')
+//     .replace(/</g, '&lt;')
+//     .replace(/>/g, '&gt;')
+//     .replace(/"/g, '&quot;')
+//     .replace(/'/g, '&#39;');
+// }
