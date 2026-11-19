@@ -1,4 +1,4 @@
-// src/ulde/configuratorservices//ulde-theme.service.ts
+// src/ulde/viewer/services/ulde-theme.service.ts
 
 import { Injectable } from '@angular/core';
 import { UldeSessionstateManageService } from '@ulde/configurator';

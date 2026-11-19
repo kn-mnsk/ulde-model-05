@@ -2,8 +2,8 @@
 
 import { Injectable } from '@angular/core';
 
+import { ThemeName } from '@ulde/viewer/services/ulde-theme.service';
 import { isBrowser } from '../../../app/global.utils/global.utils';
-import { ThemeName } from '@ulde/configurator/services/ulde-theme.service';
 
 
 // Session State
