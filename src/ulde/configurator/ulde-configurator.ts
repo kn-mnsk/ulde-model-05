@@ -1,17 +1,29 @@
 // src/ulde/configurator/configurator.ts
 
+/**
+ * Ownership
+ *
+ * Document
+    1. Load page
+    2. initiallize ULDESessionState parameters
+    3. Generaie ULDERenderState object, and
+        input it to UldeViewer component
+ * display Graph (Babylonjs, image, or matlib, etc) by links inside any page (Next Project)
+ */
+
+
+
 import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { ULDELifecycleService } from '@ulde/core';
 import { ULDEExecutionContext, ULDEPageContext } from '@ulde/types/context';
 
-import { ULDEDevtools } from '@ulde/devtools';
 import { ContentEngineService } from '@ulde/engine';
 import { ULDERendererState } from '@ulde/types/renderer/ulde-renderer.types';
 import { UldePageRestorationService, UldeViewer } from '@ulde/viewer';
 import { isBrowser } from '../../app/global.utils/global.utils';
-import { ULDE_SESSION_STATE_DEFAULT, ULDE_DEFAULT_PAGE_ID, UldeSessionstateManageService, UldeThemeService } from '@ulde/configurator';
+import { UldeThemeService } from '@ulde/configurator';
 import { ULDEDevtoolsSnapshot } from '@ulde/types';
 
 @Component({
@@ -290,8 +302,6 @@ export class UldeConfigurator implements
     // );
 
   }
-
-
 
   onErrorMarkdownViewer(
     error: Error

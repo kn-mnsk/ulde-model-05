@@ -28,7 +28,7 @@ Similarity	|Timing	|Timing + scheduling
 - [Angular Lifecycle - relation to Browser frame lifecyle](#pageId:docs/supplements/doc-angular-0100 "pageID: doc-angular-0100")
 
 
-## 1. Application(Documentation System) README
+## 1. Documentation System README
 ___This document is the master reference for the entire documentation rendering system. It explains how Markdown is parsed, enhanced, rendered to html, and synchronized with user navigation. ...___
 
 - [details](#pageId:docs/application-readme "Internal Documents")

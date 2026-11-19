@@ -1,0 +1,13 @@
+<!-- src/ulde/viewer/theme-toggle/theme-toggle.html -->
+
+<!-- <p>ulde-viewer-theme-toggle works!</p> -->
+<div class="ulde-theme-button-container">
+  <button class="ulde-theme-toggle" (click)="toggle()">
+    <div class="theme-toggle-track">
+      <div class="theme-toggle-thumb" [class.dark]="($themeName()=== 'dark') ? true: false" [title]="($themeName() === 'dark') ?'Toggle 🌙→☀️' : 'Toggle ☀️→🌙'">
+        <span class="theme-icon sun">☀️</span>
+        <span class="theme-icon moon">🌙</span>
+      </div>
+    </div>
+  </button>
+</div>

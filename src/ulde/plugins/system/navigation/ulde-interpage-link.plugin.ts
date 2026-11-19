@@ -38,18 +38,20 @@ export class UldeInterPageLinkPlugin implements
     }
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const interPageLinks =
-          markdownHost.querySelectorAll(
-            `a[href^="#pageId:docs/"]`
-          );
 
-        console.log(
-          `Log: [UldeInterPageLinkPlugin]`,
-          `\n\tInterPage Routing`,
-          `\n\tinterPageLinks=`, interPageLinks,
-          `\n\tmarkdownContainer=`, markdownHost
+      const interPageLinks =
+        markdownHost.querySelectorAll(
+          `a[href^="#pageId:docs/"]`
         );
+
+      console.log(
+        `Log: [UldeInterPageLinkPlugin]`,
+        `\n\tInterPage Routing`,
+        `\n\tinterPageLinks=`, interPageLinks,
+        `\n\tmarkdownContainer=`, markdownHost
+      );
+
+      requestAnimationFrame(() => {
 
         interPageLinks.forEach(a => {
           a.addEventListener('click', (e: Event) => {

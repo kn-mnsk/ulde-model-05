@@ -1,5 +1,11 @@
 // src/ulde/viewer/ulde-viewer.ts
 
+/**
+ * Ownership
+ *
+ *
+ */
+
 import { OnInit, AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input, output, signal, computed } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
@@ -11,6 +17,8 @@ import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext, ULDETocNode } from '@ulde/types';
 import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
 import { UldeOverlayService } from '@ulde/viewer/services/ulde-overlay.service';
+import { UldeViewerThemeToggle} from './theme-toggle';
+import { UldeThemeService, ThemeName } from '@ulde/viewer/services';
 
 
 @Component({
@@ -20,7 +28,8 @@ import { UldeOverlayService } from '@ulde/viewer/services/ulde-overlay.service';
     UldeViewerTocResizerDirective,
     ULDEDevtools,
     NgTemplateOutlet,
-  ],
+    UldeViewerThemeToggle
+],
   templateUrl: 'ulde-viewer.html',
   styleUrl: 'ulde-viewer.scss',
 })
@@ -39,11 +48,11 @@ export class UldeViewer implements
   @ViewChild('markdownHost', { static: false })
   hostRef!: ElementRef<HTMLElement>;
 
-  @ViewChild('uldeViewerTocOverlay', { static: false })
+  @ViewChild('viewerTocOverlay', { static: false })
   viewerTocOverlayRef?: ElementRef<HTMLElement>;
 
-  @ViewChild('uldeViewerTocResize', { static: false })
-  TocResizeRef!: ElementRef<HTMLElement>;
+  @ViewChild('viewerToc', { static: false })
+  viewerTocRef!: ElementRef<HTMLElement>;
 
   @ViewChild('markdownHostOverlay', { static: false })
   markdownHostOverlayRef?: ElementRef<HTMLElement>;
@@ -101,6 +110,7 @@ export class UldeViewer implements
     private scrollSpy: UldeScrollspyService,
     private pageRestore: UldePageRestorationService,
     private overlayService: UldeOverlayService,
+    private themeService: UldeThemeService,
   ) {
 
     this.handleKeydown = this.onKeyDown;
@@ -120,12 +130,12 @@ export class UldeViewer implements
       if (
         !this.hostRef ||
         !this.hostContainerRef ||
-        !this.TocResizeRef
+        !this.viewerTocRef
       )
         return;
 
 
-      this.$tocResizeRef.set(this.TocResizeRef);
+      this.$tocResizeRef.set(this.viewerTocRef);
 
       this.syncSignalInput(rendererState);
 
@@ -164,7 +174,7 @@ export class UldeViewer implements
 
     if (!isBrowser()) return;
 
-    this.overlayService.show(this.TocResizeRef);
+    this.overlayService.show(this.viewerTocRef);
     this.overlayService.show(this.markdownHostOverlayRef);
 
     this.rendererService.init(
@@ -198,7 +208,7 @@ export class UldeViewer implements
       this.handleKeydown
     );
 
-    this.overlayService.hide(this.TocResizeRef);
+    this.overlayService.hide(this.viewerTocRef);
     this.overlayService.hide(this.markdownHostOverlayRef);
 
   }
@@ -364,6 +374,14 @@ export class UldeViewer implements
   scrollTo(host: HTMLElement, slug: string) {
 
     this.scrollSpy.scrollTo(host, slug);
+
+  }
+
+  // Theme toggle
+  async onToggleTheme(theme: ThemeName) {
+    this.themeService.toggleTheme(theme);
+
+    this.rendererService.setState(this.$currentRendererState());
 
   }
 
