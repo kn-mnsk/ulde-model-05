@@ -17,7 +17,7 @@ import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext, ULDETocNode } from '@ulde/types';
 import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
 import { UldeOverlayService } from '@ulde/viewer/services/ulde-overlay.service';
-import { UldeViewerThemeToggle} from './theme-toggle';
+import { UldeViewerThemeToggle } from './theme-toggle';
 import { UldeThemeService, ThemeName } from '@ulde/viewer/services';
 
 
@@ -29,7 +29,7 @@ import { UldeThemeService, ThemeName } from '@ulde/viewer/services';
     ULDEDevtools,
     NgTemplateOutlet,
     UldeViewerThemeToggle
-],
+  ],
   templateUrl: 'ulde-viewer.html',
   styleUrl: 'ulde-viewer.scss',
 })
@@ -38,24 +38,24 @@ export class UldeViewer implements
   AfterViewInit,
   OnDestroy {
 
-
+  // Viewer Container
   @ViewChild('uldeViewerContainer', { static: false })
   viewerContainerRef!: ElementRef<HTMLElement>;
 
-  @ViewChild('markdownHostContainer', { static: false })
-  hostContainerRef!: ElementRef<HTMLElement>;
-
-  @ViewChild('markdownHost', { static: false })
-  hostRef!: ElementRef<HTMLElement>;
-
+  // Aside - TOC
+  @ViewChild('viewerToc', { static: false })
+  viewerTocRef!: ElementRef<HTMLElement>;
   @ViewChild('viewerTocOverlay', { static: false })
   viewerTocOverlayRef?: ElementRef<HTMLElement>;
 
-  @ViewChild('viewerToc', { static: false })
-  viewerTocRef!: ElementRef<HTMLElement>;
-
+  // Main - Markdown
+  @ViewChild('markdownHostContainer', { static: false })
+  hostContainerRef!: ElementRef<HTMLElement>;
   @ViewChild('markdownHostOverlay', { static: false })
   markdownHostOverlayRef?: ElementRef<HTMLElement>;
+  @ViewChild('markdownHost', { static: false })
+  hostRef!: ElementRef<HTMLElement>;
+
 
   // Full renderer state comes in as a signal input
   $rendererState = input.required<ULDERendererState>();
@@ -103,12 +103,14 @@ export class UldeViewer implements
   // event handler
   private handleKeydown!: (e: KeyboardEvent) => void;
 
+  private debugCounter: number = 0;
+
   constructor(
     public rendererService: ULDERendererService,
     private devtoolsService: ULDEDevtoolsService,
     private navigationRuntimeService: UldeNavigationRuntimeService,
     private scrollSpy: UldeScrollspyService,
-    private pageRestore: UldePageRestorationService,
+    public pageRestore: UldePageRestorationService,
     private overlayService: UldeOverlayService,
     private themeService: UldeThemeService,
   ) {
@@ -118,8 +120,28 @@ export class UldeViewer implements
     // 🔥1 React to change of $rendererState()
     effect(() => {
 
+      /** debug */
+      this.debugCounter++;
+
+      console.log(
+        `[UldeConfigurator] effect`,
+        `\n\tdebug count`, this.debugCounter
+      );
+
+      if (this.debugCounter > 20) {
+        debugger;
+        throw new Error('Loop detected');
+      }
+      /** debug */
+
       const rendererState =
         this.$rendererState();
+
+
+      console.log(
+        `[UldeConfigurator] effect`,
+        `\n\trendererState=`, rendererState
+      );
 
       if (
         !rendererState ||
@@ -301,7 +323,8 @@ export class UldeViewer implements
     this.pageRestore.
       startScrollTracking(
         host,
-        pageId
+        pageId,
+        this.$tocTree()
       );
 
   }
@@ -371,11 +394,17 @@ export class UldeViewer implements
   }
 
   // Scroll to heading
-  scrollTo(host: HTMLElement, slug: string) {
+  scrollTo(host: HTMLElement, slug: string,
+  ) {
 
-    this.scrollSpy.scrollTo(host, slug);
+    this.scrollSpy.scrollTo(host, slug, this.$tocTree());
+
+    // this.scrollSpy.detectScrollEnd(host, () => {
+    //   this.scrollSpy.activateClickedTocItem(this.$tocTree(), slug);
+    // });
 
   }
+
 
   // Theme toggle
   async onToggleTheme(theme: ThemeName) {

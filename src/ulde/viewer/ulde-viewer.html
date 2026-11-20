@@ -1,5 +1,5 @@
 <!-- src/ulde/viewer/ulde-viewer.html -->
-<div class="ulde-viewer-container" #uldeViewerContainer>
+<div #uldeViewerContainer class="ulde-viewer-container" >
 
   <div class="ulde-viewer-marrkdown-container">
 
@@ -7,7 +7,7 @@
       <ulde-viewer-theme-toggle ($toggleTheme)="onToggleTheme($event)">
       </ulde-viewer-theme-toggle>
       <div class="header-title">
-        <p>Markdown Documentation System</p>
+        <p>Markdown Documentation System - ULDE Model 05</p>
       </div>
       <div class="header-button-container">
         <button (click)="onBackToPrevPage()">
@@ -20,7 +20,7 @@
     <div class="ulde-viewer-body">
 
 
-      <aside class="ulde-viewer-toc" #viewerTtoc>
+      <aside class="ulde-viewer-toc" #viewerToc>
 
         <!-- Resizer (layout-level, not inside scroll container) -->
         <div uldeViewerTocResizerDirective [viewerTocResizer]="$tocResizeRef()?.nativeElement"
@@ -52,15 +52,10 @@
       <!-- Markdwon Content -->
       <main class="ulde-viewer-main">
 
-        <!-- temporary use -->
-        <div class="markdown-progress-bar">
-          <div class="progress-bar_fill" [style.width.%]="100"></div>
-        </div>
-
         <!-- final use -->
-        <!-- <div class="ulde-progress-bar">
-          <div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()"></div>
-        </div> -->
+        <div class="markdown-progress-bar">
+          <div class="progress-bar_fill" [style.width.%]="pageRestore.scrollPercent"></div>
+        </div>
 
         <div #markdownHostContainer class="markdown-host-container">
           <!-- <div #markdownHostOverlay class="ulde-markdown-host-overlay hidden"></div> -->
