@@ -8,9 +8,11 @@
 4. Back/forward recovery
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { UldeSessionstateManageService } from '@ulde/configurator';
 import { isBrowser } from '../../../app/global.utils/global.utils';
+import { UldeScrollspyService } from '@ulde/viewer/services/ulde-scrollspy.service';
+import { ULDETocNode } from '@ulde/types';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +23,16 @@ export class UldePageRestorationService {
 
   private handleScroll!: (e: Event) => void;
 
+  // reactive signal for current scroll percentage
+  readonly $scrollPercent = signal(0);
+  get scrollPercent(): number {
+    return this.$scrollPercent();
+  }
+
+
   constructor(
     private sessionStateService: UldeSessionstateManageService,
+    private scrollSpy: UldeScrollspyService,
   ) { }
 
   /**
@@ -33,7 +43,8 @@ export class UldePageRestorationService {
    */
   startScrollTracking(
     host: HTMLElement,
-    pageId: string
+    pageId: string,
+    tree: ULDETocNode[]
   ): void {
 
     if (!isBrowser()) {
@@ -45,8 +56,9 @@ export class UldePageRestorationService {
       (e) =>
         this.onScroll(
           e,
-          host,
-          pageId
+          // host,
+          pageId,
+          tree
         );
 
     host.addEventListener(
@@ -96,7 +108,7 @@ export class UldePageRestorationService {
    * @param pageId
    * @param scrollTop
    */
-  saveScrollPosition(
+  setPagePosition(
     pageId: string,
     scrollTop: number
   ): void {
@@ -142,24 +154,36 @@ export class UldePageRestorationService {
   /**
    * scroll event
    * @param e
-   * @param host
+  //  * @param host
    * @param pageId
    */
   private onScroll(
     e: Event,
-    host: HTMLElement,
+    // host: HTMLElement,
     pageId: string,
+    tree: ULDETocNode[]
   ): void {
-
 
     // console.log(
     //   '[ScrollRestore] onScroll',
     //   {
     //     target: e.target,
     //     pageId,
-    //     scrollTop: host.scrollTop
+    //     // scrollTop: host.scrollTop
     //   }
     // );
+
+    const target = e.target as HTMLElement;
+    const scrollTop = target.scrollTop;
+    const height = target.scrollHeight - target.clientHeight;
+    const percent = height > 0 ? Math.round((scrollTop / height) * 100) : 0;
+    this.$scrollPercent.set(percent);
+
+    /this.scrollSpy.hightLightIntersectingTocItem(
+    target,
+      pageId,
+      tree
+    );
 
     clearTimeout(
       this.saveTimer
@@ -169,9 +193,18 @@ export class UldePageRestorationService {
       window.setTimeout(
         () => {
 
-          this.saveScrollPosition(
+          this.setPagePosition(
             pageId,
-            host.scrollTop
+            // host.scrollTop
+            scrollTop
+          );
+
+          const history =
+            this.sessionStateService.getPageHistory(pageId);
+
+          console.log(
+            `[ScrollRestore] onScroll`,
+            `${pageId} history=`, history
           );
 
         },

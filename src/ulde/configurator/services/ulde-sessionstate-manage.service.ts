@@ -228,16 +228,22 @@ export class UldeSessionstateManageService {
       scrollTop;
 
 
-    if (!state.pageHistories) {
-      state.pageHistories = {};
-    };
+    // if (!state.pageHistories) {
+    //   state.pageHistories = {};
+    // };
 
-    state.pageHistories[pageId] = {
-      scrollTop: scrollTop
-    };
+    // in case of undefined state.pageHistories
+    state.pageHistories ??= {};
 
-    // state.pageHistories[pageId].scrollTop
-    //   = scrollTop;
+    const currentHistory
+      = state.pageHistories[pageId] ?? {
+        scrollTop: 0
+      };
+
+    state.pageHistories[pageId] =
+    {
+      ...currentHistory,
+      ...{ scrollTop: scrollTop } };
 
 
     this.writeSessionState(
@@ -273,7 +279,6 @@ export class UldeSessionstateManageService {
     const state = this.readSessionState(isBrowser());
 
     state.pageHistories ??= {};
-
     state.pageHistories[newPageId] ??= {
       scrollTop: 0
     };
@@ -306,7 +311,7 @@ export class UldeSessionstateManageService {
    * @param pageId
    * @param partial
    */
-  persistPagePosition(
+  persistPageHistory(
     pageId: string,
     partial: Partial<ULDEPagePosition>
   ): void {
@@ -315,6 +320,8 @@ export class UldeSessionstateManageService {
       this.readSessionState(
         isBrowser()
       );
+
+    // partial.scrollTop
 
     sessionState.pageHistories ??= {};
 
@@ -331,7 +338,7 @@ export class UldeSessionstateManageService {
     this.writeSessionState(
       sessionState,
       isBrowser(),
-      `[${this.title}] persistPagePosition()`
+      `[${this.title}] persistPageHistory()`
     );
 
   }
@@ -355,4 +362,22 @@ export class UldeSessionstateManageService {
 
   }
 
+  /**
+   * return a history by pageId
+   * @param pageId
+   * @returns
+   */
+  getPageHistory(
+    pageId: string
+  ): ULDEPagePosition | undefined {
+
+    const { pageHistories } =
+      this.readSessionState(isBrowser());
+
+    return pageHistories?.[pageId];
+
+  }
+
+
 }
+

@@ -116,7 +116,7 @@ export class ULDETocPlugin implements ULDEPluginInstance {
     }));
 
     // ctx.artifacts.toc = tocEntries; // ERROR happens here!!
-    ctx.artifacts.toc = this.buildTocNode(tocEntries);
+    ctx.artifacts.toc = this.buildTocNodeTree(tocEntries);
 
     // console.log(`Log: [ULDETocPlugin]`,
     //   `\n\tArtifacts TOC=`, ctx.artifacts.toc,
@@ -135,7 +135,7 @@ export class ULDETocPlugin implements ULDEPluginInstance {
    * @param entries
    * @returns
    */
-  private buildTocNode(entries: ULDETocEntry[]): ULDETocNode[] {
+  private buildTocNodeTree(entries: ULDETocEntry[]): ULDETocNode[] {
     const root: ULDETocNode[] = [];
     const stack: ULDETocNode[] = [];
 

@@ -31,7 +31,7 @@ import {
   ULDETocEntry,
 } from '@ulde/types';
 
-import { UldeSessionstateManageService } from '@ulde/configurator';
+import { ULDEPagePosition, UldeSessionstateManageService } from '@ulde/configurator';
 
 import { isBrowser } from '../../../app/global.utils/global.utils';
 
@@ -65,7 +65,7 @@ export class UldeScrollspyService {
   readonly isParentActive = (node: ULDETocNode) =>
     this.isAncestor(node, this.$activeHeading());
 
-
+  lastScrollTop = -1;
   constructor(
     private sessionStateService: UldeSessionstateManageService,
   ) { }
@@ -211,7 +211,7 @@ export class UldeScrollspyService {
       }
     );
 
-    this.sessionStateService.persistPagePosition(
+    this.sessionStateService.persistPageHistory(
       // this.persistSessionState(
       ctx.page.pageId,
       {
@@ -256,7 +256,7 @@ export class UldeScrollspyService {
       }
     );
 
-    this.sessionStateService.persistPagePosition(
+    this.sessionStateService.persistPageHistory(
       // this.persistSessionState(
       ctx.page.pageId,
       {
@@ -282,8 +282,30 @@ export class UldeScrollspyService {
 
   }
 
+  hightLightIntersectingTocItem(
+    host: HTMLElement,
+    pageId: string,
+    tree: ULDETocNode[]
+  ): void {
 
-  activateClickedTocItem(
+    const { archiveAnchorId, archiveSectionId } =
+      this.sessionStateService.getPageHistory(pageId) ?? {};
+
+    if (!archiveAnchorId || !archiveSectionId) return;
+
+    queueMicrotask(() => {
+
+      // actvate and hightlight
+      this.detectScrollEnd(host, () => {
+        this.activateClickedTocItem(tree, archiveAnchorId);
+      });
+
+    });
+
+  };
+
+
+  private activateClickedTocItem(
     tree: ULDETocNode[],
     slug: string): void {
 
@@ -293,47 +315,53 @@ export class UldeScrollspyService {
         this.$activeHeading.set(slug);
         return;
       }
-      this.activateClickedTocItem(node.children as ULDETocNode[], slug);
+      this.activateClickedTocItem(
+        node.children as ULDETocNode[],
+        slug
+      );
+
     }
   }
 
+  /**
+   *
+   * @param wrapper
+   * @param callback
+   */
+  private detectScrollEnd(
+    wrapper: HTMLElement,
+    callback: () => void
+  ): void {
 
-  // Build TOC tree
-  buildTocTree(
-    entries: ULDETocEntry[])
-    : ULDETocNode[] {
-    const root: ULDETocNode[] = [];
-    const stack: ULDETocNode[] = [];
+    this.lastScrollTop = -1;
+    let counter = 1;
 
-    for (const entry of entries) {
+    const check = () => {
+      const now = wrapper.scrollTop;
 
-      const node: ULDETocNode = {
-        type: 'toc',
-        entry,
-        children: [],
-        collapsed: false
-      };
+      if (now === this.lastScrollTop) {
 
+        const lastScrollTop =
+          Number(this.lastScrollTop.toFixed(2));
 
-      while (
-        stack?.length && stack[stack.length - 1].entry.depth
-        >= entry.depth
-      ) {
-        stack.pop();
+        console.log(
+          `Log: [UldeScrollspyService] detectScrollEnd()`,
+          `\n\tfinal end=`, lastScrollTop,
+          `\n\tounter=`, counter
+        );
+
+        callback();
+
+        return;
       }
 
-      if (!stack.length) {
-        root.push(node);
-      } else {
-        stack[stack.length - 1].children?.push(node);
-      }
+      this.lastScrollTop = now;
+      counter++;
+      requestAnimationFrame(check);
+    };
 
-      stack.push(node);
-    }
-
-    return root;
+    requestAnimationFrame(check);
   }
-
 
 
   isParentOfActive(
@@ -370,9 +398,21 @@ export class UldeScrollspyService {
 
 
   // Scroll to heading
-  scrollTo(host: HTMLElement, slug: string) {
+  /**
+   * activate TOC heading, and scroll to heading in the main document
+   * @param host
+   * @param slug
+   * @param tree
+   * @returns
+   */
+  scrollTo(
+    host: HTMLElement,
+    slug: string,
+    tree: ULDETocNode[]
+  ): void {
 
-    const el = host.querySelector(`a[data-anchor-id="${slug}"]`);
+    const el =
+      host.querySelector(`a[data-anchor-id="${slug}"]`);
 
     // console.log(`Log: [UldeScrllSpy]`,
     //   `\n\tscrollTo()`,
@@ -384,8 +424,16 @@ export class UldeScrollspyService {
 
 
     queueMicrotask(() => {
+
+      // actvate and hightlight
+      this.detectScrollEnd(host, () => {
+        this.activateClickedTocItem(tree, slug);
+      });
+
+      // scroll to headng, and highlight
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       this.highlightElement(el as HTMLElement);
+
     });
 
   }
@@ -401,6 +449,53 @@ export class UldeScrollspyService {
       700
     );
 
+  }
+
+
+
+
+
+  // Build TOC tree
+  /**
+   *
+   * @param entries
+   * @returns
+   * @depricated
+   * @description moved to ULDETOCPlugin as buildTocNodeTree
+   */
+  buildTocTree(
+    entries: ULDETocEntry[])
+    : ULDETocNode[] {
+    const root: ULDETocNode[] = [];
+    const stack: ULDETocNode[] = [];
+
+    for (const entry of entries) {
+
+      const node: ULDETocNode = {
+        type: 'toc',
+        entry,
+        children: [],
+        collapsed: false
+      };
+
+
+      while (
+        stack?.length && stack[stack.length - 1].entry.depth
+        >= entry.depth
+      ) {
+        stack.pop();
+      }
+
+      if (!stack.length) {
+        root.push(node);
+      } else {
+        stack[stack.length - 1].children?.push(node);
+      }
+
+      stack.push(node);
+    }
+
+    return root;
   }
 
 
