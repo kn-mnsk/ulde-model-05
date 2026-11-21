@@ -44,14 +44,19 @@ export class UldeInterPageLinkPlugin implements
           `a[href^="#pageId:docs/"]`
         );
 
-      console.log(
-        `Log: [UldeInterPageLinkPlugin]`,
-        `\n\tInterPage Routing`,
-        `\n\tinterPageLinks=`, interPageLinks,
-        `\n\tmarkdownContainer=`, markdownHost
-      );
+      // console.log(
+      //   `Log: [UldeInterPageLinkPlugin]`,
+      //   `\n\tInterPage Routing`,
+      //   `\n\tinterPageLinks=`, interPageLinks,
+      //   `\n\tmarkdownContainer=`, markdownHost
+      // );
 
       requestAnimationFrame(() => {
+
+        // console.log(
+        //   `Log: [UldeInternalLinkPlugin]`,
+        //   `\n\tinterPageLinks=`, interPageLinks,
+        // );
 
         interPageLinks.forEach(a => {
           a.addEventListener('click', (e: Event) => {

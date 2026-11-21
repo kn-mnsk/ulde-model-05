@@ -12,7 +12,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ULDEDevtools, ULDEDevtoolsService } from '@ulde/devtools';
 import type { ULDERendererState } from '@ulde/types/renderer';
 import { UldeNavigationRuntimeService, ULDERendererService, UldePageRestorationService, UldeScrollspyService } from '@ulde/viewer/services';
-import { ULDEDevtoolsSnapshot, ULDETocEntry } from '@ulde/types';
+import { ULDEAstNode, ULDEDevtoolsSnapshot, ULDETocEntry } from '@ulde/types';
 import { isBrowser } from '../../app/global.utils/global.utils';
 import { ULDEExecutionContext, ULDETocNode } from '@ulde/types';
 import { UldeViewerTocResizerDirective } from '@ulde/viewer/ulde-viewer-toc-resizer.directive';
@@ -60,10 +60,6 @@ export class UldeViewer implements
   // Full renderer state comes in as a signal input
   $rendererState = input.required<ULDERendererState>();
 
-  $ready = output<void>();
-  $error = output<Error>();
-  $rendererStateChange = output<ULDERendererState>();
-
   $currentRendererState = computed(() =>
     this.$rendererState()
   );
@@ -72,23 +68,22 @@ export class UldeViewer implements
     this.$currentRendererState()?.executionContext?.page.pageId
   );
 
+  $ready = output<void>();
+  $error = output<Error>();
+  $rendererStateChange = output<ULDERendererState>();
+
   $prevPageId = signal<string | null>(null);
 
 
   //TOC
-
   $tocResizeRef =
     signal<ElementRef<HTMLElement> | undefined>(undefined);
 
   $toc = signal<ULDETocNode[]>([]);
-  // $toc = signal<ULDETocEntry[]>([]);
 
   readonly $tocTree = computed<ULDETocNode[]>(() =>
     this.$toc()
   );
-  // readonly $tocTree = computed<ULDETocEntry[]>(() =>
-  //   this.$toc()
-  // );
 
   $activeHeading = computed<string | null>(() =>
     this.scrollSpy.$activeHeading()
@@ -137,11 +132,10 @@ export class UldeViewer implements
       const rendererState =
         this.$rendererState();
 
-
-      console.log(
-        `[UldeConfigurator] effect`,
-        `\n\trendererState=`, rendererState
-      );
+      // console.log(
+      //   `[UldeConfigurator] effect`,
+      //   `\n\trendererState=`, rendererState
+      // );
 
       if (
         !rendererState ||
@@ -162,20 +156,20 @@ export class UldeViewer implements
       this.syncSignalInput(rendererState);
 
       this.navigationRuntimeService.bind(
-        this.hostRef.nativeElement,
+        this.hostContainerRef.nativeElement,
         rendererState.executionContext
       );
 
       this.scrollSpy.disconnect();
 
       this.scrollSpy.observe(
-        this.hostRef.nativeElement,
+        this.hostContainerRef.nativeElement,
         rendererState.executionContext
       );
 
       this.scrollTracking(
+        this.hostContainerRef.nativeElement,
         rendererState.executionContext,
-        this.hostContainerRef.nativeElement
       );
 
 
@@ -186,8 +180,45 @@ export class UldeViewer implements
 
     });
 
+    // VS Code auto-expand behavior
+    effect(() => {
+      const active = this.$activeHeading();
+      const tree = this.$tocTree();
+
+      if (!tree.length) return;
+
+      if (!active) {
+        // First load → expand everything
+        tree.forEach(n => n.collapsed = false);
+        return;
+      }
+
+      this.updateTocCollapseState(tree, active);
+
+    });
+
   }
 
+  // VS Code auto-expand logic
+  private updateTocCollapseState(
+    tree: ULDETocNode[],
+    activeSlug: string | null
+  ): void {
+
+    const visit = (node: ULDETocNode): boolean => {
+
+      const isSelfActive = node.entry.id === activeSlug;
+
+      const children = node.children as ULDETocNode[] ?? [];
+      const hasActiveDesc = children.some(child => visit(child)) ?? false;
+
+      node.collapsed = !(isSelfActive || hasActiveDesc);
+
+      return isSelfActive || hasActiveDesc;
+    };
+
+    tree.forEach(root => visit(root));
+  }
 
   ngOnInit(): void { }
 
@@ -213,18 +244,16 @@ export class UldeViewer implements
       },
     );
 
-    // const toc =
-    //   this.$currentRendererState()?.executionContext?.artifacts?.toc;
-
-    // if (toc){
-    //   this.$toc.set(toc);}
-
     this.$prevPageId.set(
       this.pageRestore.getPrevPageId()
     );
 
 
     // this.viewerContainerRef.nativeElement.addEventListener( //Note: does not work!
+    // document.removeEventListener(
+    //   'keydown',
+    //   this.handleKeydown
+    // );
     document.addEventListener(
       'keydown',
       this.handleKeydown
@@ -266,23 +295,13 @@ export class UldeViewer implements
 
     const toc = rendererState.executionContext.artifacts.toc;
 
+    this.$toc.set(toc);
+
     // console.log(`[UldeViewer]`,
     //   `\n\tsyncSingnalInput`,
     //   `\n\tTOC=`, toc,
     // );
-    this.$toc.set(toc);
 
-    // if (toc) {
-    //   this.$toc.set(toc);
-    // }
-
-    // this.$currentRendererState.set(rendererState); // input for UldeDevtools
-
-
-    // console.log(
-    //   `Log: [UldeViewer] syncSignalInput()`,
-    //   state
-    // );
 
   }
 
@@ -298,8 +317,8 @@ export class UldeViewer implements
    * @param host
    */
   private scrollTracking(
+    host: HTMLElement,
     ctx: ULDEExecutionContext,
-    host: HTMLElement
   ) {
 
     // console.log(`Log: [UldeViewer] scrollTracking() beging`);
@@ -330,13 +349,10 @@ export class UldeViewer implements
   }
 
   onBackToPrevPage() {
-    console.log(`[UldeViewer] onBackToPrevPage 1`);
+    // console.log(`[UldeViewer] onBackToPrevPage 1`);
 
     const newPageId = this.$prevPageId();// prevPageId becomes newPageId
     if (!newPageId) return;
-    // this.sessionStateService.swapState(newPageId);
-
-    // this.$prevPageId.set(pageId);
 
     const currentRendererState =
       this.$currentRendererState();
@@ -352,11 +368,11 @@ export class UldeViewer implements
 
     this.syncSignalInput(currentRendererState);
 
-    console.log(
-      `[UldeViewer] onBackToPrevPage 🔄️`,
-      `\ncurrent Page=`, newPageId,
-      `\nprev Page=`, this.$prevPageId()
-    );
+    // console.log(
+    //   `[UldeViewer] onBackToPrevPage 🔄️`,
+    //   `\ncurrent Page=`, newPageId,
+    //   `\nprev Page=`, this.$prevPageId()
+    // );
 
   }
 
@@ -389,7 +405,7 @@ export class UldeViewer implements
   isParentActive(node: ULDETocNode)
     : boolean {
 
-    return this.scrollSpy.isAncestor(node, this.$activeHeading());
+    return this.scrollSpy.isParentActive(node);
 
   }
 

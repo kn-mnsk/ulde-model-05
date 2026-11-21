@@ -123,7 +123,8 @@ export class ULDERendererService {
     // };
 
     // initial placeholder
-    config.container.innerHTML = '<p>ULDE Viewer READY</p>';
+    const host = config.container;
+    host.innerHTML = '<p>ULDE Viewer READY</p>';
 
     function renderFromContext(
       renderContext: ULDERenderContext | undefined
@@ -131,8 +132,8 @@ export class ULDERendererService {
 
       if (!renderContext) return;
 
-      config.container.innerHTML = renderContext.html;
-      bindInteractivity(config.container);
+      host.innerHTML = renderContext.html;
+      // bindInteractivity(host);
 
     }
 
@@ -141,11 +142,11 @@ export class ULDERendererService {
     ): void {
       // optional: could add a data attribute or small badge
       if (!phase) {
-        delete config.container.dataset['uldeLifecyclePhase'];
+        delete host.dataset['uldeLifecyclePhase'];
         return;
       }
 
-      config.container.dataset['uldeLifecyclePhase'] = phase;
+      host.dataset['uldeLifecyclePhase'] = phase;
     }
 
     function renderDiagnosticsOverlay(
@@ -153,10 +154,10 @@ export class ULDERendererService {
     ): void {
 
       if (!diags || diags.length === 0) {
-        delete config.container.dataset['uldeDiagnosticsCount'];
+        delete host.dataset['uldeDiagnosticsCount'];
         return;
       }
-      config.container.dataset['uldeDiagnosticsCount'] = String(diags.length);
+      host.dataset['uldeDiagnosticsCount'] = String(diags.length);
 
     }
 
@@ -165,20 +166,20 @@ export class ULDERendererService {
     ): void {
       // optional: could add timing info; keep minimal for now
       if (!frame) {
-        delete config.container.dataset['uldeFrameId'];
-        delete config.container.dataset['uldeFrameTimestamp'];
+        delete host.dataset['uldeFrameId'];
+        delete host.dataset['uldeFrameTimestamp'];
         return;
       }
 
-      config.container.dataset['uldeFrameId'] = frame.id;
-      config.container.dataset['uldeFrameTimestamp'] = String(frame.timestamp);
+      host.dataset['uldeFrameId'] = frame.id;
+      host.dataset['uldeFrameTimestamp'] = String(frame.timestamp);
     }
 
     function highlightDiagnostic(
       message: string
     ): void {
       const nodes =
-        config.container.querySelectorAll('.ulde-diagnostic');
+        host.querySelectorAll('.ulde-diagnostic');
 
       nodes.forEach(n => {
         if (n.textContent?.includes(message)) {
@@ -193,13 +194,13 @@ export class ULDERendererService {
     }
 
     function bindInteractivity(
-      container: HTMLElement
+      host: HTMLElement
     ): void {
       // clear previous listeners by resetting innerHTML already done in renderFromContext
 
       // add event to highlight active section on scroll
       const sections =
-        Array.from(container.querySelectorAll('section'));
+        Array.from(host.querySelectorAll('section'));
 
       window.addEventListener('scroll', () => {
         const scrollPos = window.scrollY;
@@ -216,7 +217,7 @@ export class ULDERendererService {
 
       // add event to highlight TOC entry for active section
       const tocLinks =
-        Array.from(container.querySelectorAll('.ulde-toc a'));
+        Array.from(host.querySelectorAll('.ulde-toc a'));
 
       window.addEventListener('scroll', () => {
         const scrollPos = window.scrollY;
@@ -225,7 +226,7 @@ export class ULDERendererService {
           const href = link.getAttribute('href');
           if (!href) return;
 
-          const target = container.querySelector(href);
+          const target = host.querySelector(href);
           if (!target) return;
 
           const rect = target.getBoundingClientRect();
@@ -252,14 +253,14 @@ export class ULDERendererService {
       // });
 
       // Anchors: a[data-ulde-anchor="id"]
-      container.
-        querySelectorAll('a[data-ulde-anchor]').
-        forEach(a => {
+      host
+        .querySelectorAll('a[data-ulde-anchor]')
+        .forEach(a => {
           a.addEventListener('click', ev => {
             ev.preventDefault();
             const id = (ev.currentTarget as HTMLElement).getAttribute('data-ulde-anchor');
             if (!id) return;
-            const target = container.querySelector(`#${id}`);
+            const target = host.querySelector(`#${id}`);
             if (target) {
               target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
@@ -267,9 +268,9 @@ export class ULDERendererService {
         });
 
       // Demo blocks: .ulde-demo[data-demo-code]
-      container.
-        querySelectorAll('.ulde-demo').
-        forEach(demo => {
+      host
+        .querySelectorAll('.ulde-demo')
+        .forEach(demo => {
           demo.addEventListener('click', () => {
             const code = demo.getAttribute('data-demo-code');
             if (!code) return;

@@ -179,8 +179,12 @@ export class UldePageRestorationService {
     const percent = height > 0 ? Math.round((scrollTop / height) * 100) : 0;
     this.$scrollPercent.set(percent);
 
-    /this.scrollSpy.hightLightIntersectingTocItem(
-    target,
+
+    this.setPagePosition(pageId, scrollTop);
+
+
+    this.scrollSpy.hightLightIntersectingTocItem(
+      target,
       pageId,
       tree
     );
@@ -189,28 +193,29 @@ export class UldePageRestorationService {
       this.saveTimer
     );
 
-    this.saveTimer =
-      window.setTimeout(
-        () => {
+    // this.saveTimer =
+    //   window.setTimeout(
+    //     () => {
 
-          this.setPagePosition(
-            pageId,
-            // host.scrollTop
-            scrollTop
-          );
+    //       this.setPagePosition(
+    //         pageId,
+    //         // host.scrollTop
+    //         scrollTop
+    //       );
 
-          const history =
-            this.sessionStateService.getPageHistory(pageId);
+    //       // this.sessionStateService.setPagePosition(pageId, scrollTop, isBrowser());
 
-          console.log(
-            `[ScrollRestore] onScroll`,
-            `${pageId} history=`, history
-          );
+    //       const history = this.sessionStateService.getPageHistory(pageId);
 
-        },
-        // 200
-        100
-      );
+    //       console.log(
+    //         `[ScrollRestore] onScroll`,
+    //         `${pageId} history=`, history
+    //       );
+
+    //     },
+    //     // 200
+    //     100
+    //   );
 
   };
 
