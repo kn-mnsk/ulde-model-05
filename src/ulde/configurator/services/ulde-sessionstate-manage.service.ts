@@ -136,11 +136,11 @@ export class UldeSessionstateManageService {
         `\n[Debug: called from ${debug}]` :
         '';
 
-    console.log(
-      `Debug: [${this.title}]`,
-      `\n\twriteSessionState call finished`,
-      `\n\tDebug message=`, debugMsg,
-    );
+    // console.log(
+    //   `Debug: [${this.title}]`,
+    //   `\n\twriteSessionState call finished`,
+    //   `\n\tDebug message=`, debugMsg,
+    // );
 
   }
 

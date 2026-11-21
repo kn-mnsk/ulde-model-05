@@ -31,9 +31,7 @@ import {
   ULDETocEntry,
 } from '@ulde/types';
 
-import { ULDEPagePosition, UldeSessionstateManageService } from '@ulde/configurator';
-
-import { isBrowser } from '../../../app/global.utils/global.utils';
+import { UldeSessionstateManageService } from '@ulde/configurator';
 
 
 @Injectable({
@@ -54,6 +52,7 @@ export class UldeScrollspyService {
 
   $viewerTocRef =
     signal<ElementRef<HTMLElement> | undefined>(undefined);
+
   readonly $isParentActive = computed(() => {
     const toc = this.$toc();
     const active = this.$activeHeading();
@@ -71,7 +70,7 @@ export class UldeScrollspyService {
   ) { }
 
   observe(
-    host: HTMLElement,
+    host: HTMLElement, //scroll container: hostContainerRef.nativeElement of UldeVierwer,
     ctx: ULDEExecutionContext
   ): void {
 
@@ -90,13 +89,12 @@ export class UldeScrollspyService {
     const sections =
       host.querySelectorAll(
         '[data-section-id]'
-        // 'section'
-        // 'data-section-id'
       );
 
     // console.log(
-    //   `Log: [UldeScrollspyService] observeSections \nsections=\n`,
-    //   sections
+    //   `Log: [UldeScrollspyService]`,
+    //   `\n\tobserveSections`,
+    //   `\n\t sections=`, sections
     // );
 
     this.sectionObserver =
@@ -108,8 +106,11 @@ export class UldeScrollspyService {
           ),
         {
           root: host,
+          // rootMargin:
+          //   '-20% 0px -60% 0px',
+          // threshold: 0
           rootMargin:
-            '-20% 0px -60% 0px',
+            '0px 0px 0px 0px',
           threshold: 0
         }
       );
@@ -144,8 +145,11 @@ export class UldeScrollspyService {
           ),
         {
           root: host,
+          // rootMargin:
+          //   '-20% 0px -60% 0px',
+          // threshold: 0
           rootMargin:
-            '-20% 0px -60% 0px',
+            '0px 0px 0px 0px',
           threshold: 0
         }
       );
@@ -219,6 +223,16 @@ export class UldeScrollspyService {
       }
     )
 
+    // console.log(
+    //   `Log: [UldeScrollspyService]`,
+    //   `\n\tonSctionIntersection`,
+    //   `\n\t pageId=`, ctx.page.pageId,
+    //   `\n\t active SectionId=`, active.target,
+    //   `\n\t archiveSectionId=`, sectionId,
+    //   `\n\tentries=`, entries
+    // );
+
+
   }
 
   private onAnchorIntersection(
@@ -264,8 +278,17 @@ export class UldeScrollspyService {
       }
     );
 
-  }
 
+    // console.log(
+    //   `Log: [UldeScrollspyService]`,
+    //   `\n\tonAnchorIntersection`,
+    //   `\n\t pageId=`, ctx.page.pageId,
+    //   `\n\t active anchorId=`, active.target,
+    //   `\n\t archiveAnchorId=`, anchorId,
+    //   `\n\tentries=`, entries
+    // );
+
+  }
 
   private updateNavigationArtifact(
     ctx: ULDEExecutionContext,
@@ -293,17 +316,29 @@ export class UldeScrollspyService {
 
     if (!archiveAnchorId || !archiveSectionId) return;
 
-    queueMicrotask(() => {
+    this.$activeHeading.set(archiveAnchorId);
+    // this.$activeHeading.set(archiveSectionId);
 
-      // actvate and hightlight
-      this.detectScrollEnd(host, () => {
-        this.activateClickedTocItem(tree, archiveAnchorId);
-      });
+    // console.log(
+    //   `Log: [UldeScrollspyService] hightLightIntersectingTocItem()`,
+    //   `\n\archiveAnchorId=`, archiveAnchorId,
+    //   `\n\archiveSectionId=`, archiveSectionId
+    // );
 
-    });
+
+    // this.$activeHeading.set(archiveAnchorId);
+    // this.$activeHeading.set(archiveSectionId);
+
+    // queueMicrotask(() => {
+
+    //   // actvate and hightlight
+    //   this.detectScrollEnd(host, () => {
+    //     this.activateClickedTocItem(tree, archiveAnchorId);
+    //   });
+
+    // });
 
   };
-
 
   private activateClickedTocItem(
     tree: ULDETocNode[],
@@ -344,11 +379,11 @@ export class UldeScrollspyService {
         const lastScrollTop =
           Number(this.lastScrollTop.toFixed(2));
 
-        console.log(
-          `Log: [UldeScrollspyService] detectScrollEnd()`,
-          `\n\tfinal end=`, lastScrollTop,
-          `\n\tounter=`, counter
-        );
+        // console.log(
+        //   `Log: [UldeScrollspyService] detectScrollEnd()`,
+        //   `\n\tfinal end=`, lastScrollTop,
+        //   `\n\tounter=`, counter
+        // );
 
         callback();
 
@@ -362,7 +397,6 @@ export class UldeScrollspyService {
 
     requestAnimationFrame(check);
   }
-
 
   isParentOfActive(
     item: ULDETocEntry,
@@ -379,7 +413,7 @@ export class UldeScrollspyService {
     return item.depth < active.depth && toc.indexOf(item) < activeIndex;
   }
 
-  isAncestor(
+  private isAncestor(
     node: ULDETocNode,
     activeSlug: string | null
   ): boolean {
@@ -431,13 +465,13 @@ export class UldeScrollspyService {
       });
 
       // scroll to headng, and highlight
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.scrollIntoView({ behavior: 'auto', block: 'start' });
       this.highlightElement(el as HTMLElement);
 
     });
 
   }
-
 
   private highlightElement(el: HTMLElement) {
     const parent = el.parentElement ?? el;
@@ -450,10 +484,6 @@ export class UldeScrollspyService {
     );
 
   }
-
-
-
-
 
   // Build TOC tree
   /**
@@ -497,142 +527,5 @@ export class UldeScrollspyService {
 
     return root;
   }
-
-
-  // private persistSessionState(
-  //   pageId: string,
-  //   partial: Partial<ULDEPagePosition>
-  // ): void {
-
-  //   const sessionState =
-  //     readSessionState(
-  //       isBrowser()
-  //     );
-
-  //   sessionState.pagePositions ??= {};
-
-  //   const current =
-  //     sessionState.pagePositions[pageId] ?? {
-  //       scrollTop: 0
-  //     };
-
-  //   sessionState.pagePositions[pageId] = {
-  //     ...current,
-  //     ...partial
-  //   };
-
-  //   writeSessionState(
-  //     sessionState,
-  //     isBrowser(),
-  //     '[UldeScrollService] persistSessionState()'
-  //   );
-
-  // }
-
-
-
-  // /**
-  //  *
-  //  * @param ctx
-  //  * @param sectionId
-  //  * @returns
-  //  *
-  //  * note: later for activeNachor implementation
-  //  */
-  // private updateActiveSection(
-  //   ctx: ULDEExecutionContext,
-  //   sectionId: string
-  // ) {
-
-  //   if (!ctx.artifacts.navigation) return;
-
-  //   ctx.artifacts.navigation = {
-
-  //     ...ctx.artifacts.navigation,
-
-  //     activeSectionId: sectionId
-  //   };
-
-  //   this.persistSection(ctx.page.pageId, sectionId);
-
-  // }
-
-
-  // private persistSection(
-  //   pageId: string,
-  //   sectionId: string
-  // ) {
-
-  //   const state =
-  //     readSessionState(
-  //       isBrowser()
-  //     );
-
-  //   state.pagePositions ??= {};
-
-  //   state.pagePositions[pageId] ??= {
-  //     scrollTop: 0
-  //   };
-
-  //   state.pagePositions[
-  //     pageId
-  //   ].archiveSectionId = sectionId;
-
-  //   writeSessionState(
-  //     state,
-  //     isBrowser()
-  //   );
-  // }
-
-  // private updateActiveAnchor(
-  //   ctx: ULDEExecutionContext,
-  //   anchorId: string
-  // ): void {
-
-
-  //   if (!ctx.artifacts.navigation) return;
-
-  //   ctx.artifacts.navigation = {
-
-  //     ...ctx.artifacts.navigation,
-
-  //     activeAnchorId:
-  //       anchorId
-  //   };
-
-  //   this.persistAnchor(
-  //     ctx.page.pageId,
-  //     anchorId
-  //   );
-
-  // }
-
-  // private persistAnchor(
-  //   pageId: string,
-  //   anchorId: string
-  // ): void {
-
-  //   const state =
-  //     readSessionState(
-  //       isBrowser()
-  //     );
-
-  //   state.pagePositions ??= {};
-
-  //   state.pagePositions[pageId] ??= {
-  //     scrollTop: 0
-  //   };
-
-  //   state.pagePositions[
-  //     pageId
-  //   ].archiveAnchorId =
-  //     anchorId;
-
-  //   writeSessionState(
-  //     state,
-  //     isBrowser()
-  //   );
-  // }
-
 
 }

@@ -10,8 +10,8 @@
         <p>Markdown Documentation System - ULDE Model 05</p>
       </div>
       <div class="header-button-container">
-        <button (click)="onBackToPrevPage()">
-          Back to Previous Page <br>&nbsp;{{$prevPageId()}}
+        <button (click)="onBackToPrevPage()" [title]=`${$prevPageId()}`>
+          Back to Previous Page
         </button>
       </div>
     </header>
