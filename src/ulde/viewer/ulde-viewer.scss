@@ -19,11 +19,15 @@
 //   // overflow: hidden;
 // }
 
-.ulde-viewer-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+:root {
+  position: fixed;
+  // overflow: hidden;
   height: 100vh;
+}
+
+.ulde-viewer-container {
+  position: relative;
+  flex: 1;
 
   background: var(--bg-color);
   color: var(--text-color);
@@ -83,43 +87,42 @@
 .ulde-viewer-body {
   position: relative;
   display: flex;
-  flex: 1;
-  padding: 10px 10px;
+  // flex: 1;
+  // padding: 10px 10px;
   height: 85vh; //calc(100vh - 120px);
+  overflow: hidden;
+  background: var(--bg-color);
+  transition: background-color 0.4s ease;
 
 }
 
 // Viewer TOC
 .ulde-viewer-toc {
-  position: relative;
-  display: flex;
-  flex-direction: column;
   /* anchor for resizer + overlay */
-  // z-index: var(--z-base);
-  width: 200px;
-  ;
-  // width: fit-content;
-  // min-width: 150px;
-  max-width: 300px;
-
-  // height: 90%;
-  height: auto;
+  position: relative;
+  z-index: var(--z-base);
+  width: 250px;
+  min-width: 200px;
+  max-width: 350px;
   padding-left: 5px;
   padding-right: 5px;
-  // overflow: hidden;
+  // height: 90%;
+  height: auto;
+  overflow: hidden;
+
+
   /* wrapper scrolls now */
-  font-size: 12px;
-  border: 1px solid var(--ap-border);
+  font-size: 13px;
   border-right: 3px solid var(--ap-border);
-  // background: var(--bg-color);
-  // color: var(--text-color);
+  background: var(--bg-color);
+  color: var(--text-color);
   cursor: default;
-  // margin: 0px 5px;
+  margin: 0px 5px;
 
   transition:
-    background-color 0.6s ease,
-    color 0.6s ease,
-    border-color 0.6s ease;
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease;
 
   a {
     display: inline-table;
@@ -153,19 +156,37 @@
   }
 }
 
+.ulde-viewer-toc-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+  z-index: var(--z-overlay);
+  /* ABOVE wrapper */
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+
+}
+
 
 /*toc scroll container*/
 .toc-host-container {
   position: relative;
-  // z-index: var(--z-scroll-content);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 0;
-  height: 90%;
+  z-index: var(--z-scroll-content);
+  /* anchor for overlay */
+  overflow-y: auto;
+  height: 90%; //calc(90vh - 200px);//calc(85vh - 160px);
+  padding-right: 6px;
 
-  // border: 1px solid var(--ap-border);
-  overflow: auto; // only scroll container
+  z-index: 1;
 }
 
 
@@ -178,7 +199,6 @@
   padding-left: 5px;
   margin: 0;
 }
-
 
 .toc-item {
   list-style: none;
@@ -235,23 +255,6 @@
   align-items: center;
   gap: 4px;
 
-  // &:hover {
-  //   color: var(--link-hover-color);
-  //   text-decoration: underline;
-  // }
-
-  // a {
-  //   display: inline-table;
-  //   color: var(--link-color);
-  //   transition: color 1.0s ease;
-
-  //   &:hover {
-  //     color: var(--link-hover-color);
-  //     text-decoration: underline;
-  //   }
-  // }
-
-
 }
 
 .toc-collapse-btn {
@@ -280,27 +283,33 @@
 
 // Viewer Main
 .ulde-viewer-main {
+  position: relative;
+
   display: flex;
   flex-direction: column;
-  // background: var(--bg-color);
-  // color: var(--text-color);
-  width: fit-content;
-  min-width: 600px;
+  flex: 1;
+  z-index: var(--z-base);
+  overflow: hidden;
+  // padding: 2rem;
   border: 1px solid var(--ap-border);
-  // padding: 10px;
-  height: auto;
-  // transition:
-  //   background-color 0.4s ease,
-  //   color 0.4s ease,
-  //   border-color 0.4s ease;
+  background: var(--bg-color);
+  color: var(--text-color);
+
+  min-width: 0; // new
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+
 
   /* progress bar*/
   .markdown-progress-bar {
-    display: flex;
-    flex-direction: column;
+    // display: flex;
+    // flex-direction: column;
+
     // flex: 1;
+    position: relative;
     width: 100%;
-    height: 0.5vh;
+    height: 1.0vh;
     background: #bab1b1;
 
     .progress-bar_fill {
@@ -314,21 +323,18 @@
 
   /* markdown host container*/
   .markdown-host-container {
-    // position: relative;
+    position: relative; // ensure overlay absolute works
+    z-index: var(--z-scroll-content);
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 0;
     height: 100%;
 
-    // border: 1px solid var(--ap-border);
     overflow: auto; // only scroll container
 
     /*markdwon host overlay*/
     .markdown-host-overlay {
       position: absolute;
       inset: 0;
-      // background: var(--bg-color);
+      background: var(--bg-color);
       opacity: 0;
       pointer-events: none;
       transition: opacity 180ms ease-out;
@@ -346,19 +352,26 @@
 
     /*markdown host*/
     .markdown-host {
-      display: flex;
-      flex-direction: column;
-      // flex: 1;
-      min-height: 0;
-      padding: 10px;
-
+      position: relative;
+      z-index: var(--z-scroll-content);
+      flex: 1;
+      padding: 10px 10px;
       width: 100%;
-      // min-height: 400px;
 
     }
 
   }
 
+}
+
+/* Ensure headings don't hide under the fixed header */
+.markdown-host h1,
+.markdown-host h2,
+.markdown-host h3,
+.markdown-host h4,
+.markdown-host h5,
+.markdown-host h6 {
+  scroll-margin-top: 50px; // 80 original adjust if needed
 }
 
 
