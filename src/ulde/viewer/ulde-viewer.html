@@ -10,8 +10,11 @@
         <p>Markdown Documentation System - ULDE Model 05</p>
       </div>
       <div class="header-button-container">
-        <button (click)="onBackToPrevPage()" [title]=`${$prevPageId()}`>
-          Back to Previous Page
+        <button (click)="loadPage($prevPageId())" [title]=`${$prevPageId()}`>
+          <strong>←</strong> Previous Page
+        </button>
+        <button (click)="loadPage('docs/index')" title="docs/index">
+          Index Page<strong>→</strong>
         </button>
       </div>
     </header>

@@ -57,19 +57,17 @@ export class UldeConfigurator implements
     return { id: this.$pageId(), reload: this.$reload() };
   })
 
+  private readonly defaultRendererState: ULDERendererState = {
+    modelId: 'ulde-demo-05',
+    variantId: 'default',
+    zoom: 1,
+    rotation: { x: 0, y: 0, z: 0 },
 
-  $rendererState =
-    signal<ULDERendererState>(
-      {
-        modelId: 'ulde-demo-05',
-        variantId: 'default',
-        zoom: 1,
-        rotation: { x: 0, y: 0, z: 0 },
+    executionContext: undefined,
+    devtoolsSnapshot: undefined
+  };
 
-        executionContext: undefined,
-        devtoolsSnapshot: undefined
-      }
-    );
+  $rendererState = signal<ULDERendererState | null>(null);
 
   // $devtoolsSnapshot =
   //   computed<ULDEDevtoolsSnapshot | undefined>(() => this.$rendererState()?.devtoolsSnapshot);
@@ -115,8 +113,9 @@ export class UldeConfigurator implements
       this.debugCounter++;
 
       console.log(
-        `[UldeConfigurator] effect debug count\n\t`,
-        this.debugCounter
+        `[UldeConfigurator]`,
+        `\n\teffect()`,
+        `\n\tdebug count=`, this.debugCounter
       );
 
       if (this.debugCounter > 20) {
@@ -152,28 +151,23 @@ export class UldeConfigurator implements
 
   ngAfterViewInit() {
 
-    console.log(
-      `[UldeConfigurator]`,
-      `\n\tngAfterViewInit() Begin`
-    );
-
-    if (
-      !isBrowser() ||
-      !this.configuratorRef
-    )
-      return;
-
-
-    // this.configuratorRef.nativeElement.addEventListener( //Note: does not work!
-    // document.addEventListener(
-    //   'keydown',
-    //   this.handleKeydown
+    // console.log(
+    //   `[UldeConfigurator]`,
+    //   `\n\tngAfterViewInit() Begin`
     // );
 
-    console.log(
-      `[UldeConfigurator]`,
-      `\n\tngAfterViewInit() End`
-    );
+    // if (
+    //   !isBrowser() ||
+    //   !this.configuratorRef
+    // )
+    //   return;
+
+    // console.log(
+    //   `[UldeConfigurator]`,
+    //   `\n\tngAfterViewInit() End`
+    // );
+
+
   }
 
   ngOnDestroy() {
@@ -242,24 +236,19 @@ export class UldeConfigurator implements
     };
 
     // $rendererState update
-    const newState = this.$rendererState();
+    const newState = { ...this.defaultRendererState, executionContext };
 
-    newState.executionContext =
-      executionContext;
+    newState.devtoolsSnapshot ??= {} as ULDEDevtoolsSnapshot;
 
-    newState.devtoolsSnapshot ??=
-      {} as ULDEDevtoolsSnapshot;
+    newState.devtoolsSnapshot.executionContext = executionContext;
 
-    newState.devtoolsSnapshot.executionContext =
-      executionContext;
-
-    this.$rendererState.
-      update(state =>
-      ({
-        ...state,
-        ...newState
-      })
-      );
+    this.$rendererState.set(newState);
+    // update(state =>
+    // ({
+    //   ...state,
+    //   ...newState
+    // })
+    // );
 
     // console.log(
     //   `Log: [${this.component}] ngAfterViewInit \n rendererState:`,
@@ -278,13 +267,15 @@ export class UldeConfigurator implements
 
     if (!pageId) return;
 
-    if (pageId === this.$pageId()) {
+    // wap curentt page to prev page, and new page to current page...
+    this.pageRestore.swapPage(pageId);
 
+    if (pageId === this.$pageId()) {
+      // this.$reload.update(n => n + 1);
       return;
     }
 
-    // wap curentt page to prev page, and new page to current page...
-    this.pageRestore.swapPage(pageId)
+
 
     /**
      * invoke effect =>
@@ -296,10 +287,11 @@ export class UldeConfigurator implements
     );
 
 
-    // console.log(
-    //   `Log: [${this.component}] onViewerStateChanged state=`,
-    //   state
-    // );
+    console.log(
+      `Log: [${this.component}]`,
+      `\n\tonRndererStateChange()`,
+      `\n\tRenderer State=`, state
+    );
 
   }
 

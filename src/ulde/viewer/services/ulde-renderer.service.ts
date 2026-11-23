@@ -36,25 +36,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ULDERendererService {
 
-  private handle: ULDERendererHandle | null = null;
-
-  // init(
-  //   host: ElementRef<HTMLElement>,
-  //   size: { width: number; height: number },
-  //   events?: ULDERendererEvents
-  // ): void {
-  //   const config: ULDERendererConfig = {
-  //     container: host.nativeElement,
-  //     width: size.width,
-  //     height: size.height,
-  //     backgroundColor: '#ffffff'
-  //   };
-
-  //   this.handle =
-  //     this.createUldeRendererHandle(config, events);
-
-  //   events?.onReady?.();
-  // }
+  private rendererHandle: ULDERendererHandle | null = null;
 
   init(
     rendererState: ULDERendererState,
@@ -70,7 +52,7 @@ export class ULDERendererService {
       backgroundColor: '#ffffff'
     };
 
-    this.handle =
+    this.rendererHandle =
       this.createUldeRendererHandle(
         rendererState,
         config,
@@ -80,30 +62,28 @@ export class ULDERendererService {
     events?.onReady?.();
   }
 
-
-
   setState(
     partial: Partial<ULDERendererState>
   ): void {
-    this.handle?.setState(partial);
+    this.rendererHandle?.setState(partial);
   }
 
   getState(): ULDERendererState | null {
 
-    return this.handle ? this.handle.getState() : null;
+    return this.rendererHandle ? this.rendererHandle.getState() : null;
   }
 
   highlightDiagnostic(
     message: string
   ): void {
 
-    this.handle?.highlightDiagnostic(message);
+    this.rendererHandle?.highlightDiagnostic(message);
   }
 
   dispose(): void {
 
-    this.handle?.dispose();
-    this.handle = null;
+    this.rendererHandle?.dispose();
+    this.rendererHandle = null;
   }
 
   private createUldeRendererHandle(
@@ -111,16 +91,6 @@ export class ULDERendererService {
     config: ULDERendererConfig,
     events?: ULDERendererEvents
   ): ULDERendererHandle {
-
-    // let state: ULDERendererState = {
-    //   modelId: '',
-    //   variantId: undefined,
-    //   zoom: 1,
-    //   rotation: { x: 0, y: 0, z: 0 },
-
-    //   executionContext: undefined,
-    //   devtoolsSnapshot: undefined
-    // };
 
     // initial placeholder
     const host = config.container;
@@ -307,6 +277,7 @@ export class ULDERendererService {
     //   // container.addEventListener('ulde:navigate', handleNavigate);
     // }
 
+    let currentRendererState!: ULDERendererState;
 
     return {
 
@@ -314,14 +285,14 @@ export class ULDERendererService {
         partial: Partial<ULDERendererState>
       ): void {
 
-        rendererState = {
+        currentRendererState = {
           ...rendererState,
           ...partial
         };
 
-        if (rendererState.executionContext !== undefined) {
+        if (currentRendererState.executionContext !== undefined) {
           // if (partial.executionContext !== undefined) {
-          renderFromContext(rendererState.executionContext?.render);
+          renderFromContext(currentRendererState.executionContext?.render);
 
           // internal docrouting
           // config.container.addEventListener('ulde:navigate', (e: any) => {
@@ -351,11 +322,11 @@ export class ULDERendererService {
         //   renderFrameInfo(state.frame);
         // }
 
-        events?.onStateChange?.(rendererState);
+        events?.onStateChange?.(currentRendererState);
       },
 
       getState() {
-        return rendererState;
+        return currentRendererState;
       },
 
 
@@ -371,6 +342,28 @@ export class ULDERendererService {
         // delete config.container.dataset['uldeFrameTimestamp'];
       }
     };
+  }
+
+
+  // VS Code auto-expand logic
+  updateTocCollapseState(
+    tree: ULDETocNode[],
+    activeSlug: string | null
+  ): void {
+
+    const visit = (node: ULDETocNode): boolean => {
+
+      const isSelfActive = node.entry.id === activeSlug;
+
+      const children = node.children as ULDETocNode[] ?? [];
+      const hasActiveDesc = children.some(child => visit(child)) ?? false;
+
+      node.collapsed = !(isSelfActive || hasActiveDesc);
+
+      return isSelfActive || hasActiveDesc;
+    };
+
+    tree.forEach(root => visit(root));
   }
 
 }
