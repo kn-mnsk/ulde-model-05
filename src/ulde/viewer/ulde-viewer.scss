@@ -65,12 +65,17 @@
   }
 
   .header-button-container {
+    // position: relative;
+    display: flex;
+    flex-direction: column;
     align-content: center;
     width: fit-content;
 
     button {
       text-align: center;
       border-radius: 10px;
+      margin-top: 3px;;
+      margin-bottom: 3px;;
       transition:
         all 0.8s ease-in-out;
 

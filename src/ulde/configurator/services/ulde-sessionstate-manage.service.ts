@@ -235,15 +235,16 @@ export class UldeSessionstateManageService {
     // in case of undefined state.pageHistories
     state.pageHistories ??= {};
 
-    const currentHistory
-      = state.pageHistories[pageId] ?? {
-        scrollTop: 0
-      };
+    state.pageHistories[pageId] ?? {
+      scrollTop: 0
+    };
 
-    state.pageHistories[pageId] =
-    {
-      ...currentHistory,
-      ...{ scrollTop: scrollTop } };
+    state.pageHistories[pageId].scrollTop = scrollTop;
+    
+    // {
+    //   ...currentHistory,
+    //   ...{ scrollTop: scrollTop }
+    // };
 
 
     this.writeSessionState(
@@ -284,24 +285,27 @@ export class UldeSessionstateManageService {
     };
 
     // swap and set
-
-    const newState = {
+    const swapped = {
       pageId: newPageId,
       prevPageId: state.pageId ?? '',
       scrollTop: state.pageHistories[newPageId].scrollTop,
       prevScrollTop: state.scrollTop ?? '',
-      pagePositions: state.pageHistories
+      pageHistories: state.pageHistories
     };
+
+    console.log(`Log: [${this.title}]`,
+      `\n\tswapPage()`,
+      '\n\tswapped=', swapped,
+    );
+
+    const newState = { ...state, swapped };
 
 
     this.writeSessionState(
-      {
-        ...state,
-        ...newState
-      },
+      newState,
       isBrowser(),
 
-      `[${this.title}] updateStateByNewPageId()'`
+      // `[${this.title}] swapPage() \n\t${JSON.stringify(newState)}'`
     )
 
   }

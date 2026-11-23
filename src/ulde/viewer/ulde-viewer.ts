@@ -58,10 +58,10 @@ export class UldeViewer implements
 
 
   // Full renderer state comes in as a signal input
-  $rendererState = input.required<ULDERendererState>();
+  $inputRendererState = input.required<ULDERendererState | null>();
 
   $currentRendererState = computed(() =>
-    this.$rendererState()
+    this.$inputRendererState()
   );
 
   $pageId = computed(() =>
@@ -96,6 +96,7 @@ export class UldeViewer implements
     computed<ULDEDevtoolsSnapshot | undefined>(() => this.$currentRendererState()?.devtoolsSnapshot);
 
   // event handler
+  private keyDownEvent!: any;
   private handleKeydown!: (e: KeyboardEvent) => void;
 
   private debugCounter: number = 0;
@@ -110,7 +111,7 @@ export class UldeViewer implements
     private themeService: UldeThemeService,
   ) {
 
-    this.handleKeydown = this.onKeyDown;
+    // this.handleKeydown = this.onKeyDown;
 
     // 🔥1 React to change of $rendererState()
     effect(() => {
@@ -119,8 +120,9 @@ export class UldeViewer implements
       this.debugCounter++;
 
       console.log(
-        `[UldeConfigurator] effect`,
-        `\n\tdebug count`, this.debugCounter
+        `[UldeViewer]`,
+        `\n\teffect()`,
+        `\n\tdebug count=`, this.debugCounter
       );
 
       if (this.debugCounter > 20) {
@@ -129,48 +131,93 @@ export class UldeViewer implements
       }
       /** debug */
 
-      const rendererState =
-        this.$rendererState();
+
+      const currentRendererState =
+        this.$currentRendererState();
+      const executionContext
+        = currentRendererState?.executionContext;
 
       // console.log(
-      //   `[UldeConfigurator] effect`,
-      //   `\n\trendererState=`, rendererState
+      //   `[UldeViewer]`,
+      //   `\n\teffect()`,
+      //   `\n\tcurrentRendererState=`, currentRendererState
       // );
 
       if (
-        !rendererState ||
-        !rendererState.executionContext
-      )
-        return;
+        !currentRendererState ||
+        !executionContext
+      ) return;
 
       if (
         !this.hostRef ||
         !this.hostContainerRef ||
         !this.viewerTocRef
-      )
-        return;
+      ) return;
 
+      // 1. overlay on
+      this.overlayService.show(this.viewerTocRef);
+      this.overlayService.show(this.markdownHostOverlayRef);
 
-      this.$tocResizeRef.set(this.viewerTocRef);
+      // 2. update spapshot
+      currentRendererState.devtoolsSnapshot = this.devtoolsService.$generateDevtoolsSnapshot(executionContext)();
 
-      this.syncSignalInput(rendererState);
-
-      this.navigationRuntimeService.bind(
-        this.hostContainerRef.nativeElement,
-        rendererState.executionContext
+      // 3. set rendererState
+      this.rendererService.init(
+        currentRendererState,
+        this.hostRef,
+        {
+          width: this.hostRef.nativeElement.clientWidth,
+          height: this.hostRef.nativeElement.clientHeight,
+        },
+        {
+          onReady: () => this.$ready.emit(),
+          onError: (e) => this.$error.emit(e),
+          onStateChange: (s) => this.$rendererStateChange.emit(s),
+        },
       );
 
-      this.scrollSpy.disconnect();
+      // // 4. recover previous pageId
+      // this.$prevPageId.set(
+      //   this.pageRestore.getPrevPageId()
+      // );
 
+      // 5. set TOC
+      const toc = executionContext.artifacts.toc;
+      this.$toc.set(toc);
+      //
+
+      // 6. Toc layout rezizer setting
+      this.$tocResizeRef.set(this.viewerTocRef);
+
+      // 7. set rendererStae
+      currentRendererState.executionContext = executionContext;
+
+      this.rendererService.setState(currentRendererState);
+
+      // 4. recover previous pageId
+      this.$prevPageId.set(
+        this.pageRestore.getPrevPageId()
+      );
+
+
+      // 8. scrollspy setting through intersetionobserver
+      this.scrollSpy.disconnect();
       this.scrollSpy.observe(
         this.hostContainerRef.nativeElement,
-        rendererState.executionContext
+        executionContext
       );
 
       this.scrollTracking(
         this.hostContainerRef.nativeElement,
-        rendererState.executionContext,
+        executionContext,
       );
+
+      // 9. seeting intrapage link to hight linked anchor
+      this.navigationRuntimeService.bind(
+        this.hostContainerRef.nativeElement,
+        executionContext
+      );
+
 
 
       console.log(
@@ -193,32 +240,12 @@ export class UldeViewer implements
         return;
       }
 
-      this.updateTocCollapseState(tree, active);
+      this.rendererService.updateTocCollapseState(tree, active);
 
     });
 
   }
 
-  // VS Code auto-expand logic
-  private updateTocCollapseState(
-    tree: ULDETocNode[],
-    activeSlug: string | null
-  ): void {
-
-    const visit = (node: ULDETocNode): boolean => {
-
-      const isSelfActive = node.entry.id === activeSlug;
-
-      const children = node.children as ULDETocNode[] ?? [];
-      const hasActiveDesc = children.some(child => visit(child)) ?? false;
-
-      node.collapsed = !(isSelfActive || hasActiveDesc);
-
-      return isSelfActive || hasActiveDesc;
-    };
-
-    tree.forEach(root => visit(root));
-  }
 
   ngOnInit(): void { }
 
@@ -227,38 +254,20 @@ export class UldeViewer implements
 
     if (!isBrowser()) return;
 
-    this.overlayService.show(this.viewerTocRef);
-    this.overlayService.show(this.markdownHostOverlayRef);
 
-    this.rendererService.init(
-      this.$currentRendererState(),
-      this.hostRef,
-      {
-        width: this.hostRef.nativeElement.clientWidth,
-        height: this.hostRef.nativeElement.clientHeight,
-      },
-      {
-        onReady: () => this.$ready.emit(),
-        onError: (e) => this.$error.emit(e),
-        onStateChange: (s) => this.$rendererStateChange.emit(s),
-      },
+    // event listner to open devtools
+    document.removeEventListener(
+      'keydown',
+      this.handleKeydown
     );
-
-    this.$prevPageId.set(
-      this.pageRestore.getPrevPageId()
-    );
-
-
-    // this.viewerContainerRef.nativeElement.addEventListener( //Note: does not work!
-    // document.removeEventListener(
-    //   'keydown',
-    //   this.handleKeydown
-    // );
+    this.handleKeydown = () => { };
+    this.handleKeydown = this.onKeyDown;
     document.addEventListener(
       'keydown',
       this.handleKeydown
     );
 
+    // overlay off
     this.overlayService.hide(this.viewerTocRef);
     this.overlayService.hide(this.markdownHostOverlayRef);
 
@@ -276,9 +285,11 @@ export class UldeViewer implements
 
 
     this.handleKeydown = (e: Event): void => { };
-    this.onKeyDown.bind(null);
+    // this.onKeyDown.bind(null);
 
-    // console.log(`Log: []UldeViewer ngOnDestroy Completed`);
+    console.log(`Log: [UldeViewer]`,
+      `\n\tngOnDestroy Completed`
+    );
   }
 
   private syncSignalInput(
@@ -348,25 +359,28 @@ export class UldeViewer implements
 
   }
 
-  onBackToPrevPage() {
+  backToPrevPage() {
     // console.log(`[UldeViewer] onBackToPrevPage 1`);
 
     const newPageId = this.$prevPageId();// prevPageId becomes newPageId
-    if (!newPageId) return;
-
-    const currentRendererState =
-      this.$currentRendererState();
-
-    if (
-      !currentRendererState ||
-      !currentRendererState.executionContext
-    ) return;
+    // if (!newPageId) return;
 
 
-    currentRendererState.executionContext.page.pageId
-      = newPageId;
+    this.loadPage(newPageId);
 
-    this.syncSignalInput(currentRendererState);
+    // const currentRendererState =
+    //   this.$currentRendererState();
+
+    // if (
+    //   !currentRendererState ||
+    //   !currentRendererState.executionContext
+    // ) return;
+
+
+    // currentRendererState.executionContext.page.pageId
+    //   = newPageId;
+
+    // this.syncSignalInput(currentRendererState);
 
     // console.log(
     //   `[UldeViewer] onBackToPrevPage 🔄️`,
@@ -378,9 +392,9 @@ export class UldeViewer implements
 
   private onKeyDown = (e: KeyboardEvent) => {
 
-    console.log(
-      `[UldeConfigurator] onKeyDown`
-    );
+    // console.log(
+    //   `[UldeConfigurator] onKeyDown`
+    // );
 
     if (
       e.ctrlKey &&
@@ -423,10 +437,45 @@ export class UldeViewer implements
 
 
   // Theme toggle
-  async onToggleTheme(theme: ThemeName) {
+  async onToggleTheme(theme: ThemeName): Promise<void> {
     this.themeService.toggleTheme(theme);
 
-    this.rendererService.setState(this.$currentRendererState());
+    const currentRedererState =
+      this.$currentRendererState();
+    if (!currentRedererState) return;
+    this.rendererService.setState(currentRedererState);
+
+  }
+
+  loadPage(pageId: string | null): void {
+
+    if (!pageId) {
+      console.error(`[UldeViewer]`,
+        `\n\tloadPage()`,
+        `\n\tInvalid PageId=`, pageId,
+      );
+      return;
+    };
+
+    const currentRendererState =
+      this.$currentRendererState();
+
+    if (
+      !currentRendererState ||
+      !currentRendererState.executionContext
+    ) return;
+
+
+    currentRendererState.executionContext.page.pageId = pageId;
+
+    // this.syncSignalInput(currentRendererState);
+    this.rendererService.setState(currentRendererState);
+
+    console.log(
+      `[UldeViewer] loadPage`,
+      `\nnew pageId=`, pageId,
+      `\nprev Page=`, this.$prevPageId()
+    );
 
   }
 
