@@ -1,4 +1,5 @@
 // src/ulde/plugins/system/navigation/ulde-internal-link.plugin.ts
+import { computed } from '@angular/core';
 
 import { ULDEPluginInstance, ULDEPluginKind } from "@ulde/types/plugin";
 
@@ -19,6 +20,7 @@ export class UldeInterPageLinkPlugin implements
   ): Promise<void> {
 
     if (ctx.lifecyclePhase !== 'hydrate') return;
+    // if (ctx.lifecyclePhase !== 'afterRender') return;
     if (!ctx.render) return;
     if (!isBrowser()) return;
 
@@ -37,61 +39,68 @@ export class UldeInterPageLinkPlugin implements
       return;
     }
 
-    requestAnimationFrame(() => {
+    const interPageLinks = markdownHost.querySelectorAll(
+      'a[href^="#pageId:docs/"]'
+    );
 
-      const interPageLinks =
-        markdownHost.querySelectorAll(
-          `a[href^="#pageId:docs/"]`
-        );
 
-      // console.log(
-      //   `Log: [UldeInterPageLinkPlugin]`,
-      //   `\n\tInterPage Routing`,
-      //   `\n\tinterPageLinks=`, interPageLinks,
-      //   `\n\tmarkdownContainer=`, markdownHost
-      // );
 
-      requestAnimationFrame(() => {
+    // console.log(
+    //   `Log: [UldeInternalLinkPlugin]`,
+    //   `\n\tinterPageLinks=`, interPageLinks,
+    //   `\n\tmarkdown host=`, markdownHost,
 
-        // console.log(
-        //   `Log: [UldeInternalLinkPlugin]`,
-        //   `\n\tinterPageLinks=`, interPageLinks,
-        // );
+    // );
 
-        interPageLinks.forEach(a => {
-          a.addEventListener('click', (e: Event) => {
+    // requestAnimationFrame(() => {
+    //   requestAnimationFrame(() => {
+    setTimeout(() => {
+      interPageLinks.forEach(a => {
+        // $interPageLinks().forEach(a => {
+        a.addEventListener('click', (e: Event) => {
 
-            e.preventDefault();
+          e.preventDefault();
 
-            const href = a.getAttribute('href')!;
-            const pageId = href.replace('#pageId:', '');
+          const href = a.getAttribute('href')!;
+          const pageId = href.replace('#pageId:', '');
 
-            const rect = a.getBoundingClientRect();
-            const containerRect = markdownHost.getBoundingClientRect();
-            const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+          const rect = a.getBoundingClientRect();
+          const containerRect = markdownHost.getBoundingClientRect();
+          const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
 
-            console.log(
-              `Log: [UldeInternalLinkPlugin]`,
-              `\n\tInterPage Routing pageId=`, pageId,
-              `\n\tanchoPos=`, anchorPos
-            );
+          console.log(
+            `Log: [UldeInternalLinkPlugin]`,
+            `\n\tInterPage Routing pageId=`, pageId,
+            `\n\tanchoPos=`, anchorPos
+          );
 
-            const InterPageLinkEvent =
-              new CustomEvent('ulde:interpagelink', {
-                detail: {
-                  pageId: pageId,
-                  scrollTop: anchorPos,
-                },
-                bubbles: true
-              });
+          const InterPageLinkEvent =
+            new CustomEvent('ulde:interpagelink', {
+              detail: {
+                pageId: pageId,
+                scrollTop: anchorPos,
+              },
+              bubbles: true
+            });
 
-            markdownHost.dispatchEvent(InterPageLinkEvent);
+          markdownHost.dispatchEvent(InterPageLinkEvent);
 
-          });
         });
       });
+    },
+      3000
+    );
 
-    });
+    console.log(
+      `Log: [UldeInternalLinkPlugin]`,
+      `\n\tinterPageLinks=`, interPageLinks,
+      `\n\tmarkdown host=`, markdownHost,
+    );
+
+    //   });
+    // });
+
+    console.log(`[UldeInterPageLinkPlugin] Finished`);
 
   }
 

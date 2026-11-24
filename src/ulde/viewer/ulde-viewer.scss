@@ -74,8 +74,10 @@
     button {
       text-align: center;
       border-radius: 10px;
-      margin-top: 3px;;
-      margin-bottom: 3px;;
+      margin-top: 3px;
+      ;
+      margin-bottom: 3px;
+      ;
       transition:
         all 0.8s ease-in-out;
 
@@ -203,6 +205,7 @@
   list-style: none;
   padding-left: 5px;
   margin: 0;
+
 }
 
 .toc-item {
@@ -212,7 +215,9 @@
   a {
     text-decoration: none;
     color: var(--text-color);
+
   }
+
 }
 
 /* Active heading */
@@ -325,49 +330,62 @@
     }
 
   }
+}
 
-  /* markdown host container*/
-  .markdown-host-container {
-    position: relative; // ensure overlay absolute works
-    z-index: var(--z-scroll-content);
-    display: flex;
-    height: 100%;
 
-    overflow: auto; // only scroll container
 
-    /*markdwon host overlay*/
-    .markdown-host-overlay {
-      position: absolute;
-      inset: 0;
-      background: var(--bg-color);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 180ms ease-out;
-      z-index: var(--z-overlay);
-      /* ABOVE wrapper */
+/* markdown host container*/
+.markdown-host-container {
+  position: relative; // ensure overlay absolute works
+  z-index: var(--z-scroll-content);
+  display: flex;
+  height: 100%;
 
-      &.visible {
-        opacity: 1;
-      }
+  overflow: auto; // only scroll container
+}
 
-      &.hidden {
-        opacity: 0;
-      }
-    }
+/*markdwon host overlay*/
+.markdown-host-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+  z-index: var(--z-overlay);
+  /* ABOVE wrapper */
 
-    /*markdown host*/
-    .markdown-host {
-      position: relative;
-      z-index: var(--z-scroll-content);
-      flex: 1;
-      padding: 10px 10px;
-      width: 100%;
-
-    }
-
+  &.visible {
+    opacity: 1;
   }
 
+  &.hidden {
+    opacity: 0;
+  }
 }
+
+/*markdown host*/
+.markdown-host {
+  position: relative;
+  z-index: var(--z-scroll-content);
+  flex: 1;
+  padding: 10px 10px;
+  width: 100%;
+
+  // // // a[title]:hover {
+  // ul a:hover::after {
+  //   content: attr(data-title);
+  //   position: absolute;
+  //   top: -100%;
+  //   left: 0;
+  //   scale: 1.1;
+  //   background-color: aquamarine;
+  //   z-index: 100;
+  //   width: 250px;
+  // }
+
+}
+
 
 /* Ensure headings don't hide under the fixed header */
 .markdown-host h1,
@@ -377,6 +395,8 @@
 .markdown-host h5,
 .markdown-host h6 {
   scroll-margin-top: 50px; // 80 original adjust if needed
+
+
 }
 
 

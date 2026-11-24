@@ -131,6 +131,7 @@ export class UldeViewer implements
       }
       /** debug */
 
+      if (!isBrowser()) return;
 
       const currentRendererState =
         this.$currentRendererState();
@@ -155,8 +156,8 @@ export class UldeViewer implements
       ) return;
 
       // 1. overlay on
-      this.overlayService.show(this.viewerTocRef);
-      this.overlayService.show(this.markdownHostOverlayRef);
+      // this.overlayService.show(this.viewerTocRef);
+      // this.overlayService.show(this.markdownHostOverlayRef);
 
       // 2. update spapshot
       currentRendererState.devtoolsSnapshot = this.devtoolsService.$generateDevtoolsSnapshot(executionContext)();
@@ -267,9 +268,29 @@ export class UldeViewer implements
       this.handleKeydown
     );
 
+
     // overlay off
     this.overlayService.hide(this.viewerTocRef);
     this.overlayService.hide(this.markdownHostOverlayRef);
+
+
+
+//test
+    const container: HTMLElement| null = document.querySelector('div.markdown-host');
+    const nodes = container?.querySelectorAll('a[href^="#pageId:"]');
+
+    // container?.childNodes.forEach(child => {
+    //   console.log(`debug`,child.nodeName);
+    // })
+
+    console.log(
+      `Log: [UldeViewer]`,
+      `\n\tcontainer=`, container,
+      nodes,
+
+    );
+
+//test
 
   }
 

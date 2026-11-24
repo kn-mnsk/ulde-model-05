@@ -102,6 +102,19 @@ a {
   }
 }
 
+// to be checked
+// .markdown-host a[data-title]:hover::after {
+//   content: attr(data-title);
+//   position: absolute;
+//   top: -100%;
+//   left: 0;
+//   scale: 1.1;
+//   background-color: aquamarine;
+
+//   color: var(white);
+//   z-index: 100;
+//   width: 250px;
+// }
 
 /* ---------------------------------------------------------
    Global UI elements

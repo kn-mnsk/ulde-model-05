@@ -90,14 +90,18 @@ export function renderUldeAstToHtml(nodes: ULDEAstNode[]): string {
       }
 
       case 'interPageLink': {
-
+        // console.log(`Log: [AstRenderer] intraPagelLink \nnode=`, node);
         const href = escapeHtml(node.href ?? '');
+        // const href = ` href="${escapeHtml(node.href ?? '')}"`;
 
         const title = node.title
           ? ` title="${escapeHtml(node.title)}"`
-          : '';
-
+          // : '';
+          : ` title="interPageLink: ${href.replace('#pageId:', '')}"`;
+        // :  ` data-title="${href.replace('#pageId:', '')}"`;
+        // const style = ` style="color: red;"`
         buf.push(`<a href="${href}"${title}>`);
+        // buf.push(`<a href="${href}"${title}${style}>`);
 
         node.children?.forEach(renderNode);
 
