@@ -44,6 +44,7 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
     () => new ULDEDemoPlugin(),
     () => new ULDEDummyTestPlugin(),
     () => new ULDENavigationBreadcrumbsPlugin(),
+
   ],
 
   // Layout: operate on AST structure (sections, anchors, TOC)
@@ -54,7 +55,6 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
 
   // Interactive: operate on rendered HTML / DOM
   hydrate: [
-    () => new UldeInterPageLinkPlugin(),
     () => new ULDEPlaygroundInjectorPlugin(),
     () => new UldeMermaidPlugin(
       new UldeThemeService(
@@ -62,6 +62,9 @@ export const ULDE_PLUGIN_REGISTRY: ULDEPluginRegistryMap = {
       )
     ),
     () => new UldeKatexPlugin(),
+
+    () => new UldeInterPageLinkPlugin(),
+
   ],
 
   // ULDE system: diagnostics, overlay, performance analysis

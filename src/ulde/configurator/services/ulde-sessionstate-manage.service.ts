@@ -201,7 +201,7 @@ export class UldeSessionstateManageService {
 
   /**
    * pagePositions[pageId].scrollTop = scrollTop
-   * @param pageId
+   * @param pageId - current pageId as key
    * @param scrollTop
    * @param isBrowser
    */
@@ -215,14 +215,14 @@ export class UldeSessionstateManageService {
       this.readSessionState(isBrowser);
 
 
-    state.prevPageId =
-      state.pageId;
+    // state.prevPageId =
+    //   state.pageId;
 
-    state.prevScrollTop =
-      state.scrollTop;
+    // state.prevScrollTop =
+    //   state.scrollTop;
 
-    state.pageId =
-      pageId;
+    // state.pageId =
+    //   pageId;
 
     state.scrollTop =
       scrollTop;
@@ -240,7 +240,7 @@ export class UldeSessionstateManageService {
     };
 
     state.pageHistories[pageId].scrollTop = scrollTop;
-    
+
     // {
     //   ...currentHistory,
     //   ...{ scrollTop: scrollTop }

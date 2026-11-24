@@ -91,7 +91,7 @@
       <!-- &nbsp; -->
       }
 
-      <a (click)="scrollTo(hostRef.nativeElement, node.entry.id)">
+      <a (click)="scrollTo(hostRef.nativeElement, node.entry.id)" [title]="'intraPageLink: '+ node.entry.id">
         {{ node.entry.text }}
       </a>
     </div>

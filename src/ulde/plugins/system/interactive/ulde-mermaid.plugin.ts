@@ -164,7 +164,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
           {
             level: "info",
             lifecyclePhase: ctx.lifecyclePhase,
-            message: `selector 'code.language-mermaid' not found in 'markdown-host'`,
+            message: `marmaidNodes: length=${mermaidNodes.length} in  \nselector 'code.language-mermaid' not found in this pageId(${ctx.page.pageId})`,
             pluginKind: this.pluginKind,
             pluginName: this.pluginName
           }
@@ -356,7 +356,7 @@ export class UldeMermaidPlugin implements ULDEPluginInstance {
           startScale: 0.6,
           startX: -100,
           // startY: -50,
-          
+
         }
       );
 
